@@ -38,8 +38,33 @@ The proxy DLL sits in the game's executable directory. Because Windows prioritiz
 
 ---
 
+## Debugging & Logging
+
+The proxy features a centralized, high-performance logging system designed for DebugView or similar kernel-mode debuggers.
+
+### Features
+
+- **Unified Tagging:** All log entries are prefixed with `[D3D11_PROXY]`.
+- **Contextual Info:** Every log line includes a high-resolution timestamp and the name of the calling function.
+- **Detailed Parameter Dumps:** Tracks API calls with their respective return values (`HRESULT`) and arguments.
+
+### Enabling Logging
+
+Logging is disabled by default in standard builds to ensure maximum performance.
+Set the Solution Configuration to `Release_Logging` in order to enable it.
+
+### Using DebugView
+
+To see the logs in real-time:
+
+1. Run **DebugView** (Sysinternals).
+2. Go to `Capture` → `Capture Win32`.
+3. Set a filter (`Ctrl+L`) with `Include: [D3D11_PROXY]*` to isolate proxy logs from system noise.
+
+---
+
 ## Installation & Usage
 
 1. Copy the compiled `d3d11.dll` to the folder containing the game's `.exe`.
-2. *(Optional)* Use a tool like **DebugView** to monitor `trace()` outputs if logging is enabled.
+2. *(Optional)* Use a tool like **DebugView** to monitor debug outputs if logging is enabled.
 3. Start the game normally.
