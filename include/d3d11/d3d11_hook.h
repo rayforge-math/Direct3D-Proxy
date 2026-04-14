@@ -58,7 +58,7 @@ namespace d3d11 {
 		OpenAdapter10_2_i
 	};
 
-	void hook_exports();
+	BOOL hook_exports();
 	BOOL unhook_exports();
 
 	FARPROC dx_func(func_index idx);

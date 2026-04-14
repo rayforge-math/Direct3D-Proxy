@@ -1,4 +1,5 @@
 #include "d3d11/d3d11_hook.h"
+#include "debug.h"
 #include <string>
 
 namespace d3d11 {
@@ -64,44 +65,68 @@ namespace d3d11 {
 		"OpenAdapter10_2"
 	};
 
-    void hook_exports()
-    {
-        char sysDir[MAX_PATH];
-
-        // path to sys32
-        if (GetSystemDirectoryA(sysDir, MAX_PATH) == 0) {
-            MessageBoxA(NULL, "System32 could not be found!", "Error", MB_ICONERROR);
-            exit(0);
-        }
-
-        std::string path = std::string(sysDir) + "\\" + filename;
-
-        // load actual directx dll
-        chain = LoadLibraryA(path.c_str());
-
-        if (!chain)
-        {
-            std::string errorMsg = "Error loading original DLL: " + path;
-            MessageBoxA(NULL, errorMsg.c_str(), "Proxy Error", MB_ICONERROR);
-            exit(0);
-        }
-
-        // cache all function pointers
-        int count = 0;
-        for (int i = 0; i < func_count; i++)
-        {
-            FARPROC func = GetProcAddress(chain, func_names[i]);
-            if (func)
-            {
-                count++;
-            }
-            functions[i] = func;
-        }
-    }
-
-	BOOL unhook_exports() 
+	BOOL hook_exports()
 	{
-		return BOOL(!!FreeLibrary(chain));
+		char sysDir[MAX_PATH];
+
+		// path to sys32
+		if (GetSystemDirectoryA(sysDir, MAX_PATH) == 0) {
+			MessageBoxA(NULL, "System32 could not be found!", "Error", MB_ICONERROR);
+			return FALSE;
+		}
+
+		std::string path = std::string(sysDir) + "\\" + filename;
+		LOG_VARS(S_OK, path);
+
+		// load actual directx dll
+		chain = LoadLibraryA(path.c_str());
+
+		if (!chain)
+		{
+			std::string errorMsg = "Error loading original DLL: " + path;
+			LOG_MSG(errorMsg);
+			MessageBoxA(NULL, errorMsg.c_str(), "Proxy Error", MB_ICONERROR);
+			exit(0);
+		}
+
+		// cache all function pointers
+		int count = 0;
+		for (int i = 0; i < func_count; i++)
+		{
+			FARPROC func = GetProcAddress(chain, func_names[i]);
+			if (func)
+			{
+				count++;
+			}
+			else
+			{
+				LOG_VARS(E_FAIL, i, func_names[i]);
+			}
+			functions[i] = func;
+		}
+
+		LOG_VARS(S_OK, func_count, count);
+
+		return (count > 0);
+	}
+
+	BOOL unhook_exports()
+	{
+		if (chain)
+		{
+			BOOL result = FreeLibrary(chain);
+			if (result) {
+				LOG_MSG("Original DLL released successfully.");
+				chain = nullptr;
+			}
+			else {
+				LOG_VARS(E_FAIL, chain);
+			}
+			return result;
+		}
+
+		LOG_MSG("unhook_exports called, but chain was already null.");
+		return TRUE;
 	}
 
 	FARPROC dx_func(func_index idx)
