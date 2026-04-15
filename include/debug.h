@@ -1,17 +1,42 @@
+#pragma once
+
+#include "logger.h"
+#include "globals.h"
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 
 #include <windows.h>
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
+#include <string_view>
+#include <charconv>
 
 namespace debug {
 
 #ifdef ENABLE_PROXY_LOGGING
 
+    template<typename... Args>
+    inline void log_msg(const char* func_name, Args... args) {
+        logger::build_and_log<false>(globals::name, func_name, args...);
+    }
+
+    template<typename... Args>
+    inline void log_params(const char* func_name, Args... args) {
+        logger::build_and_log<true>(globals::name, func_name, args...);
+    }
+
+    template<typename... Args>
+    inline void log_result(const char* func_name, HRESULT hr, Args... args) {
+        char hexbuf[16];
+        auto [ptr, ec] = std::to_chars(hexbuf, hexbuf + sizeof(hexbuf), (uint32_t)hr, 16);
+
+        std::string_view status = SUCCEEDED(hr) ? " [OK]" : " [FAILED]";
+
+        log_msg(func_name, "Result: 0x", std::string_view(hexbuf, ptr - hexbuf), status, args...);
+    }
+
+    /*
     inline std::string get_time() {
         SYSTEMTIME st;
         GetLocalTime(&st);
@@ -58,53 +83,59 @@ namespace debug {
     }
 
     inline void log_api(const char* func_name, HRESULT hr) {
-        char buffer[256];
-        sprintf_s(buffer, "Result: 0x%08X [%s]\n",
-            (unsigned int)hr, SUCCEEDED(hr) ? "OK" : "FAILED");
-        trace_out(func_name, buffer);
-    }
-
-    template<typename... Args>
-    inline void log_params(const char* func_name, HRESULT hr, Args... args) {
         std::stringstream ss;
-        ss << "(";
-        format_args(ss, args...);
-        ss << " ) | Result: 0x" << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << (unsigned int)hr << "\n";
+        ss << "Result: 0x"
+            << std::hex << std::uppercase << std::setw(8) << std::setfill('0')
+            << (unsigned int)hr
+            << " [" << (SUCCEEDED(hr) ? "OK" : "FAILED") << "]\n";
         trace_out(func_name, ss.str());
     }
 
-#endif // ENABLE_PROXY_LOGGING
+    template<typename... Args>
+    inline void log_params(const char* func_name, Args... args) {
+        std::stringstream ss;
+        ss << "(";
+        format_args(ss, args...);
+        ss << " )\n";
+        trace_out(func_name, ss.str());
+    }
+    */
 
-} // debug
+#endif // ENABLE_PROXY_LOGGING
+}
 
 #ifdef ENABLE_PROXY_LOGGING
 
-    #define EXPAND(x) x
+#define EXPAND(x) x
 
-    #define V1(v1) #v1, v1
-    #define V2(v1, v2) #v1, v1, #v2, v2
-    #define V3(v1, v2, v3) #v1, v1, #v2, v2, #v3, v3
-    #define V4(v1, v2, v3, v4) #v1, v1, #v2, v2, #v3, v3, #v4, v4
-    #define V5(v1, v2, v3, v4, v5) #v1, v1, #v2, v2, #v3, v3, #v4, v4, #v5, v5
-    #define V6(v1, v2, v3, v4, v5, v6) #v1, v1, #v2, v2, #v3, v3, #v4, v4, #v5, v5, #v6, v6
-    #define V7(v1, v2, v3, v4, v5, v6, v7) #v1, v1, #v2, v2, #v3, v3, #v4, v4, #v5, v5, #v6, v6, #v7, v7
-    #define V8(v1, v2, v3, v4, v5, v6, v7, v8) #v1, v1, #v2, v2, #v3, v3, #v4, v4, #v5, v5, #v6, v6, #v7, v7, #v8, v8
-    #define V9(v1, v2, v3, v4, v5, v6, v7, v8, v9) #v1, v1, #v2, v2, #v3, v3, #v4, v4, #v5, v5, #v6, v6, #v7, v7, #v8, v8, #v9, v9
-    #define V10(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) #v1, v1, #v2, v2, #v3, v3, #v4, v4, #v5, v5, #v6, v6, #v7, v7, #v8, v8, #v9, v9, #v10, v10
+#define FE_1(WHAT, X) WHAT(X)
+#define FE_2(WHAT, X, ...) WHAT(X), EXPAND(FE_1(WHAT, __VA_ARGS__))
+#define FE_3(WHAT, X, ...) WHAT(X), EXPAND(FE_2(WHAT, __VA_ARGS__))
+#define FE_4(WHAT, X, ...) WHAT(X), EXPAND(FE_3(WHAT, __VA_ARGS__))
+#define FE_5(WHAT, X, ...) WHAT(X), EXPAND(FE_4(WHAT, __VA_ARGS__))
+#define FE_6(WHAT, X, ...) WHAT(X), EXPAND(FE_5(WHAT, __VA_ARGS__))
+#define FE_7(WHAT, X, ...) WHAT(X), EXPAND(FE_6(WHAT, __VA_ARGS__))
+#define FE_8(WHAT, X, ...) WHAT(X), EXPAND(FE_7(WHAT, __VA_ARGS__))
+#define FE_9(WHAT, X, ...) WHAT(X), EXPAND(FE_8(WHAT, __VA_ARGS__))
+#define FE_10(WHAT, X, ...) WHAT(X), EXPAND(FE_9(WHAT, __VA_ARGS__))
 
-    #define GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,NAME,...) NAME
+#define GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,NAME,...) NAME
 
-    #define LOG_VARS(hr, ...) \
-            EXPAND(debug::log_params(__FUNCTION__, hr, \
-                EXPAND(GET_MACRO(__VA_ARGS__, V10, V9, V8, V7, V6, V5, V4, V3, V2, V1)(__VA_ARGS__))))
+#define FOR_EACH(action, ...) \
+        EXPAND(GET_MACRO(__VA_ARGS__, FE_10, FE_9, FE_8, FE_7, FE_6, FE_5, FE_4, FE_3, FE_2, FE_1)(action, __VA_ARGS__))
 
-    #define LOG_RESULT(hr)  debug::log_api(__FUNCTION__, hr)
-    #define LOG_MSG(...)    debug::log_msg(__FUNCTION__, __VA_ARGS__)
+#define EXPAND_PAIR(v) #v, v
+
+#define LOG_VARS(...) \
+        EXPAND(debug::log_params(__FUNCTION__, FOR_EACH(EXPAND_PAIR, __VA_ARGS__)))
+
+#define LOG_RESULT(hr, ...)     debug::log_result(__FUNCTION__, hr, __VA_ARGS__)
+#define LOG_MSG(...)            debug::log_msg(__FUNCTION__, __VA_ARGS__)
 
 #else
 
-    #define LOG_VARS(hr, ...)
-    #define LOG_API(hr)
-    #define LOG_MSG(...)
+#define LOG_VARS(hr, ...)
+#define LOG_API(hr)
+#define LOG_MSG(...)
 
 #endif // ENABLE_PROXY_LOGGING

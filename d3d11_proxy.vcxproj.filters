@@ -21,7 +21,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\debug.h">
+    <ClInclude Include="include\logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\dllmain.h">
@@ -32,6 +32,12 @@
     </ClInclude>
     <ClInclude Include="include\d3d11\d3d11_impl.h">
       <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\debug.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -76,7 +76,7 @@ namespace d3d11 {
 		}
 
 		std::string path = std::string(sysDir) + "\\" + filename;
-		LOG_VARS(S_OK, path);
+		LOG_VARS(path);
 
 		// load actual directx dll
 		chain = LoadLibraryA(path.c_str());
@@ -84,19 +84,18 @@ namespace d3d11 {
 		if (!chain)
 		{
 			std::string errorMsg = "Error loading original DLL: " + path;
-			LOG_MSG(errorMsg);
 			MessageBoxA(NULL, errorMsg.c_str(), "Proxy Error", MB_ICONERROR);
 			exit(0);
 		}
 
 		// cache all function pointers
-		int count = 0;
+		int found = 0;
 		for (int i = 0; i < func_count; i++)
 		{
 			FARPROC func = GetProcAddress(chain, func_names[i]);
 			if (func)
 			{
-				count++;
+				found++;
 			}
 			else
 			{
@@ -105,9 +104,9 @@ namespace d3d11 {
 			functions[i] = func;
 		}
 
-		LOG_VARS(S_OK, func_count, count);
+		LOG_VARS(func_count, found);
 
-		return (count > 0);
+		return (found > 0);
 	}
 
 	BOOL unhook_exports()
@@ -116,7 +115,6 @@ namespace d3d11 {
 		{
 			BOOL result = FreeLibrary(chain);
 			if (result) {
-				LOG_MSG("Original DLL released successfully.");
 				chain = nullptr;
 			}
 			else {
@@ -125,11 +123,10 @@ namespace d3d11 {
 			return result;
 		}
 
-		LOG_MSG("unhook_exports called, but chain was already null.");
 		return TRUE;
 	}
 
-	FARPROC dx_func(func_index idx)
+	extern "C" inline FARPROC dx_func(func_index idx)
 	{
 		return functions[idx];
 	}

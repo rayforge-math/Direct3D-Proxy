@@ -61,6 +61,6 @@ namespace d3d11 {
 	BOOL hook_exports();
 	BOOL unhook_exports();
 
-	FARPROC dx_func(func_index idx);
+	extern "C" inline FARPROC dx_func(func_index idx);
 
 } // namespace d3d11
