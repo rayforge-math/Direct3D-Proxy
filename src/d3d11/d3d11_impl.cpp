@@ -9,7 +9,7 @@
 #include "d3d11/d3d11_hook.h"
 
 /**
- * @file d3d11_proxy_main.cpp
+ * @file d3d11_impl.cpp
  * @brief D3D11 Kernel-Mode Thunk Proxy Implementation
  * @section Calling Convention Integrity
  * IMPORTANT: This implementation strictly adheres to the __stdcall (WINAPI)
@@ -21,13 +21,16 @@
  * @subsection Stack Stability & Casting
  * As long as the function signature in the typedef is correct, local variable
  * allocation within these proxy functions does not compromise stack integrity.
- * The C++ compiler automatically manages the stack frame (prologue/epilogue),
- * ensuring that parameters are correctly passed and the stack pointer is restored.
+ * The C++ compiler automatically manages the stack frame (prologue/epilogue).
+ * @note COMPILER OPTIMIZATION:
+ * In optimized builds (Release), simple local variables or function pointers (like 'fn')
+ * are often stored directly in registers. This further reduces stack overhead
+ * and ensures that the transition to the original DLL is as lightweight as possible.
  * @example Safe Implementation (Correct Signature):
  * @code
  * typedef NTSTATUS (WINAPI* D3DKMTDestroyContext_t)(const D3DKMT_DESTROYCONTEXT*);
  * HRESULT WINAPI D3DKMTDestroyContext_() {
- *      int a = 10; // Safe: Compiler manages stack offset for local vars
+ *      int a = 10;                                 // Safe: Compiler manages stack offset or uses a register
  *      auto fn = dx_func(D3DKMTDestroyContext_i);
  *      return (HRESULT)((D3DKMTDestroyContext_t)fn)((D3DKMT_DESTROYCONTEXT*)nullptr);
  * }
@@ -36,14 +39,14 @@
  * @code
  * typedef NTSTATUS (WINAPI* D3DKMTDestroyContext_WRONG_t)(); // Missing params!
  * HRESULT WINAPI D3DKMTDestroyContext_() {
- *      char buffer[256] = {0}; // Dangerous: Stack offset changed manually
- *      auto fn = dx_func(D3DKMTDestroyContext_i);
- *      return (HRESULT)((D3DKMTDestroyContext_WRONG_t)fn)(); // Crash: Wrong stack alignment
+ *      char buffer[256] = {0};                     // Dangerous: Stack pointer will point to wrong address
+ *      auto fn = dx_func(D3DKMTDestroyContext_i);  // Usually safe: fn will most likely be stored in a register
+ *      return (HRESULT)((D3DKMTDestroyContext_WRONG_t)fn)(); // Crash: Invalid stack/register state
  * }
  * @endcode
- * Mismatched calling conventions or incorrect signatures will result in
+ * * Mismatched calling conventions or incorrect signatures will result in
  * stack corruption, leading to immediate application crashes.
- * @see https://learn.microsoft.com/en-us/cpp/cpp/argument-passing-and-naming-conventions?view=msvc-170
+ * * @see https://learn.microsoft.com/en-us/cpp/cpp/argument-passing-and-naming-conventions?view=msvc-170
  */
 
 namespace d3d11 {
