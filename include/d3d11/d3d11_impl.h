@@ -147,11 +147,11 @@ namespace d3d11 {
          * runtime to recognize and initialize optional layers (such as the Debug
          * or D3D11On12 layers). It is called during the early stages of device
          * initialization.
-         * @param unknown0 [in] Opaque pointer to the layer registration data.
-         * @param unknown1 [in] Internal versioning or configuration flags.
+         * @param pLayerInfo [in] Opaque pointer to the layer registration data.
+         * @param LayerCount [in] Internal versioning or configuration flags.
          * @return HRESULT Returns S_OK if the layers were registered successfully.
          */
-        HRESULT WINAPI D3D11CoreRegisterLayers_(const void* unknown0, DWORD unknown1);
+        HRESULT WINAPI D3D11CoreRegisterLayers_(const void* pLayerInfo, DWORD LayerCount);
 
         typedef HRESULT(WINAPI* D3D11CoreCreateLayeredDevice_t)(
             const void*,
@@ -166,19 +166,19 @@ namespace d3d11 {
          * which allow for features like the SDK Debug Layer or the D3D11On12
          * translation layer. It is a lower-level entry point than the standard
          * device creation APIs.
-         * @param unknown0 [in]  Opaque pointer to internal layer data.
-         * @param unknown1 [in]  Internal flags or bitmask for layer configuration.
-         * @param unknown2 [in]  Opaque pointer to secondary layer configuration.
-         * @param riid     [in]  The GUID of the interface being requested (usually ID3D11Device).
-         * @param ppvObj   [out] Returns the created layered device or object.
+         * @param pLayerContexts [in]  Opaque pointer to internal layer data.
+         * @param ContextCount   [in]  Internal flags or bitmask for layer configuration.
+         * @param pDeviceDesc    [in]  Opaque pointer to secondary layer configuration.
+         * @param riid           [in]  The GUID of the interface being requested (usually ID3D11Device).
+         * @param ppvDevice      [out] Returns the created layered device or object.
          * @return HRESULT Standard Direct3D return codes.
          */
         HRESULT WINAPI D3D11CoreCreateLayeredDevice_(
-            const void* unknown0,
-            DWORD unknown1,
-            const void* unknown2,
+            const void* pLayerContexts,
+            DWORD ContextCount,
+            const void* pDeviceDesc,
             REFIID riid,
-            void** ppvObj
+            void** ppvDevice
         );
 
         typedef SIZE_T(WINAPI* D3D11CoreGetLayeredDeviceSize_t)(const void*, DWORD);
@@ -187,11 +187,11 @@ namespace d3d11 {
          * Part of the internal D3D11 layer infrastructure. This function calculates
          * the allocation size necessary to house the internal data structures for
          * a specific set of device layers.
-         * @param unknown0 [in] Opaque pointer to internal layer configuration data.
-         * @param unknown1 [in] Internal flags or bitmask associated with the layers.
+         * @param pLayerContexts    [in] Opaque pointer to internal layer configuration data.
+         * @param ContextCount      [in] Internal flags or bitmask associated with the layers.
          * @return SIZE_T The required size in bytes for the layered device structure.
          */
-        SIZE_T WINAPI D3D11CoreGetLayeredDeviceSize_(const void* unknown0, DWORD unknown1);
+        SIZE_T WINAPI D3D11CoreGetLayeredDeviceSize_(const void* pLayerContexts, DWORD unknown1);
 
         // ============================================================================
         // SECTION 2: D3D11On12 & Interop APIs

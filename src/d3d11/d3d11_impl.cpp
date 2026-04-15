@@ -44,9 +44,9 @@
  *      return (HRESULT)((D3DKMTDestroyContext_WRONG_t)fn)(); // Crash: Invalid stack/register state
  * }
  * @endcode
- * * Mismatched calling conventions or incorrect signatures will result in
+ * Mismatched calling conventions or incorrect signatures will result in
  * stack corruption, leading to immediate application crashes.
- * * @see https://learn.microsoft.com/en-us/cpp/cpp/argument-passing-and-naming-conventions?view=msvc-170
+ * @see https://learn.microsoft.com/en-us/cpp/cpp/argument-passing-and-naming-conventions?view=msvc-170
  */
 
 namespace d3d11 {
@@ -210,7 +210,7 @@ namespace d3d11 {
             return result;
         }
 
-        HRESULT WINAPI D3D11CoreRegisterLayers_(const void* unknown0, DWORD unknown1)
+        HRESULT WINAPI D3D11CoreRegisterLayers_(const void* pLayerInfo, DWORD LayerCount)
         {
             /**
              * @note INTERNAL IMPLEMENTATION:
@@ -222,31 +222,30 @@ namespace d3d11 {
              * effectively breaking features like the DirectX Debug Layer.
              */
 
-            HRESULT result = D3D11CoreRegisterLayers_t(dx_func(D3D11CoreRegisterLayers_i))(unknown0, unknown1);
+            HRESULT result = D3D11CoreRegisterLayers_t(dx_func(D3D11CoreRegisterLayers_i))(pLayerInfo, LayerCount);
             return result;
         }
 
         HRESULT WINAPI D3D11CoreCreateLayeredDevice_(
-            const void* unknown0,
-            DWORD unknown1,
-            const void* unknown2,
+            const void* pLayerContexts,
+            DWORD ContextCount,
+            const void* pDeviceDesc,
             REFIID riid,
-            void** ppvObj)
+            void** ppvDevice)
         {
             /**
              * @note INTERNAL IMPLEMENTATION:
-             * This function uses undocumented parameters ('unknown0', 'unknown1', 'unknown2').
              * These are vital for the internal D3D11 "Layer" infrastructure.
              * Interference here is dangerous; any modification to these pointers
              * without deep knowledge of the specific Windows build's runtime
              * will likely result in an immediate crash or device loss.
              */
 
-            HRESULT result = D3D11CoreCreateLayeredDevice_t(dx_func(D3D11CoreCreateLayeredDevice_i))(unknown0, unknown1, unknown2, riid, ppvObj);
+            HRESULT result = D3D11CoreCreateLayeredDevice_t(dx_func(D3D11CoreCreateLayeredDevice_i))(pLayerContexts, ContextCount, pDeviceDesc, riid, ppvDevice);
             return result;
         }
 
-        SIZE_T WINAPI D3D11CoreGetLayeredDeviceSize_(const void* unknown0, DWORD unknown1)
+        SIZE_T WINAPI D3D11CoreGetLayeredDeviceSize_(const void* pLayerContexts, DWORD ContextCount)
         {
             /**
              * @note INTERNAL IMPLEMENTATION:
@@ -258,7 +257,7 @@ namespace d3d11 {
              * device memory.
              */
 
-            SIZE_T result = D3D11CoreGetLayeredDeviceSize_t(dx_func(D3D11CoreGetLayeredDeviceSize_i))(unknown0, unknown1);
+            SIZE_T result = D3D11CoreGetLayeredDeviceSize_t(dx_func(D3D11CoreGetLayeredDeviceSize_i))(pLayerContexts, ContextCount);
             return result;
         }
 
