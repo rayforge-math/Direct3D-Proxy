@@ -14,65 +14,6 @@ namespace d3d11 {
     extern "C" {
 
         // ============================================================================
-        // DIRECT3D 11 PROXY DLL - MODULE ARCHITECTURE & TABLE OF CONTENTS
-        // ============================================================================
-        //
-        // [1] DIRECT3D 11 PUBLIC & CORE APIs
-        //     - D3D11CreateDevice_
-        //     - D3D11CreateDeviceAndSwapChain_
-        //     - D3D11CoreCreateDevice_
-        //     - D3D11CoreRegisterLayers_
-        //     - D3D11CoreCreateLayeredDevice_
-        //     - D3D11CoreGetLayeredDeviceSize_
-        //
-        // [2] D3D11ON12 & INTEROP APIs
-        //     - D3D11CreateDeviceForD3D12_
-        //     - D3D11On12CreateDevice_
-        //     - CreateDirect3D11DeviceFromDXGIDevice_
-        //     - CreateDirect3D11SurfaceFromDXGISurface_
-        //
-        // [3] USER-MODE DRIVER & INITIALIZATION
-        //     - OpenAdapter10_
-        //     - OpenAdapter10_2_
-        //     - EnableFeatureLevelUpgrade_
-        //
-        // [4] D3D PERFORMANCE TOOLING
-        //     - D3DPerformance_BeginEvent_
-        //     - D3DPerformance_EndEvent_
-        //     - D3DPerformance_SetMarker_
-        //     - D3DPerformance_GetStatus_
-        //
-        // [5] KERNEL-MODE THUNKS (D3DKMT)
-        //     A. Adapter & Device Management:
-        //        - D3DKMTOpenAdapterFromHdc_, D3DKMTQueryAdapterInfo_, D3DKMTCreateDevice_, 
-        //          D3DKMTGetDeviceState_, D3DKMTDestroyDevice_, D3DKMTCloseAdapter_
-        //
-        //     B. Context & Scheduling:
-        //        - D3DKMTCreateContext_, D3DKMTGetContextSchedulingPriority_, 
-        //          D3DKMTSetContextSchedulingPriority_, D3DKMTDestroyContext_
-        //
-        //     C. Allocation & Resource Management:
-        //        - D3DKMTCreateAllocation_, D3DKMTQueryResourceInfo_, D3DKMTOpenResource_, 
-        //          D3DKMTGetSharedPrimaryHandle_, D3DKMTLock_, D3DKMTUnlock_, 
-        //          D3DKMTQueryAllocationResidency_, D3DKMTSetAllocationPriority_, 
-        //          D3DKMTDestroyAllocation_
-        //
-        //     D. Rendering & Display:
-        //        - D3DKMTSetVidPnSourceOwner_, D3DKMTSetDisplayMode_, 
-        //          D3DKMTSetDisplayPrivateDriverFormat_, D3DKMTSetGammaRamp_, 
-        //          D3DKMTRender_, D3DKMTPresent_, D3DKMTGetDisplayModeList_, 
-        //          D3DKMTGetMultisampleMethodList_, D3DKMTWaitForVerticalBlankEvent_
-        //
-        //     E. Synchronization:
-        //        - D3DKMTCreateSynchronizationObject_, D3DKMTSignalSynchronizationObject_, 
-        //          D3DKMTWaitForSynchronizationObject_, D3DKMTDestroySynchronizationObject_
-        //
-        //     F. System & Misc:
-        //        - D3DKMTEscape_, D3DKMTGetRuntimeData_
-        //
-        // ============================================================================
-
-        // ============================================================================
         // SECTION 1: DIRECT3D 11 PUBLIC & CORE APIs
         // ============================================================================
 

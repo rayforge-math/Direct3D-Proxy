@@ -8,7 +8,123 @@
 #include "d3d11/d3d11_impl.h"
 #include "d3d11/d3d11_hook.h"
 
+/**
+ * @file d3d11_proxy_main.cpp
+ * @brief D3D11 Kernel-Mode Thunk Proxy Implementation
+ * @section Calling Convention Integrity
+ * IMPORTANT: This implementation strictly adheres to the __stdcall (WINAPI)
+ * calling convention.
+ * Because this proxy utilizes "blind forwarding" (casting function pointers
+ * and invoking them without explicit parameter manipulation in C++), it relies
+ * on the CPU registers (RCX, RDX, etc. on x64) and the stack being managed
+ * exactly as the original system DLL expects.
+ * @subsection Stack Stability & Casting
+ * As long as the function signature in the typedef is correct, local variable
+ * allocation within these proxy functions does not compromise stack integrity.
+ * The C++ compiler automatically manages the stack frame (prologue/epilogue),
+ * ensuring that parameters are correctly passed and the stack pointer is restored.
+ * @example Safe Implementation (Correct Signature):
+ * @code
+ * typedef NTSTATUS (WINAPI* D3DKMTDestroyContext_t)(const D3DKMT_DESTROYCONTEXT*);
+ * HRESULT WINAPI D3DKMTDestroyContext_() {
+ *      int a = 10; // Safe: Compiler manages stack offset for local vars
+ *      auto fn = dx_func(D3DKMTDestroyContext_i);
+ *      return (HRESULT)((D3DKMTDestroyContext_t)fn)((D3DKMT_DESTROYCONTEXT*)nullptr);
+ * }
+ * @endcode
+ * @example Dangerous Implementation (Incorrect/Missing Signature):
+ * @code
+ * typedef NTSTATUS (WINAPI* D3DKMTDestroyContext_WRONG_t)(); // Missing params!
+ * HRESULT WINAPI D3DKMTDestroyContext_() {
+ *      char buffer[256] = {0}; // Dangerous: Stack offset changed manually
+ *      auto fn = dx_func(D3DKMTDestroyContext_i);
+ *      return (HRESULT)((D3DKMTDestroyContext_WRONG_t)fn)(); // Crash: Wrong stack alignment
+ * }
+ * @endcode
+ * Mismatched calling conventions or incorrect signatures will result in
+ * stack corruption, leading to immediate application crashes.
+ * @see https://learn.microsoft.com/en-us/cpp/cpp/argument-passing-and-naming-conventions?view=msvc-170
+ */
+
 namespace d3d11 {
+
+    // ============================================================================
+    // DIRECT3D 11 PROXY DLL - MODULE ARCHITECTURE & TABLE OF CONTENTS
+    // ============================================================================
+    //
+    // [1] DIRECT3D 11 PUBLIC & CORE APIs
+    //     - D3D11CreateDevice_
+    //     - D3D11CreateDeviceAndSwapChain_
+    //     - D3D11CoreCreateDevice_
+    //     - D3D11CoreRegisterLayers_
+    //     - D3D11CoreCreateLayeredDevice_
+    //     - D3D11CoreGetLayeredDeviceSize_
+    //
+    // [2] D3D11ON12 & INTEROP APIs
+    //     - D3D11CreateDeviceForD3D12_
+    //     - D3D11On12CreateDevice_
+    //     - CreateDirect3D11DeviceFromDXGIDevice_
+    //     - CreateDirect3D11SurfaceFromDXGISurface_
+    //
+    // [3] USER-MODE DRIVER & INITIALIZATION
+    //     - OpenAdapter10_
+    //     - OpenAdapter10_2_
+    //     - EnableFeatureLevelUpgrade_
+    //
+    // [4] D3D PERFORMANCE TOOLING
+    //     - D3DPerformance_BeginEvent_
+    //     - D3DPerformance_EndEvent_
+    //     - D3DPerformance_SetMarker_
+    //     - D3DPerformance_GetStatus_
+    //
+    // [5] KERNEL-MODE THUNKS (D3DKMT)
+    //     A. Adapter & Device Management:
+    //        - D3DKMTOpenAdapterFromHdc_
+    //        - D3DKMTQueryAdapterInfo_
+    //        - D3DKMTCloseAdapter_
+    //        - D3DKMTCreateDevice_
+    //        - D3DKMTGetDeviceState_
+    //        - D3DKMTDestroyDevice_
+    //
+    //     B. Context & Scheduling:
+    //        - D3DKMTCreateContext_
+    //        - D3DKMTGetContextSchedulingPriority_
+    //        - D3DKMTSetContextSchedulingPriority_
+    //        - D3DKMTDestroyContext_
+    //
+    //     C. Allocation & Resource Management:
+    //        - D3DKMTCreateAllocation_
+    //        - D3DKMTQueryResourceInfo_
+    //        - D3DKMTOpenResource_
+    //        - D3DKMTGetSharedPrimaryHandle_
+    //        - D3DKMTLock_
+    //        - D3DKMTUnlock_
+    //        - D3DKMTQueryAllocationResidency_
+    //        - D3DKMTSetAllocationPriority_
+    //        - D3DKMTDestroyAllocation_
+    //
+    //     D. Rendering & Display:
+    //        - D3DKMTSetVidPnSourceOwner_
+    //        - D3DKMTSetDisplayMode_
+    //        - D3DKMTGetDisplayModeList_
+    //        - D3DKMTSetDisplayPrivateDriverFormat_
+    //        - D3DKMTSetGammaRamp_
+    //        - D3DKMTGetMultisampleMethodList_
+    //        - D3DKMTWaitForVerticalBlankEvent_
+    //        - D3DKMTRender_
+    //        - D3DKMTPresent_
+    //
+    //     E. Synchronization:
+    //        - D3DKMTCreateSynchronizationObject_
+    //        - D3DKMTWaitForSynchronizationObject_
+    //        - D3DKMTSignalSynchronizationObject_
+    //        - D3DKMTDestroySynchronizationObject_
+    //
+    //     F. System & Misc:
+    //        - D3DKMTEscape_
+    //        - D3DKMTGetRuntimeData_
+    //
+    // ============================================================================
 
     extern "C" {
 
