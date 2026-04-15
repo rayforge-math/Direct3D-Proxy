@@ -17,7 +17,6 @@ namespace logger {
         static constexpr std::string_view bool_true = "true";
         static constexpr std::string_view bool_false = "false";
         static constexpr std::string_view fallback = "<?>";
-        static constexpr std::string_view separator = " ";
     }
 
     namespace max_len {
@@ -126,75 +125,116 @@ namespace logger {
         static constexpr size_t time_len = 12; // "HH:MM:SS.mmm"
         static constexpr std::string_view prefix_begin = "[";
         static constexpr std::string_view prefix_end = "]";
+        static constexpr std::string_view separator = " ";
+        static constexpr std::string_view param_open = "( ";
+        static constexpr std::string_view param_close = " )\n";
+        static constexpr std::string_view param_sep = "->";
+        static constexpr std::string_view msg_end = "\n";
     }
 
-    inline void append_time(std::string& buf) {
+    constexpr size_t size_time(std::string_view open, std::string_view close, std::string_view sep) {
+        return open.size() + constants::time_len + close.size() + sep.size();
+    }
+
+    inline void append_time(std::string& buf, std::string_view open, std::string_view close, std::string_view sep) {
         SYSTEMTIME st;
         GetLocalTime(&st);
         char tbuf[16];
         int len = snprintf(tbuf, sizeof(tbuf), "%02d:%02d:%02d.%03d",
             st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+        buf.append(open);
         buf.append(tbuf, len);
+        buf.append(close);
+        buf.append(sep);
+    }
+
+    constexpr size_t size_wrapped(std::string_view content, std::string_view open, std::string_view close, std::string_view sep) {
+        return open.size() + content.size() + close.size() + sep.size();
+    }
+
+    inline void append_wrapped(std::string& buf, std::string_view open, std::string_view content, std::string_view close, std::string_view sep) {
+        buf.append(open);
+        buf.append(content);
+        buf.append(close);
+        buf.append(sep);
+    }
+
+    constexpr size_t size_header(std::string_view prefix, const char* func_name, std::string_view open, std::string_view close, std::string_view sep) {
+        size_t s = 0;
+        s += size_wrapped(prefix, open, close, sep);
+        s += size_time(open, close, sep);
+        s += size_wrapped(func_name ? func_name : "", open, close, sep);
+        return s;
+    }
+
+    inline void append_header(std::string& buf, std::string_view prefix, const char* func_name,
+        std::string_view open, std::string_view close, std::string_view sep) {
+        append_wrapped(buf, open, prefix, close, sep);
+        append_time(buf, open, close, sep);
+        append_wrapped(buf, open, func_name ? func_name : "", close, sep);
+    }
+
+    template<typename... Args>
+    constexpr size_t size_params_block(std::string_view open, std::string_view close, std::string_view p_sep, std::string_view g_sep, Args... args) {
+        size_t s = open.size() + close.size();
+        if constexpr (sizeof...(args) > 0) {
+            s += (sizeof...(args) / 2) * p_sep.size();
+            s += ((sizeof...(args) - 1) / 2) * g_sep.size();
+        }
+        return s;
+    }
+
+    template<typename... Args>
+    void append_params_block(std::string& buf, std::string_view open, std::string_view close, std::string_view p_sep, std::string_view g_sep, Args... args) {
+        buf.append(open);
+        size_t i = 0;
+        ((
+            append_arg(buf, args),
+            i++,
+            buf.append(i < sizeof...(args) ? (i % 2 == 0 ? g_sep : p_sep) : "")
+            ), ...);
+        buf.append(close);
+    }
+
+    template<typename... Args>
+    void append_messages(std::string& buf, Args... args) {
+        size_t i = 0;
+        ((
+            append_arg(buf, args),
+            buf.append(++i < sizeof...(args) ? constants::separator : "")
+            ), ...);
+        buf.append("\n");
     }
 
     template<bool IsParams, typename... Args>
     void build_and_log(const std::string_view prefix, const char* func_name, Args... args) {
-        // size
-        size_t msg_size = (get_max_buffer_size(args) + ...);
-        // Header: [D3D11_PROXY] [HH:MM:SS.mmm] [func_name]
-        size_t header_size = (constants::prefix_begin.size() * 3) +
-            (constants::prefix_end.size() * 3) +
-            prefix.size() +
-            constants::time_len +
-            strlen(func_name) +
-            (constants::separator.size() * 2);
+        size_t payload_size = (get_max_buffer_size(args) + ...);
 
-        std::string buf;
-        buf.reserve(header_size + msg_size + 16); // +16 buffer/newline
+        size_t header_size = size_header(prefix, func_name, constants::prefix_begin, constants::prefix_end, constants::separator);
 
-        // header
-        auto wrap = [&](std::string_view content) {
-            buf.append(constants::prefix_begin);
-            buf.append(content);
-            buf.append(constants::prefix_end);
-            buf.append(constants::separator);
-            };
-
-        wrap(prefix);
-
-        // time
-        buf.append(constants::prefix_begin);
-        append_time(buf);
-        buf.append(constants::prefix_end);
-        buf.append(constants::separator);
-
-        wrap(func_name);
-
-        // content
+        size_t struct_size = 0;
         if constexpr (IsParams) {
-            buf.append("( ");
-            size_t i = 0;
-            auto append_pair = [&](const auto& arg) {
-                append_arg(buf, arg);
-                if (++i < sizeof...(args)) {
-                    buf.append((i % 2 == 0) ? constants::separator : "->");
-                }
-                };
-            (append_pair(args), ...);
-            buf.append(" )\n");
+            struct_size = size_params_block(constants::param_open, constants::param_close, constants::param_sep, constants::separator, args...);
         }
         else {
-            // regular msg
-            size_t i = 0;
-            auto append_with_sep = [&](const auto& arg) {
-                append_arg(buf, arg);
-                if (++i < sizeof...(args)) buf.append(constants::separator);
-                };
-            (append_with_sep(args), ...);
-            buf.append("\n");
+            struct_size = constants::msg_end.size() + (sizeof...(args) > 0 ? (sizeof...(args) - 1) * constants::separator.size() : 0);
         }
 
-        // output
+        static thread_local std::string buf;
+        buf.clear();
+        buf.reserve(header_size + payload_size + struct_size + 1);
+
+        append_header(buf, prefix, func_name, constants::prefix_begin, constants::prefix_end, constants::separator);
+
+        if constexpr (IsParams) {
+            append_params_block(buf, constants::param_open, constants::param_close, constants::param_sep, constants::separator, args...);
+        }
+        else {
+            size_t i = 0;
+            ((append_arg(buf, args), buf.append(++i < sizeof...(args) ? constants::separator : "")), ...);
+            buf.append(constants::msg_end);
+        }
+
         OutputDebugStringA(buf.c_str());
     }
 
