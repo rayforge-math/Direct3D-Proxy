@@ -242,7 +242,7 @@ namespace d3d11 {
             UINT,
             _In_opt_ const D3D_FEATURE_LEVEL*,
             UINT,
-            _In_opt_ IUnknown*,
+            _In_opt_ IUnknown* const*,
             UINT,
             UINT,
             _Out_opt_ ID3D11Device**,
@@ -272,7 +272,7 @@ namespace d3d11 {
             UINT Flags,
             _In_opt_ const D3D_FEATURE_LEVEL* pFeatureLevels,
             UINT FeatureLevels,
-            _In_opt_ IUnknown* ppCommandQueues,
+            _In_opt_ IUnknown* const* ppCommandQueues,
             UINT NumQueues,
             UINT NodeMask,
             _Out_opt_ ID3D11Device** ppDevice,
@@ -280,7 +280,7 @@ namespace d3d11 {
             _Out_opt_ D3D_FEATURE_LEVEL* pChosenFeatureLevel
         );
 
-        typedef HRESULT(WINAPI* CreateDirect3D11DeviceFromDXGIDevice_t)(IDXGIDevice*, IInspectable**);
+        typedef HRESULT(WINAPI* CreateDirect3D11DeviceFromDXGIDevice_t)(_In_ IDXGIDevice*, _Out_ IInspectable**);
         /**
          * @brief Creates a WinRT IDirect3DDevice instance from a native DXGI device.
          * This function is used to interop between the native D3D11/DXGI layer and the
@@ -293,7 +293,7 @@ namespace d3d11 {
          */
         HRESULT WINAPI CreateDirect3D11DeviceFromDXGIDevice_(_In_ IDXGIDevice* dxgiDevice, _Out_ IInspectable** graphicsDevice);
 
-        typedef HRESULT(WINAPI* CreateDirect3D11SurfaceFromDXGISurface_t)(IDXGISurface*, IInspectable**);
+        typedef HRESULT(WINAPI* CreateDirect3D11SurfaceFromDXGISurface_t)(IDXGISurface*, _Out_ IInspectable**);
         /**
          * @brief Creates a WinRT IDirect3DSurface instance from a native DXGI surface.
          * * This interop function wraps a native IDXGISurface into a Windows Runtime
@@ -304,7 +304,7 @@ namespace d3d11 {
          * @return HRESULT Standard COM return codes (S_OK on success).
          * @see https://learn.microsoft.com/en-us/windows/win32/api/windows.graphics.directx.direct3d11.interop/nf-windows-graphics-directx-direct3d11-interop-createdirect3d11surfacefromdxgisurface
          */
-        HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(_In_ IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface);
+        HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface);
 
         // ============================================================================
         // SECTION 3: User-Mode Driver

@@ -26,6 +26,12 @@
  * In optimized builds (Release), simple local variables or function pointers (like 'fn')
  * are often stored directly in registers. This further reduces stack overhead
  * and ensures that the transition to the original DLL is as lightweight as possible.
+ * 
+ * @section Signature Audit Status
+ * The following functions have been identified as having potentially volatile or 
+ * undocumented signatures. Caution is advised when modifying these hooks:
+ * - D3D11CreateDeviceForD3D12
+ * 
  * @example Safe Implementation (Correct Signature):
  * @code
  * typedef NTSTATUS (WINAPI* D3DKMTDestroyContext_t)(const D3DKMT_DESTROYCONTEXT*);
@@ -36,6 +42,7 @@
  * }
  * @endcode
  * @example Dangerous Implementation (Incorrect/Missing Signature):
+ * 
  * @code
  * typedef NTSTATUS (WINAPI* D3DKMTDestroyContext_WRONG_t)(); // Missing params!
  * HRESULT WINAPI D3DKMTDestroyContext_() {
@@ -44,6 +51,7 @@
  *      return (HRESULT)((D3DKMTDestroyContext_WRONG_t)fn)(); // Crash: Invalid stack/register state
  * }
  * @endcode
+ * 
  * Mismatched calling conventions or incorrect signatures will result in
  * stack corruption, leading to immediate application crashes.
  * @see https://learn.microsoft.com/en-us/cpp/cpp/argument-passing-and-naming-conventions?view=msvc-170
@@ -296,7 +304,7 @@ namespace d3d11 {
             UINT Flags,
             _In_opt_ const D3D_FEATURE_LEVEL* pFeatureLevels,
             UINT FeatureLevels,
-            _In_opt_ IUnknown* ppCommandQueues,
+            _In_opt_ IUnknown* const* ppCommandQueues,
             UINT NumQueues,
             UINT NodeMask,
             _Out_opt_ ID3D11Device** ppDevice,
@@ -332,7 +340,7 @@ namespace d3d11 {
             return result;
         }
 
-        HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(_In_ IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface)
+        HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface)
         {
             /**
              * @note INTERNAL IMPLEMENTATION:
