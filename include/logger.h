@@ -17,6 +17,15 @@ namespace logger {
         static constexpr std::string_view bool_true = "true";
         static constexpr std::string_view bool_false = "false";
         static constexpr std::string_view fallback = "<?>";
+
+        static constexpr size_t time_len = 12; // "HH:MM:SS.mmm"
+        static constexpr std::string_view prefix_begin = "[";
+        static constexpr std::string_view prefix_end = "]";
+        static constexpr std::string_view separator = " ";
+        static constexpr std::string_view param_open = "( ";
+        static constexpr std::string_view param_close = " )\n";
+        static constexpr std::string_view param_sep = "->";
+        static constexpr std::string_view msg_end = "\n";
     }
 
     namespace max_len {
@@ -121,17 +130,6 @@ namespace logger {
         }
     }
 
-    namespace constants {
-        static constexpr size_t time_len = 12; // "HH:MM:SS.mmm"
-        static constexpr std::string_view prefix_begin = "[";
-        static constexpr std::string_view prefix_end = "]";
-        static constexpr std::string_view separator = " ";
-        static constexpr std::string_view param_open = "( ";
-        static constexpr std::string_view param_close = " )\n";
-        static constexpr std::string_view param_sep = "->";
-        static constexpr std::string_view msg_end = "\n";
-    }
-
     constexpr size_t size_time(std::string_view open, std::string_view close, std::string_view sep) {
         return open.size() + constants::time_len + close.size() + sep.size();
     }
@@ -140,8 +138,7 @@ namespace logger {
         SYSTEMTIME st;
         GetLocalTime(&st);
         char tbuf[16];
-        int len = snprintf(tbuf, sizeof(tbuf), "%02d:%02d:%02d.%03d",
-            st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+        int len = snprintf(tbuf, sizeof(tbuf), "%02d:%02d:%02d.%03d", st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
         buf.append(open);
         buf.append(tbuf, len);
         buf.append(close);
@@ -197,42 +194,51 @@ namespace logger {
     }
 
     template<typename... Args>
-    void append_messages(std::string& buf, Args... args) {
+    constexpr size_t size_messages_block(std::string_view sep, std::string_view end, Args... args) {
+        size_t s = end.size();
+        if constexpr (sizeof...(args) > 0) {
+            s += (sizeof...(args) - 1) * sep.size();
+        }
+        return s;
+    }
+
+    template<typename... Args>
+    void append_messages_block(std::string& buf, std::string_view sep, std::string_view end, Args... args) {
         size_t i = 0;
         ((
             append_arg(buf, args),
-            buf.append(++i < sizeof...(args) ? constants::separator : "")
+            buf.append(++i < sizeof...(args) ? sep : "")
             ), ...);
-        buf.append("\n");
+        buf.append(end);
     }
 
     template<bool IsParams, typename... Args>
     void build_and_log(const std::string_view prefix, const char* func_name, Args... args) {
+        using namespace constants;
+
         size_t payload_size = (get_max_buffer_size(args) + ...);
 
-        size_t header_size = size_header(prefix, func_name, constants::prefix_begin, constants::prefix_end, constants::separator);
+        size_t header_size = size_header(prefix, func_name, prefix_begin, prefix_end, separator);
 
         size_t struct_size = 0;
         if constexpr (IsParams) {
-            struct_size = size_params_block(constants::param_open, constants::param_close, constants::param_sep, constants::separator, args...);
+            struct_size = size_params_block(param_open, param_close, param_sep, separator, args...);
         }
         else {
-            struct_size = constants::msg_end.size() + (sizeof...(args) > 0 ? (sizeof...(args) - 1) * constants::separator.size() : 0);
+            struct_size = size_messages_block(separator, msg_end, args...);
         }
 
         static thread_local std::string buf;
         buf.clear();
         buf.reserve(header_size + payload_size + struct_size + 1);
 
-        append_header(buf, prefix, func_name, constants::prefix_begin, constants::prefix_end, constants::separator);
+        append_header(buf, prefix, func_name, prefix_begin, prefix_end, separator);
 
         if constexpr (IsParams) {
-            append_params_block(buf, constants::param_open, constants::param_close, constants::param_sep, constants::separator, args...);
+            append_params_block(buf, param_open, param_close, param_sep, separator, args...);
         }
         else {
-            size_t i = 0;
-            ((append_arg(buf, args), buf.append(++i < sizeof...(args) ? constants::separator : "")), ...);
-            buf.append(constants::msg_end);
+            append_messages_block(buf, separator, msg_end, args...);
         }
 
         OutputDebugStringA(buf.c_str());
