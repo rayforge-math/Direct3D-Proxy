@@ -36,6 +36,8 @@ The proxy DLL sits in the game's executable directory. Because Windows prioritiz
    - The clean output is located in: `.\Release\x64\`
    - Intermediate build files are isolated in the `build/` subdirectory.
 
+> **Note:** A successful build confirms the code is valid. Keep in mind that this is a DLL, not an executable; it has no independent functionality. It only "comes to life" once it is injected into or loaded by a process that utilizes the D3D11 runtime.
+
 ---
 
 ## Debugging & Logging

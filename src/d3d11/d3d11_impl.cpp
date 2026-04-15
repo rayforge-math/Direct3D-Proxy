@@ -3,6 +3,8 @@
         https://github.com/doitsujin/dxvk/blob/master/src/d3d11/d3d11_main.cpp
         https://github.com/bo3b/3Dmigoto/blob/master/DirectX11/D3D11Wrapper.cpp
         https://chromium.googlesource.com/external/p3/regal/+/cass/src/apitrace/wrappers/d3d11stubs.cpp
+        https://github.com/wine-mirror/wine/blob/master/dlls/d3d11/d3d11_main.c
+        https://github.com/apitrace/dxsdk/blob/master/Include/d3d11.h
 */
 
 #include "d3d11/d3d11_impl.h"
@@ -30,7 +32,14 @@
  * @section Signature Audit Status
  * The following functions have been identified as having potentially volatile or 
  * undocumented signatures. Caution is advised when modifying these hooks:
+ * - D3D11CoreCreateDevice
+ * - D3D11CoreRegisterLayers
+ * - D3D11CoreCreateLayeredDevice
+ * - D3D11CoreGetLayeredDeviceSize
  * - D3D11CreateDeviceForD3D12
+ * - EnableFeatureLevelUpgrade
+ * - OpenAdapter10
+ * - OpenAdapter10_2
  * 
  * @example Safe Implementation (Correct Signature):
  * @code
@@ -63,30 +72,30 @@ namespace d3d11 {
     // DIRECT3D 11 PROXY DLL - MODULE ARCHITECTURE & TABLE OF CONTENTS
     // ============================================================================
     //
-    // [1] DIRECT3D 11 PUBLIC & CORE APIs
-    //     - D3D11CreateDevice_
-    //     - D3D11CreateDeviceAndSwapChain_
-    //     - D3D11CoreCreateDevice_
-    //     - D3D11CoreRegisterLayers_
-    //     - D3D11CoreCreateLayeredDevice_
-    //     - D3D11CoreGetLayeredDeviceSize_
+    // [1] PUBLIC SDK APIs (Stable & Documented)
+    //      - D3D11CreateDevice_
+    //      - D3D11CreateDeviceAndSwapChain_
+    //      - D3D11On12CreateDevice_
+    //      - CreateDirect3D11DeviceFromDXGIDevice_
+    //      - CreateDirect3D11SurfaceFromDXGISurface_
     //
-    // [2] D3D11ON12 & INTEROP APIs
-    //     - D3D11CreateDeviceForD3D12_
-    //     - D3D11On12CreateDevice_
-    //     - CreateDirect3D11DeviceFromDXGIDevice_
-    //     - CreateDirect3D11SurfaceFromDXGISurface_
+    // [2] INTERNAL & UNDOCUMENTED "CORE" APIs (High Volatility)
+    //      - D3D11CoreCreateDevice_
+    //      - D3D11CoreRegisterLayers_
+    //      - D3D11CoreCreateLayeredDevice_
+    //      - D3D11CoreGetLayeredDeviceSize_
+    //      - D3D11CreateDeviceForD3D12_
+    //      - EnableFeatureLevelUpgrade_
     //
-    // [3] USER-MODE DRIVER & INITIALIZATION
-    //     - OpenAdapter10_
-    //     - OpenAdapter10_2_
-    //     - EnableFeatureLevelUpgrade_
+    // [3] USER-MODE DRIVER
+    //      - OpenAdapter10_
+    //      - OpenAdapter10_2_
     //
     // [4] D3D PERFORMANCE TOOLING
-    //     - D3DPerformance_BeginEvent_
-    //     - D3DPerformance_EndEvent_
-    //     - D3DPerformance_SetMarker_
-    //     - D3DPerformance_GetStatus_
+    //      - D3DPerformance_BeginEvent_
+    //      - D3DPerformance_EndEvent_
+    //      - D3DPerformance_SetMarker_
+    //      - D3DPerformance_GetStatus_
     //
     // [5] KERNEL-MODE THUNKS (D3DKMT)
     //     A. Adapter & Device Management:
@@ -140,7 +149,7 @@ namespace d3d11 {
     extern "C" {
 
         // ============================================================================
-        // SECTION 1: DIRECT3D 11 PUBLIC & CORE APIs
+        // SECTION 1: PUBLIC SDK APIs (Stable & Documented)
         // ============================================================================
 
         HRESULT WINAPI D3D11CreateDevice_(
@@ -196,6 +205,65 @@ namespace d3d11 {
             HRESULT result = D3D11CreateDeviceAndSwapChain_t(dx_func(D3D11CreateDeviceAndSwapChain_i))(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
             return result;
         }
+
+        HRESULT WINAPI D3D11On12CreateDevice_(
+            _In_ IUnknown* pDevice,
+            UINT Flags,
+            _In_opt_ const D3D_FEATURE_LEVEL* pFeatureLevels,
+            UINT FeatureLevels,
+            _In_opt_ IUnknown* const* ppCommandQueues,
+            UINT NumQueues,
+            UINT NodeMask,
+            _Out_opt_ ID3D11Device** ppDevice,
+            _Out_opt_ ID3D11DeviceContext** ppImmediateContext,
+            _Out_opt_ D3D_FEATURE_LEVEL* pChosenFeatureLevel)
+        {
+            /**
+             * @note INTERNAL IMPLEMENTATION:
+             * This function is the public entry point for D3D11-to-D3D12 mapping.
+             * 1. 'pDevice' is an ID3D12Device and 'ppCommandQueues' contains
+             * ID3D12CommandQueue pointers.
+             * 2. If your proxy aims to intercept D3D12-level execution, you must
+             * ensure these pointers are correctly unwrapped to the original
+             * system pointers before calling the real function.
+             * 3. Successful return of 'ppDevice' provides a D3D11 device that
+             * can be wrapped in your D3D11 proxy class.
+             */
+
+            HRESULT result = D3D11On12CreateDevice_t(dx_func(D3D11On12CreateDevice_i))(pDevice, Flags, pFeatureLevels, FeatureLevels, ppCommandQueues, NumQueues, NodeMask, ppDevice, ppImmediateContext, pChosenFeatureLevel);
+            return result;
+        }
+
+        HRESULT WINAPI CreateDirect3D11DeviceFromDXGIDevice_(_In_ IDXGIDevice* dxgiDevice, _Out_ IInspectable** graphicsDevice)
+        {
+            /**
+             * @note INTERNAL NOTE:
+             * This function acts as an interop bridge. If you are proxying the DXGI device,
+             * ensure the 'dxgiDevice' passed here is your proxy pointer (if applicable)
+             * to maintain the hook chain into the WinRT/UWP environment.
+             */
+
+            HRESULT result = CreateDirect3D11DeviceFromDXGIDevice_t(dx_func(CreateDirect3D11DeviceFromDXGIDevice_i))(dxgiDevice, graphicsDevice);
+            return result;
+        }
+
+        HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface)
+        {
+            /**
+             * @note INTERNAL IMPLEMENTATION:
+             * This function bridges the gap between DXGI and WinRT surfaces.
+             * If you are proxying DXGI surfaces to intercept 'Present' calls or
+             * modification of frame data, ensure that 'dxgiSurface' is handled
+             * correctly to maintain the proxy chain.
+             */
+
+            HRESULT result = CreateDirect3D11SurfaceFromDXGISurface_t(dx_func(CreateDirect3D11SurfaceFromDXGISurface_i))(dxgiSurface, graphicsSurface);
+            return result;
+        }
+
+        // ============================================================================
+        // SECTION 2: INTERNAL & UNDOCUMENTED "CORE" APIs (High Volatility)
+        // ============================================================================
 
         HRESULT WINAPI D3D11CoreCreateDevice_(
             IDXGIFactory* pFactory,
@@ -269,10 +337,6 @@ namespace d3d11 {
             return result;
         }
 
-        // ============================================================================
-        // SECTION 2: D3D11On12 & Interop APIs
-        // ============================================================================
-
         HRESULT WINAPI D3D11CreateDeviceForD3D12_(
             IUnknown* pDevice,
             UINT Flags,
@@ -299,58 +363,19 @@ namespace d3d11 {
             return result;
         }
 
-        HRESULT WINAPI D3D11On12CreateDevice_(
-            _In_ IUnknown* pDevice,
-            UINT Flags,
-            _In_opt_ const D3D_FEATURE_LEVEL* pFeatureLevels,
-            UINT FeatureLevels,
-            _In_opt_ IUnknown* const* ppCommandQueues,
-            UINT NumQueues,
-            UINT NodeMask,
-            _Out_opt_ ID3D11Device** ppDevice,
-            _Out_opt_ ID3D11DeviceContext** ppImmediateContext,
-            _Out_opt_ D3D_FEATURE_LEVEL* pChosenFeatureLevel)
+        void* WINAPI EnableFeatureLevelUpgrade_()
         {
             /**
-             * @note INTERNAL IMPLEMENTATION:
-             * This function is the public entry point for D3D11-to-D3D12 mapping.
-             * 1. 'pDevice' is an ID3D12Device and 'ppCommandQueues' contains
-             * ID3D12CommandQueue pointers.
-             * 2. If your proxy aims to intercept D3D12-level execution, you must
-             * ensure these pointers are correctly unwrapped to the original
-             * system pointers before calling the real function.
-             * 3. Successful return of 'ppDevice' provides a D3D11 device that
-             * can be wrapped in your D3D11 proxy class.
+             * @note IMPLEMENTATION DETAIL:
+             * This thunk is rarely called but critical for hardware compatibility.
+             * 1. It bridges the Gap between older hardware and newer D3D features.
+             * 2. If your proxy returns E_NOTIMPL here, it may prevent some engines
+             * from utilizing advanced hardware tiers (like 12_1 or 12_2) even if
+             * the GPU technically supports them.
              */
 
-            HRESULT result = D3D11On12CreateDevice_t(dx_func(D3D11On12CreateDevice_i))(pDevice, Flags, pFeatureLevels, FeatureLevels, ppCommandQueues, NumQueues, NodeMask, ppDevice, ppImmediateContext, pChosenFeatureLevel);
-            return result;
-        }
-
-        HRESULT WINAPI CreateDirect3D11DeviceFromDXGIDevice_(_In_ IDXGIDevice* dxgiDevice, _Out_ IInspectable** graphicsDevice)
-        {
-            /**
-             * @note INTERNAL NOTE:
-             * This function acts as an interop bridge. If you are proxying the DXGI device,
-             * ensure the 'dxgiDevice' passed here is your proxy pointer (if applicable)
-             * to maintain the hook chain into the WinRT/UWP environment.
-             */
-
-            HRESULT result = CreateDirect3D11DeviceFromDXGIDevice_t(dx_func(CreateDirect3D11DeviceFromDXGIDevice_i))(dxgiDevice, graphicsDevice);
-            return result;
-        }
-
-        HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface)
-        {
-            /**
-             * @note INTERNAL IMPLEMENTATION:
-             * This function bridges the gap between DXGI and WinRT surfaces.
-             * If you are proxying DXGI surfaces to intercept 'Present' calls or
-             * modification of frame data, ensure that 'dxgiSurface' is handled
-             * correctly to maintain the proxy chain.
-             */
-
-            HRESULT result = CreateDirect3D11SurfaceFromDXGISurface_t(dx_func(CreateDirect3D11SurfaceFromDXGISurface_i))(dxgiSurface, graphicsSurface);
+            auto fn = dx_func(EnableFeatureLevelUpgrade_i);
+            void* result = fn ? EnableFeatureLevelUpgrade_t(fn)() : (void*)E_NOTIMPL;
             return result;
         }
 
@@ -358,7 +383,7 @@ namespace d3d11 {
         // SECTION 3: User-Mode Driver
         // ============================================================================
 
-        HRESULT WINAPI OpenAdapter10_(void* pOpenData)
+        HRESULT WINAPI OpenAdapter10_(_Inout_ void* pOpenData)
         {
             /**
              * @note IMPLEMENTATION DETAIL:
@@ -385,22 +410,6 @@ namespace d3d11 {
              */
 
             HRESULT result = OpenAdapter10_2_t(dx_func(OpenAdapter10_2_i))(pOpenData);
-            return result;
-        }
-
-        void* WINAPI EnableFeatureLevelUpgrade_()
-        {
-            /**
-             * @note IMPLEMENTATION DETAIL:
-             * This thunk is rarely called but critical for hardware compatibility.
-             * 1. It bridges the Gap between older hardware and newer D3D features.
-             * 2. If your proxy returns E_NOTIMPL here, it may prevent some engines
-             * from utilizing advanced hardware tiers (like 12_1 or 12_2) even if
-             * the GPU technically supports them.
-             */
-
-            auto fn = dx_func(EnableFeatureLevelUpgrade_i);
-            void* result = fn ? EnableFeatureLevelUpgrade_t(fn)() : (void*)E_NOTIMPL;
             return result;
         }
 

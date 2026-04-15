@@ -3,6 +3,8 @@
         https://github.com/doitsujin/dxvk/blob/master/src/d3d11/d3d11_main.cpp
         https://github.com/bo3b/3Dmigoto/blob/master/DirectX11/D3D11Wrapper.cpp
         https://chromium.googlesource.com/external/p3/regal/+/cass/src/apitrace/wrappers/d3d11stubs.cpp
+        https://github.com/wine-mirror/wine/blob/master/dlls/d3d11/d3d11_main.c
+        https://github.com/apitrace/dxsdk/blob/master/Include/d3d11.h
 */
 #pragma once
 
@@ -14,7 +16,7 @@ namespace d3d11 {
     extern "C" {
 
         // ============================================================================
-        // SECTION 1: DIRECT3D 11 PUBLIC & CORE APIs
+        // SECTION 1: PUBLIC SDK APIs (Stable & Documented)
         // ============================================================================
 
         typedef HRESULT(WINAPI* D3D11CreateDevice_t)(
@@ -109,134 +111,6 @@ namespace d3d11 {
             _Out_opt_ ID3D11DeviceContext** ppImmediateContext
         );
 
-        typedef HRESULT(WINAPI* D3D11CoreCreateDevice_t)(
-            IDXGIFactory*,
-            IDXGIAdapter*,
-            UINT,
-            const D3D_FEATURE_LEVEL*,
-            UINT,
-            ID3D11Device**
-            );
-        /**
-         * @brief Internal core function to create a Direct3D 11 device.
-         * This function is an internal entry point used by the D3D11 runtime to
-         * initialize the device. Unlike the public D3D11CreateDevice, this version
-         * requires an explicit IDXGIFactory and IDXGIAdapter. It is frequently
-         * targeted by proxy DLLs to ensure all device creation paths are hooked.
-         * @param pFactory       [in]  Pointer to the DXGI factory.
-         * @param pAdapter       [in]  Pointer to the DXGI adapter to use.
-         * @param Flags          [in]  Runtime creation flags (e.g., D3D11_CREATE_DEVICE_DEBUG).
-         * @param pFeatureLevels [in]  Pointer to an array of D3D_FEATURE_LEVELs.
-         * @param FeatureLevels  [in]  Number of feature levels in the array.
-         * @param ppDevice       [out] Returns the created ID3D11Device.
-         * @return HRESULT Standard Direct3D 11 return codes.
-         */
-        HRESULT WINAPI D3D11CoreCreateDevice_(
-            IDXGIFactory* pFactory,
-            IDXGIAdapter* pAdapter,
-            UINT Flags,
-            const D3D_FEATURE_LEVEL* pFeatureLevels,
-            UINT FeatureLevels,
-            ID3D11Device** ppDevice
-        );
-
-        typedef HRESULT(WINAPI* D3D11CoreRegisterLayers_t)(const void*, DWORD);
-        /**
-         * @brief Internal function to register Direct3D 11 device layers.
-         * This function is part of the internal infrastructure that allows the D3D11
-         * runtime to recognize and initialize optional layers (such as the Debug
-         * or D3D11On12 layers). It is called during the early stages of device
-         * initialization.
-         * @param pLayerInfo [in] Opaque pointer to the layer registration data.
-         * @param LayerCount [in] Internal versioning or configuration flags.
-         * @return HRESULT Returns S_OK if the layers were registered successfully.
-         */
-        HRESULT WINAPI D3D11CoreRegisterLayers_(const void* pLayerInfo, DWORD LayerCount);
-
-        typedef HRESULT(WINAPI* D3D11CoreCreateLayeredDevice_t)(
-            const void*,
-            DWORD,
-            const void*,
-            REFIID,
-            void**
-            );
-        /**
-         * @brief Internal function to create a layered Direct3D 11 device.
-         * This function is used by the D3D11 runtime to initialize layered devices,
-         * which allow for features like the SDK Debug Layer or the D3D11On12
-         * translation layer. It is a lower-level entry point than the standard
-         * device creation APIs.
-         * @param pLayerContexts [in]  Opaque pointer to internal layer data.
-         * @param ContextCount   [in]  Internal flags or bitmask for layer configuration.
-         * @param pDeviceDesc    [in]  Opaque pointer to secondary layer configuration.
-         * @param riid           [in]  The GUID of the interface being requested (usually ID3D11Device).
-         * @param ppvDevice      [out] Returns the created layered device or object.
-         * @return HRESULT Standard Direct3D return codes.
-         */
-        HRESULT WINAPI D3D11CoreCreateLayeredDevice_(
-            const void* pLayerContexts,
-            DWORD ContextCount,
-            const void* pDeviceDesc,
-            REFIID riid,
-            void** ppvDevice
-        );
-
-        typedef SIZE_T(WINAPI* D3D11CoreGetLayeredDeviceSize_t)(const void*, DWORD);
-        /**
-         * @brief Retrieves the memory size required for a layered Direct3D 11 device.
-         * Part of the internal D3D11 layer infrastructure. This function calculates
-         * the allocation size necessary to house the internal data structures for
-         * a specific set of device layers.
-         * @param pLayerContexts    [in] Opaque pointer to internal layer configuration data.
-         * @param ContextCount      [in] Internal flags or bitmask associated with the layers.
-         * @return SIZE_T The required size in bytes for the layered device structure.
-         */
-        SIZE_T WINAPI D3D11CoreGetLayeredDeviceSize_(const void* pLayerContexts, DWORD unknown1);
-
-        // ============================================================================
-        // SECTION 2: D3D11On12 & Interop APIs
-        // ============================================================================
-
-        typedef HRESULT(WINAPI* D3D11CreateDeviceForD3D12_t)(
-            IUnknown*,
-            UINT,
-            const D3D_FEATURE_LEVEL*,
-            UINT,
-            UINT,
-            UINT,
-            ID3D11Device**,
-            ID3D11DeviceContext**,
-            D3D_FEATURE_LEVEL*
-            );
-        /**
-         * @brief Creates a D3D11 device that routes commands through a D3D12 device.
-         * This function initializes the D3D11On12 translation layer. It allows
-         * applications to use D3D11 objects and rendering commands which are
-         * then translated into D3D12 calls for the provided D3D12 device.
-         * @param pDevice               [in]  The underlying D3D12 device (as IUnknown).
-         * @param Flags                 [in]  Creation flags (D3D11_CREATE_DEVICE_FLAG).
-         * @param pFeatureLevels        [in]  Array of requested feature levels.
-         * @param FeatureLevels         [in]  Number of feature levels in the array.
-         * @param NumQueues             [in]  Number of command queues to use from the D3D12 device.
-         * @param NodeMask              [in]  The node mask for multi-adapter configurations.
-         * @param ppDevice              [out] Returns the D3D11On12 device.
-         * @param ppImmediateContext    [out] Returns the D3D11On12 immediate context.
-         * @param pChosenFeatureLevel   [out] Returns the actual supported feature level.
-         * @return HRESULT Standard Direct3D return codes.
-         * @see https://learn.microsoft.com/en-us/windows/win32/api/d3d11on12/nf-d3d11on12-d3d11on12createdevice
-         */
-        HRESULT WINAPI D3D11CreateDeviceForD3D12_(
-            IUnknown* pDevice,
-            UINT Flags,
-            const D3D_FEATURE_LEVEL* pFeatureLevels,
-            UINT FeatureLevels,
-            UINT NumQueues, // ? SDKVersion ?
-            UINT NodeMask, // ? NumQueues ?
-            ID3D11Device** ppDevice,
-            ID3D11DeviceContext** ppImmediateContext,
-            D3D_FEATURE_LEVEL* pChosenFeatureLevel
-        );
-
         typedef HRESULT(WINAPI* D3D11On12CreateDevice_t)(
             _In_ IUnknown*,
             UINT,
@@ -307,33 +181,133 @@ namespace d3d11 {
         HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface);
 
         // ============================================================================
-        // SECTION 3: User-Mode Driver
+        // SECTION 2: INTERNAL & UNDOCUMENTED "CORE" APIs (High Volatility)
         // ============================================================================
 
-        typedef HRESULT(WINAPI* OpenAdapter10_t)(void*);
+        typedef HRESULT(WINAPI* D3D11CoreCreateDevice_t)(
+            IDXGIFactory*,
+            IDXGIAdapter*,
+            UINT,
+            const D3D_FEATURE_LEVEL*,
+            UINT,
+            ID3D11Device**
+            );
         /**
-         * @brief Creates a Direct3D 10 graphics adapter object.
-         * This is the primary entry point for the D3D10 User-Mode Driver. It initializes
-         * the driver's capabilities and returns a table of function pointers (the DDI)
-         * that the runtime will use for all subsequent hardware communication.
-         * @param pOpenData [in, out] Pointer to a D3D10DDIARG_OPENADAPTER structure
-         * containing version info and table pointers.
-         * @return HRESULT Returns S_OK if the adapter was successfully opened.
-         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3d10umddi/nc-d3d10umddi-pfnd3d10ddi_openadapter
+         * @brief Internal core function to create a Direct3D 11 device.
+         * This function is an internal entry point used by the D3D11 runtime to
+         * initialize the device. Unlike the public D3D11CreateDevice, this version
+         * requires an explicit IDXGIFactory and IDXGIAdapter. It is frequently
+         * targeted by proxy DLLs to ensure all device creation paths are hooked.
+         * @param pFactory       [in]  Pointer to the DXGI factory.
+         * @param pAdapter       [in]  Pointer to the DXGI adapter to use.
+         * @param Flags          [in]  Runtime creation flags (e.g., D3D11_CREATE_DEVICE_DEBUG).
+         * @param pFeatureLevels [in]  Pointer to an array of D3D_FEATURE_LEVELs.
+         * @param FeatureLevels  [in]  Number of feature levels in the array.
+         * @param ppDevice       [out] Returns the created ID3D11Device.
+         * @return HRESULT Standard Direct3D 11 return codes.
+         * @see https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-d3d11createdevice
          */
-        HRESULT WINAPI OpenAdapter10_(void* pOpenData);
+        HRESULT WINAPI D3D11CoreCreateDevice_(
+            IDXGIFactory* pFactory,
+            IDXGIAdapter* pAdapter,
+            UINT Flags,
+            const D3D_FEATURE_LEVEL* pFeatureLevels,
+            UINT FeatureLevels,
+            ID3D11Device** ppDevice
+        );
 
-        typedef HRESULT(WINAPI* OpenAdapter10_2_t)(void*);
+        typedef HRESULT(WINAPI* D3D11CoreRegisterLayers_t)(const void*, DWORD);
         /**
-         * @brief Creates a Direct3D 10.2 graphics adapter object.
-         * An updated version of the adapter initialization introduced with D3D10.2
-         * (Windows 7 SP1 / WDDM 1.1). It provides extended initialization data and
-         * improved support for newer hardware features.
-         * @param pOpenData [in, out] Pointer to a D3D10DDIARG_OPENADAPTER structure.
-         * @return HRESULT Returns S_OK on success.
-         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3d10umddi/nc-d3d10umddi-pfnd3d10ddi_openadapter
+         * @brief Internal function to register Direct3D 11 device layers.
+         * This function is part of the internal infrastructure that allows the D3D11
+         * runtime to recognize and initialize optional layers (such as the Debug
+         * or D3D11On12 layers). It is called during the early stages of device
+         * initialization.
+         * @param pLayerInfo [in] Opaque pointer to the layer registration data.
+         * @param LayerCount [in] Internal versioning or configuration flags.
+         * @return HRESULT Returns S_OK if the layers were registered successfully.
          */
-        HRESULT WINAPI OpenAdapter10_2_(_Inout_ void* pOpenData);
+        HRESULT WINAPI D3D11CoreRegisterLayers_(const void* pLayerInfo, DWORD LayerCount);
+
+        typedef HRESULT(WINAPI* D3D11CoreCreateLayeredDevice_t)(
+            const void*,
+            DWORD,
+            const void*,
+            REFIID,
+            void**
+            );
+        /**
+         * @brief Internal function to create a layered Direct3D 11 device.
+         * This function is used by the D3D11 runtime to initialize layered devices,
+         * which allow for features like the SDK Debug Layer or the D3D11On12
+         * translation layer. It is a lower-level entry point than the standard
+         * device creation APIs.
+         * @param pLayerContexts [in]  Opaque pointer to internal layer data.
+         * @param ContextCount   [in]  Internal flags or bitmask for layer configuration.
+         * @param pDeviceDesc    [in]  Opaque pointer to secondary layer configuration.
+         * @param riid           [in]  The GUID of the interface being requested (usually ID3D11Device).
+         * @param ppvDevice      [out] Returns the created layered device or object.
+         * @return HRESULT Standard Direct3D return codes.
+         */
+        HRESULT WINAPI D3D11CoreCreateLayeredDevice_(
+            const void* pLayerContexts,
+            DWORD ContextCount,
+            const void* pDeviceDesc,
+            REFIID riid,
+            void** ppvDevice
+        );
+
+        typedef SIZE_T(WINAPI* D3D11CoreGetLayeredDeviceSize_t)(const void*, DWORD);
+        /**
+         * @brief Retrieves the memory size required for a layered Direct3D 11 device.
+         * Part of the internal D3D11 layer infrastructure. This function calculates
+         * the allocation size necessary to house the internal data structures for
+         * a specific set of device layers.
+         * @param pLayerContexts    [in] Opaque pointer to internal layer configuration data.
+         * @param ContextCount      [in] Internal flags or bitmask associated with the layers.
+         * @return SIZE_T The required size in bytes for the layered device structure.
+         */
+        SIZE_T WINAPI D3D11CoreGetLayeredDeviceSize_(const void* pLayerContexts, DWORD ContextCount);
+
+        typedef HRESULT(WINAPI* D3D11CreateDeviceForD3D12_t)(
+            IUnknown*,
+            UINT,
+            const D3D_FEATURE_LEVEL*,
+            UINT,
+            UINT,
+            UINT,
+            ID3D11Device**,
+            ID3D11DeviceContext**,
+            D3D_FEATURE_LEVEL*
+            );
+        /**
+         * @brief Creates a D3D11 device that routes commands through a D3D12 device.
+         * This function initializes the D3D11On12 translation layer. It allows
+         * applications to use D3D11 objects and rendering commands which are
+         * then translated into D3D12 calls for the provided D3D12 device.
+         * @param pDevice               [in]  The underlying D3D12 device (as IUnknown).
+         * @param Flags                 [in]  Creation flags (D3D11_CREATE_DEVICE_FLAG).
+         * @param pFeatureLevels        [in]  Array of requested feature levels.
+         * @param FeatureLevels         [in]  Number of feature levels in the array.
+         * @param NumQueues             [in]  Number of command queues to use from the D3D12 device.
+         * @param NodeMask              [in]  The node mask for multi-adapter configurations.
+         * @param ppDevice              [out] Returns the D3D11On12 device.
+         * @param ppImmediateContext    [out] Returns the D3D11On12 immediate context.
+         * @param pChosenFeatureLevel   [out] Returns the actual supported feature level.
+         * @return HRESULT Standard Direct3D return codes.
+         * @see https://learn.microsoft.com/en-us/windows/win32/api/d3d11on12/nf-d3d11on12-d3d11on12createdevice
+         */
+        HRESULT WINAPI D3D11CreateDeviceForD3D12_(
+            IUnknown* pDevice,
+            UINT Flags,
+            const D3D_FEATURE_LEVEL* pFeatureLevels,
+            UINT FeatureLevels,
+            UINT NumQueues, // ? SDKVersion ?
+            UINT NodeMask, // ? NumQueues ?
+            ID3D11Device** ppDevice,
+            ID3D11DeviceContext** ppImmediateContext,
+            D3D_FEATURE_LEVEL* pChosenFeatureLevel
+        );
 
         typedef void* (WINAPI* EnableFeatureLevelUpgrade_t)();
         /**
@@ -347,6 +321,35 @@ namespace d3d11 {
          * @see https://github.com/tpn/winsdk-10/blob/master/Include/10.0.16299.0/um/d3d11_1.h (Related Internal Header)
          */
         void* WINAPI EnableFeatureLevelUpgrade_();
+
+        // ============================================================================
+        // SECTION 3: User-Mode Driver
+        // ============================================================================
+
+        typedef HRESULT(WINAPI* OpenAdapter10_t)(_Inout_ void*);
+        /**
+         * @brief Creates a Direct3D 10 graphics adapter object.
+         * This is the primary entry point for the D3D10 User-Mode Driver. It initializes
+         * the driver's capabilities and returns a table of function pointers (the DDI)
+         * that the runtime will use for all subsequent hardware communication.
+         * @param pOpenData [in, out] Pointer to a D3D10DDIARG_OPENADAPTER structure
+         * containing version info and table pointers.
+         * @return HRESULT Returns S_OK if the adapter was successfully opened.
+         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3d10umddi/nc-d3d10umddi-pfnd3d10ddi_openadapter
+         */
+        HRESULT WINAPI OpenAdapter10_(_Inout_ void* pOpenData);
+
+        typedef HRESULT(WINAPI* OpenAdapter10_2_t)(_Inout_ void*);
+        /**
+         * @brief Creates a Direct3D 10.2 graphics adapter object.
+         * An updated version of the adapter initialization introduced with D3D10.2
+         * (Windows 7 SP1 / WDDM 1.1). It provides extended initialization data and
+         * improved support for newer hardware features.
+         * @param pOpenData [in, out] Pointer to a D3D10DDIARG_OPENADAPTER structure.
+         * @return HRESULT Returns S_OK on success.
+         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3d10umddi/nc-d3d10umddi-pfnd3d10ddi_openadapter
+         */
+        HRESULT WINAPI OpenAdapter10_2_(_Inout_ void* pOpenData);
 
         // ============================================================================
         // SECTION 4: D3D Performance Tooling
