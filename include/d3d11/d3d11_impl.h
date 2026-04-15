@@ -11,6 +11,14 @@
 #include "D3D11.h"
 #include "Windows.Graphics.DirectX.Direct3D11.interop.h"
 
+//#define CORE_CREATE_DEVICE_USE_ASM
+
+#ifndef CORE_CREATE_DEVICE_USE_ASM
+#define CORE_CREATE_DEVICE_LEGACY
+#endif // !CORE_CREATE_DEVICE_USE_ASM
+
+
+
 namespace d3d11 {
 
     extern "C" {
@@ -184,6 +192,8 @@ namespace d3d11 {
         // SECTION 2: INTERNAL & UNDOCUMENTED "CORE" APIs (High Volatility)
         // ============================================================================
 
+#ifdef CORE_CREATE_DEVICE_LEGACY
+
         typedef HRESULT(WINAPI* D3D11CoreCreateDevice_t)(
             IDXGIFactory*,
             IDXGIAdapter*,
@@ -191,7 +201,7 @@ namespace d3d11 {
             const D3D_FEATURE_LEVEL*,
             UINT,
             ID3D11Device**
-            );
+        );
         /**
          * @brief Internal core function to create a Direct3D 11 device.
          * This function is an internal entry point used by the D3D11 runtime to
@@ -205,7 +215,7 @@ namespace d3d11 {
          * @param FeatureLevels  [in]  Number of feature levels in the array.
          * @param ppDevice       [out] Returns the created ID3D11Device.
          * @return HRESULT Standard Direct3D 11 return codes.
-         * @see https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-d3d11createdevice
+         * @see https://github.com/doitsujin/dxvk/blob/master/src/d3d11/d3d11_main.cpp
          */
         HRESULT WINAPI D3D11CoreCreateDevice_(
             IDXGIFactory* pFactory,
@@ -215,6 +225,53 @@ namespace d3d11 {
             UINT FeatureLevels,
             ID3D11Device** ppDevice
         );
+        
+#else
+
+        typedef HRESULT(WINAPI* D3D11CoreCreateDevice_t)(
+            IDXGIFactory* pFactory,
+            IDXGIAdapter* pAdapter,
+            D3D_DRIVER_TYPE DriverType,
+            HMODULE Software,
+            UINT Flags,
+            const D3D_FEATURE_LEVEL* pFeatureLevels,
+            UINT FeatureLevels,
+            UINT SDKVersion,
+            ID3D11Device** ppDevice,
+            D3D_FEATURE_LEVEL* pOutFeatureLevel
+        );
+        /**
+         * @brief Internal core function to create a Direct3D 11 device.
+         * This is the actual internal entry point within d3d11.dll that the public
+         * D3D11CreateDevice API eventually calls. It provides granular control over
+         * the device creation process, including explicit factory and adapter handling.
+         * @param pFactory       [in]  Pointer to the IDXGIFactory used for adapter enumeration.
+         * @param pAdapter       [in]  Pointer to the IDXGIAdapter (Hardware/Software) to use.
+         * @param DriverType     [in]  The type of driver to create (Hardware, Warp, etc.).
+         * @param Software       [in]  Handle to a software rasterizer DLL (usually nullptr).
+         * @param Flags          [in]  Runtime creation flags (D3D11_CREATE_DEVICE_FLAG).
+         * @param pFeatureLevels [in]  Pointer to an array of D3D_FEATURE_LEVELs to attempt.
+         * @param FeatureLevels  [in]  Number of feature levels in the input array.
+         * @param SDKVersion     [in]  The SDK version (usually D3D11_SDK_VERSION).
+         * @param ppDevice       [out] Address of a pointer to the returned ID3D11Device.
+         * @param pOutFeatureLevel [out] Returns the actual feature level successfully created.
+         * @return HRESULT Standard Direct3D 11 return codes (S_OK on success).
+         * @see Verified against DXVK implementation: https://github.com/doitsujin/dxvk/blob/master/src/d3d11/d3d11_main.cpp
+         */
+        HRESULT WINAPI D3D11CoreCreateDevice_(
+            IDXGIFactory* pFactory,
+            IDXGIAdapter* pAdapter,
+            D3D_DRIVER_TYPE DriverType,
+            HMODULE Software,
+            UINT Flags,
+            const D3D_FEATURE_LEVEL* pFeatureLevels,
+            UINT FeatureLevels,
+            UINT SDKVersion,
+            ID3D11Device** ppDevice,
+            D3D_FEATURE_LEVEL* pOutFeatureLevel
+        );
+
+#endif
 
         typedef HRESULT(WINAPI* D3D11CoreRegisterLayers_t)(const void*, DWORD);
         /**

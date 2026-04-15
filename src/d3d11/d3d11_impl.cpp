@@ -12,58 +12,27 @@
 
 /**
  * @file d3d11_impl.cpp
- * @brief D3D11 Kernel-Mode Thunk Proxy Implementation
- * @section Calling Convention Integrity
- * IMPORTANT: This implementation strictly adheres to the __stdcall (WINAPI)
- * calling convention.
- * Because this proxy utilizes "blind forwarding" (casting function pointers
- * and invoking them without explicit parameter manipulation in C++), it relies
- * on the CPU registers (RCX, RDX, etc. on x64) and the stack being managed
- * exactly as the original system DLL expects.
- * @subsection Stack Stability & Casting
- * As long as the function signature in the typedef is correct, local variable
- * allocation within these proxy functions does not compromise stack integrity.
- * The C++ compiler automatically manages the stack frame (prologue/epilogue).
- * @note COMPILER OPTIMIZATION:
- * In optimized builds (Release), simple local variables or function pointers (like 'fn')
- * are often stored directly in registers. This further reduces stack overhead
- * and ensures that the transition to the original DLL is as lightweight as possible.
- * 
- * @section Signature Audit Status
- * The following functions have been identified as having potentially volatile or 
- * undocumented signatures. Caution is advised when modifying these hooks:
- * - D3D11CoreCreateDevice
- * - D3D11CoreRegisterLayers
- * - D3D11CoreCreateLayeredDevice
- * - D3D11CoreGetLayeredDeviceSize
- * - D3D11CreateDeviceForD3D12
- * - EnableFeatureLevelUpgrade
- * - OpenAdapter10
- * - OpenAdapter10_2
- * 
- * @example Safe Implementation (Correct Signature):
- * @code
- * typedef NTSTATUS (WINAPI* D3DKMTDestroyContext_t)(const D3DKMT_DESTROYCONTEXT*);
- * HRESULT WINAPI D3DKMTDestroyContext_() {
- *      int a = 10;                                 // Safe: Compiler manages stack offset or uses a register
- *      auto fn = dx_func(D3DKMTDestroyContext_i);
- *      return (HRESULT)((D3DKMTDestroyContext_t)fn)((D3DKMT_DESTROYCONTEXT*)nullptr);
- * }
- * @endcode
- * @example Dangerous Implementation (Incorrect/Missing Signature):
- * 
- * @code
- * typedef NTSTATUS (WINAPI* D3DKMTDestroyContext_WRONG_t)(); // Missing params!
- * HRESULT WINAPI D3DKMTDestroyContext_() {
- *      char buffer[256] = {0};                     // Dangerous: Stack pointer will point to wrong address
- *      auto fn = dx_func(D3DKMTDestroyContext_i);  // Usually safe: fn will most likely be stored in a register
- *      return (HRESULT)((D3DKMTDestroyContext_WRONG_t)fn)(); // Crash: Invalid stack/register state
- * }
- * @endcode
- * 
- * Mismatched calling conventions or incorrect signatures will result in
- * stack corruption, leading to immediate application crashes.
- * @see https://learn.microsoft.com/en-us/cpp/cpp/argument-passing-and-naming-conventions?view=msvc-170
+ * @brief D3D11 Proxy - Hybrid Interception Layer
+ * @section Architecture Strategy
+ * To maintain 100% stack integrity, this proxy uses two distinct methods:
+ * 1. C++ Wrappers: Used ONLY for well-documented functions with stable signatures.
+ * 2. ASM Jump-Stubs (Transparent Forwarding): Used for undocumented or volatile
+ * "Core" functions. This avoids the C++ 'call' instruction, which would
+ * push a return address onto the stack and displace function parameters.
+ *
+ * @section Signature Audit Status (HIGH RISK)
+ * THE FOLLOWING FUNCTIONS MUST REMAIN IN ASM JUMP-STUBS.
+ * Implementation in C++ (even with 'void' or 'auto') will cause stack
+ * misalignment and immediate crashes due to undocumented/variable parameter counts:
+ * - D3D11CoreCreateDevice         (Known stack variance: 6 vs 10 params)
+ * - D3D11CoreRegisterLayers       (Undocumented)
+ * - D3D11CoreCreateLayeredDevice  (Undocumented)
+ * - D3D11CoreGetLayeredDeviceSize (Undocumented)
+ * - D3D11CreateDeviceForD3D12     (Internal/Volatile)
+ * - EnableFeatureLevelUpgrade     (Internal/Volatile)
+ * - OpenAdapter10                 (Legacy/Internal)
+ * - OpenAdapter10_2               (Legacy/Internal)
+ * @see jump_stubs.asm for the implementation of these functions.
  */
 
 namespace d3d11 {
@@ -265,6 +234,8 @@ namespace d3d11 {
         // SECTION 2: INTERNAL & UNDOCUMENTED "CORE" APIs (High Volatility)
         // ============================================================================
 
+#ifdef CORE_CREATE_DEVICE_LEGACY
+
         HRESULT WINAPI D3D11CoreCreateDevice_(
             IDXGIFactory* pFactory,
             IDXGIAdapter* pAdapter,
@@ -285,6 +256,46 @@ namespace d3d11 {
             HRESULT result = D3D11CoreCreateDevice_t(dx_func(D3D11CoreCreateDevice_i))(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
             return result;
         }
+
+#else
+
+        HRESULT WINAPI D3D11CoreCreateDevice_(
+            IDXGIFactory* pFactory,
+            IDXGIAdapter* pAdapter,
+            D3D_DRIVER_TYPE DriverType,
+            HMODULE Software,
+            UINT Flags,
+            const D3D_FEATURE_LEVEL* pFeatureLevels,
+            UINT FeatureLevels,
+            UINT SDKVersion,
+            ID3D11Device** ppDevice,
+            D3D_FEATURE_LEVEL* pOutFeatureLevel)
+        {
+            /**
+             * @note INTERNAL IMPLEMENTATION:
+             * This is a critical hooking point. Even if an application calls the
+             * public 'D3D11CreateDevice', the runtime often eventually routes the
+             * call through this core function.
+             * Ensure that if you are wrapping the resulting ID3D11Device, you do so
+             * here to capture devices created via internal runtime paths.
+             */
+
+            HRESULT result = D3D11CoreCreateDevice_t(dx_func(D3D11CoreCreateDevice_i))(
+                pFactory,
+                pAdapter,
+                DriverType,
+                Software,
+                Flags,
+                pFeatureLevels,
+                FeatureLevels,
+                SDKVersion,
+                ppDevice,
+                pOutFeatureLevel
+            );
+            return result;
+        }
+
+#endif
 
         HRESULT WINAPI D3D11CoreRegisterLayers_(const void* pLayerInfo, DWORD LayerCount)
         {
