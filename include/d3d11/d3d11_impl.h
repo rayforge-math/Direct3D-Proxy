@@ -11,13 +11,107 @@
 #include "D3D11.h"
 #include "Windows.Graphics.DirectX.Direct3D11.interop.h"
 
-//#define CORE_CREATE_DEVICE_USE_ASM
+// ============================================================================
+// PROXY CONFIGURATION - FEATURE TOGGLES
+// ============================================================================
+// Comment out a define to disable the C++ Hook and use the ASM Pass-Through.
 
-#ifndef CORE_CREATE_DEVICE_USE_ASM
-#define CORE_CREATE_DEVICE_LEGACY
-#endif // !CORE_CREATE_DEVICE_USE_ASM
+// [1] PUBLIC SDK APIs
+#define PROXY_SECTION_1
+#ifdef PROXY_SECTION_1
+    #define PROXY_D3D11_CREATE_DEVICE
+    #define PROXY_D3D11_CREATE_DEVICE_AND_SWCHAIN
+    #define PROXY_D3D11_ON12_CREATE_DEVICE
+    #define PROXY_CREATE_D3D11_DEV_FROM_DXGI
+    #define PROXY_CREATE_D3D11_SURF_FROM_DXGI
+#endif
 
+// [2] INTERNAL & UNDOCUMENTED "CORE" APIs
+#define PROXY_SECTION_2
+#ifdef PROXY_SECTION_2
+    #define PROXY_D3D11_CORE_CREATE_DEVICE
+    #define PROXY_D3D11_CORE_REGISTER_LAYERS
+    #define PROXY_D3D11_CORE_CREATE_LAYERED_DEV
+    #define PROXY_D3D11_CORE_GET_LAYERED_SIZE
+    #define PROXY_D3D11_CREATE_DEVICE_FOR_D3D12
+    #define PROXY_ENABLE_FEATURE_LEVEL_UPGRADE
+#endif
 
+// [3] USER-MODE DRIVER
+#define PROXY_SECTION_3
+#ifdef PROXY_SECTION_3
+    #define PROXY_OPEN_ADAPTER_10
+    #define PROXY_OPEN_ADAPTER_10_2
+#endif
+
+// [4] D3D PERFORMANCE TOOLING
+#define PROXY_SECTION_4
+#ifdef PROXY_SECTION_4
+    #define PROXY_D3D_PERF_BEGIN_EVENT
+    #define PROXY_D3D_PERF_END_EVENT
+    #define PROXY_D3D_PERF_SET_MARKER
+    #define PROXY_D3D_PERF_GET_STATUS
+#endif
+
+// [5] KERNEL-MODE THUNKS (D3DKMT)
+#define PROXY_SECTION_5
+#ifdef PROXY_SECTION_5
+
+    // A. Adapter & Device Management
+    #define PROXY_D3DKMT_OPEN_ADAPTER_FROM_HDC
+    #define PROXY_D3DKMT_QUERY_ADAPTER_INFO
+    #define PROXY_D3DKMT_CLOSE_ADAPTER
+    #define PROXY_D3DKMT_CREATE_DEVICE
+    #define PROXY_D3DKMT_GET_DEVICE_STATE
+    #define PROXY_D3DKMT_DESTROY_DEVICE
+
+    // B. Context & Scheduling
+    #define PROXY_D3DKMT_CREATE_CONTEXT
+    #define PROXY_D3DKMT_GET_CONTEXT_SCHED_PRIO
+    #define PROXY_D3DKMT_SET_CONTEXT_SCHED_PRIO
+    #define PROXY_D3DKMT_DESTROY_CONTEXT
+
+    // C. Allocation & Resource Management
+    #define PROXY_D3DKMT_CREATE_ALLOCATION
+    #define PROXY_D3DKMT_QUERY_RESOURCE_INFO
+    #define PROXY_D3DKMT_OPEN_RESOURCE
+    #define PROXY_D3DKMT_GET_SHARED_PRIMARY
+    #define PROXY_D3DKMT_LOCK
+    #define PROXY_D3DKMT_UNLOCK
+    #define PROXY_D3DKMT_QUERY_ALLOC_RESIDENCY
+    #define PROXY_D3DKMT_SET_ALLOC_PRIORITY
+    #define PROXY_D3DKMT_DESTROY_ALLOCATION
+
+    // D. Rendering & Display
+    #define PROXY_D3DKMT_SET_VIDPN_SOURCE_OWNER
+    #define PROXY_D3DKMT_SET_DISPLAY_MODE
+    #define PROXY_D3DKMT_GET_DISPLAY_MODE_LIST
+    #define PROXY_D3DKMT_SET_DISPLAY_PRIV_DRIVER
+    #define PROXY_D3DKMT_SET_GAMMA_RAMP
+    #define PROXY_D3DKMT_GET_MULTISAMPLE_LIST
+    #define PROXY_D3DKMT_WAIT_FOR_VBLANK
+    #define PROXY_D3DKMT_RENDER
+    #define PROXY_D3DKMT_PRESENT
+
+    // E. Synchronization
+    #define PROXY_D3DKMT_CREATE_SYNC_OBJ
+    #define PROXY_D3DKMT_SIGNAL_SYNC_OBJ
+    #define PROXY_D3DKMT_WAIT_FOR_SYNC_OBJ
+    #define PROXY_D3DKMT_DESTROY_SYNC_OBJ
+
+    // F. System & Misc
+    #define PROXY_D3DKMT_ESCAPE
+    #define PROXY_D3DKMT_GET_RUNTIME_DATA
+#endif
+
+// ============================================================================
+// ARCHITECTURAL FALLBACK MAPPING
+// ============================================================================
+// This internal logic maps disabled hooks to their legacy ASM counterparts.
+
+#ifdef PROXY_D3D11_CORE_CREATE_DEVICE
+#define PROXY_D3D11_CORE_CREATE_DEVICE_LEGACY
+#endif
 
 namespace d3d11 {
 
@@ -192,8 +286,7 @@ namespace d3d11 {
         // SECTION 2: INTERNAL & UNDOCUMENTED "CORE" APIs (High Volatility)
         // ============================================================================
 
-#ifdef CORE_CREATE_DEVICE_LEGACY
-
+#ifdef PROXY_D3D11_CORE_CREATE_DEVICE_LEGACY
         typedef HRESULT(WINAPI* D3D11CoreCreateDevice_t)(
             IDXGIFactory*,
             IDXGIAdapter*,
@@ -225,9 +318,7 @@ namespace d3d11 {
             UINT FeatureLevels,
             ID3D11Device** ppDevice
         );
-        
 #else
-
         typedef HRESULT(WINAPI* D3D11CoreCreateDevice_t)(
             IDXGIFactory* pFactory,
             IDXGIAdapter* pAdapter,
@@ -270,7 +361,6 @@ namespace d3d11 {
             ID3D11Device** ppDevice,
             D3D_FEATURE_LEVEL* pOutFeatureLevel
         );
-
 #endif
 
         typedef HRESULT(WINAPI* D3D11CoreRegisterLayers_t)(const void*, DWORD);
@@ -788,6 +878,20 @@ namespace d3d11 {
          */
         HRESULT WINAPI D3DKMTSetDisplayMode_();
 
+        typedef HRESULT(WINAPI* D3DKMTGetDisplayModeList_t)();
+        /**
+         * @brief Retrieves a list of available display modes, including extended formats.
+         * Queries the display miniport driver for all supported screen resolutions,
+         * refresh rates, and scanline ordering for a specific display source.
+         * @note Official Signature: NTSTATUS APIENTRY D3DKMTGetDisplayModeList(D3DKMT_GETDISPLAYMODELIST* pData)
+         * This wrapper uses an implicit passthrough. The 'pData' structure contains
+         * the source handle and will be populated with the mode list upon success.
+         * @param pData [in, out] Pointer to a D3DKMT_GETDISPLAYMODELIST structure.
+         * @return NTSTATUS Returns STATUS_SUCCESS (0) if the mode list was retrieved.
+         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtgetdisplaymodelist
+         */
+        HRESULT WINAPI D3DKMTGetDisplayModeList_();
+
         typedef HRESULT(WINAPI* D3DKMTSetDisplayPrivateDriverFormat_t)();
         /**
          * @brief Changes the private format attribute of a video present source.
@@ -814,6 +918,33 @@ namespace d3d11 {
          * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtsetgammaramp
          */
         HRESULT WINAPI D3DKMTSetGammaRamp_();
+
+        typedef HRESULT(WINAPI* D3DKMTGetMultisampleMethodList_t)();
+        /**
+         * @brief Retrieves a list of multiple-sample methods supported for an allocation.
+         * This KMT function queries the display miniport driver for the available
+         * multi-sampling (MSAA) configurations for a specific pixel format and
+         * resolution on a given adapter.
+         * @note Official Signature: NTSTATUS APIENTRY D3DKMTGetMultisampleMethodList(D3DKMT_GETMULTISAMPLEMETHODLIST* pData)
+         * This wrapper uses an implicit passthrough. The 'pData' structure contains
+         * the adapter handle and format, and will be populated with the method list.
+         * @param pData [in, out] Pointer to a D3DKMT_GETMULTISAMPLEMETHODLIST structure.
+         * @return NTSTATUS Returns STATUS_SUCCESS (0) if the method list was retrieved.
+         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtgetmultisamplemethodlist
+         */
+        HRESULT WINAPI D3DKMTGetMultisampleMethodList_();
+
+        typedef HRESULT(WINAPI* D3DKMTWaitForVerticalBlankEvent_t)();
+        /**
+         * @brief Waits for the vertical blanking interval (V-Sync) to occur.
+         * Blocks the calling thread until the monitor finishes drawing the current
+         * frame and enters the vertical blanking period. This is essential for
+         * tear-free rendering and precise timing of frame presentations.
+         * @param pData [in] Pointer to a D3DKMT_WAITFORVERTICALBLANKEVENT structure.
+         * @return NTSTATUS Returns STATUS_SUCCESS (0) on success.
+         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtwaitforverticalblankevent
+         */
+        HRESULT WINAPI D3DKMTWaitForVerticalBlankEvent_();
 
         typedef HRESULT(WINAPI* D3DKMTRender_t)();
         /**
@@ -842,47 +973,6 @@ namespace d3d11 {
          * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtpresent
          */
         HRESULT WINAPI D3DKMTPresent_();
-
-        typedef HRESULT(WINAPI* D3DKMTGetDisplayModeList_t)();
-        /**
-         * @brief Retrieves a list of available display modes, including extended formats.
-         * Queries the display miniport driver for all supported screen resolutions,
-         * refresh rates, and scanline ordering for a specific display source.
-         * @note Official Signature: NTSTATUS APIENTRY D3DKMTGetDisplayModeList(D3DKMT_GETDISPLAYMODELIST* pData)
-         * This wrapper uses an implicit passthrough. The 'pData' structure contains
-         * the source handle and will be populated with the mode list upon success.
-         * @param pData [in, out] Pointer to a D3DKMT_GETDISPLAYMODELIST structure.
-         * @return NTSTATUS Returns STATUS_SUCCESS (0) if the mode list was retrieved.
-         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtgetdisplaymodelist
-         */
-        HRESULT WINAPI D3DKMTGetDisplayModeList_();
-
-        typedef HRESULT(WINAPI* D3DKMTGetMultisampleMethodList_t)();
-        /**
-         * @brief Retrieves a list of multiple-sample methods supported for an allocation.
-         * This KMT function queries the display miniport driver for the available
-         * multi-sampling (MSAA) configurations for a specific pixel format and
-         * resolution on a given adapter.
-         * @note Official Signature: NTSTATUS APIENTRY D3DKMTGetMultisampleMethodList(D3DKMT_GETMULTISAMPLEMETHODLIST* pData)
-         * This wrapper uses an implicit passthrough. The 'pData' structure contains
-         * the adapter handle and format, and will be populated with the method list.
-         * @param pData [in, out] Pointer to a D3DKMT_GETMULTISAMPLEMETHODLIST structure.
-         * @return NTSTATUS Returns STATUS_SUCCESS (0) if the method list was retrieved.
-         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtgetmultisamplemethodlist
-         */
-        HRESULT WINAPI D3DKMTGetMultisampleMethodList_();
-
-        typedef HRESULT(WINAPI* D3DKMTWaitForVerticalBlankEvent_t)();
-        /**
-         * @brief Waits for the vertical blanking interval (V-Sync) to occur.
-         * Blocks the calling thread until the monitor finishes drawing the current
-         * frame and enters the vertical blanking period. This is essential for
-         * tear-free rendering and precise timing of frame presentations.
-         * @param pData [in] Pointer to a D3DKMT_WAITFORVERTICALBLANKEVENT structure.
-         * @return NTSTATUS Returns STATUS_SUCCESS (0) on success.
-         * @see https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/d3dkmthk/nf-d3dkmthk-d3dkmtwaitforverticalblankevent
-         */
-        HRESULT WINAPI D3DKMTWaitForVerticalBlankEvent_();
 
         // ============================================================================
         // 5.E: Synchronization

@@ -70,7 +70,7 @@ namespace d3d11 {
 		FARPROC proc_OpenAdapter10_2 = nullptr;
 	}
 
-	static const ProxyMapping g_proxy_map[] = {
+	static const ProxyMapping s_proxy_map[] = {
 		{ "CreateDirect3D11DeviceFromDXGIDevice", &proc_CreateDirect3D11DeviceFromDXGIDevice },
 		{ "CreateDirect3D11SurfaceFromDXGISurface", &proc_CreateDirect3D11SurfaceFromDXGISurface },
 		{ "D3D11CoreCreateDevice", &proc_D3D11CoreCreateDevice },
@@ -124,7 +124,7 @@ namespace d3d11 {
 		{ "OpenAdapter10_2", &proc_OpenAdapter10_2 }
 	};
 
-	static constexpr size_t mapping_count = sizeof(g_proxy_map) / sizeof(ProxyMapping);
+	static constexpr size_t mapping_count = sizeof(s_proxy_map) / sizeof(ProxyMapping);
 	static constexpr const char* file_name = "d3d11.dll";
 	static constexpr size_t func_count = 51; // func_count = 42 on Windows 7
 
@@ -163,7 +163,7 @@ namespace d3d11 {
 		}
 
 		// cache all function pointers
-		int found = map_functions(s_export_cache, g_proxy_map, mapping_count);
+		int found = map_functions(s_export_cache, s_proxy_map, mapping_count);
 
 		LOG_VARS(mapping_count, found);
 		return (found > 0);

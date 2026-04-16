@@ -105,8 +105,8 @@ namespace d3d11 {
     //
     //     E. Synchronization:
     //        - D3DKMTCreateSynchronizationObject_
-    //        - D3DKMTWaitForSynchronizationObject_
     //        - D3DKMTSignalSynchronizationObject_
+    //        - D3DKMTWaitForSynchronizationObject_
     //        - D3DKMTDestroySynchronizationObject_
     //
     //     F. System & Misc:
@@ -121,6 +121,7 @@ namespace d3d11 {
         // SECTION 1: PUBLIC SDK APIs (Stable & Documented)
         // ============================================================================
 
+#ifdef PROXY_D3D11_CREATE_DEVICE
         HRESULT WINAPI D3D11CreateDevice_(
             _In_opt_ IDXGIAdapter* pAdapter,
             D3D_DRIVER_TYPE DriverType,
@@ -157,7 +158,11 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3D11CreateDevice=D3D11CreateDevice_ASM")
+#endif
 
+#ifdef PROXY_D3D11_CREATE_DEVICE_AND_SWCHAIN
         HRESULT WINAPI D3D11CreateDeviceAndSwapChain_(
             _In_opt_ IDXGIAdapter* pAdapter,
             D3D_DRIVER_TYPE DriverType,
@@ -198,7 +203,11 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3D11CreateDeviceAndSwapChain=D3D11CreateDeviceAndSwapChain_ASM")
+#endif
 
+#ifdef PROXY_D3D11_ON12_CREATE_DEVICE
         HRESULT WINAPI D3D11On12CreateDevice_(
             _In_ IUnknown* pDevice,
             UINT Flags,
@@ -237,7 +246,11 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3D11On12CreateDevice=D3D11On12CreateDevice_ASM")
+#endif
 
+#ifdef PROXY_CREATE_D3D11_DEV_FROM_DXGI
         HRESULT WINAPI CreateDirect3D11DeviceFromDXGIDevice_(_In_ IDXGIDevice* dxgiDevice, _Out_ IInspectable** graphicsDevice)
         {
             /**
@@ -253,7 +266,11 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:CreateDirect3D11DeviceFromDXGIDevice=CreateDirect3D11DeviceFromDXGIDevice_ASM")
+#endif
 
+#ifdef PROXY_CREATE_D3D11_SURF_FROM_DXGI
         HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface)
         {
             /**
@@ -270,13 +287,16 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:CreateDirect3D11SurfaceFromDXGISurface=CreateDirect3D11SurfaceFromDXGISurface_ASM")
+#endif
 
         // ============================================================================
         // SECTION 2: INTERNAL & UNDOCUMENTED "CORE" APIs (High Volatility)
         // ============================================================================
 
-#ifdef CORE_CREATE_DEVICE_LEGACY
-
+#ifdef PROXY_D3D11_CORE_CREATE_DEVICE
+#ifdef PROXY_D3D11_CORE_CREATE_DEVICE_LEGACY
         HRESULT WINAPI D3D11CoreCreateDevice_(
             IDXGIFactory* pFactory,
             IDXGIAdapter* pAdapter,
@@ -304,9 +324,7 @@ namespace d3d11 {
                 );
             return result;
         }
-
 #else
-
         HRESULT WINAPI D3D11CoreCreateDevice_(
             IDXGIFactory* pFactory,
             IDXGIAdapter* pAdapter,
@@ -342,9 +360,12 @@ namespace d3d11 {
                 );
             return result;
         }
-
+#endif
+#else
+#pragma comment(linker, "/export:D3D11CoreCreateDevice=D3D11CoreCreateDevice_ASM")
 #endif
 
+#ifdef PROXY_D3D11_CORE_REGISTER_LAYERS
         HRESULT WINAPI D3D11CoreRegisterLayers_(const void* pLayerInfo, DWORD LayerCount)
         {
             /**
@@ -363,7 +384,11 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3D11CoreRegisterLayers=D3D11CoreRegisterLayers_ASM")
+#endif
 
+#ifdef PROXY_D3D11_CORE_CREATE_LAYERED_DEV
         HRESULT WINAPI D3D11CoreCreateLayeredDevice_(
             const void* pLayerContexts,
             DWORD ContextCount,
@@ -388,7 +413,11 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3D11CoreCreateLayeredDevice=D3D11CoreCreateLayeredDevice_ASM")
+#endif
 
+#ifdef PROXY_D3D11_CORE_GET_LAYERED_SIZE
         SIZE_T WINAPI D3D11CoreGetLayeredDeviceSize_(const void* pLayerContexts, DWORD ContextCount)
         {
             /**
@@ -407,7 +436,11 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3D11CoreGetLayeredDeviceSize=D3D11CoreGetLayeredDeviceSize_ASM")
+#endif
 
+#ifdef PROXY_D3D11_CREATE_DEVICE_FOR_D3D12
         HRESULT WINAPI D3D11CreateDeviceForD3D12_(
             IUnknown* pDevice,
             UINT Flags,
@@ -443,7 +476,11 @@ namespace d3d11 {
                 );
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3D11CreateDeviceForD3D12=D3D11CreateDeviceForD3D12_ASM")
+#endif
 
+#ifdef PROXY_ENABLE_FEATURE_LEVEL_UPGRADE
         void* WINAPI EnableFeatureLevelUpgrade_()
         {
             /**
@@ -459,11 +496,15 @@ namespace d3d11 {
             void* result = fn ? fn() : (void*)E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:EnableFeatureLevelUpgrade=EnableFeatureLevelUpgrade_ASM")
+#endif
 
         // ============================================================================
         // SECTION 3: User-Mode Driver
         // ============================================================================
 
+#ifdef PROXY_OPEN_ADAPTER_10
         HRESULT WINAPI OpenAdapter10_(_Inout_ void* pOpenData)
         {
             /**
@@ -478,7 +519,11 @@ namespace d3d11 {
             HRESULT result = reinterpret_cast<OpenAdapter10_t>(proc_OpenAdapter10)(pOpenData);
             return result;
         }
+#else
+#pragma comment(linker, "/export:OpenAdapter10=OpenAdapter10_ASM")
+#endif
 
+#ifdef PROXY_OPEN_ADAPTER_10_2
         HRESULT WINAPI OpenAdapter10_2_(_Inout_ void* pOpenData)
         {
             /**
@@ -493,11 +538,15 @@ namespace d3d11 {
             HRESULT result = reinterpret_cast<OpenAdapter10_2_t>(proc_OpenAdapter10_2)(pOpenData);
             return result;
         }
+#else
+#pragma comment(linker, "/export:OpenAdapter10_2=OpenAdapter10_2_ASM")
+#endif
 
         // ============================================================================
         // SECTION 4: D3D Performance Tooling
         // ============================================================================
 
+#ifdef PROXY_D3D_PERF_BEGIN_EVENT
         void* D3DPerformance_BeginEvent_(void* unknown0, void* unknown1)
         {
             /**
@@ -512,7 +561,11 @@ namespace d3d11 {
             void* result = fn ? fn(unknown0, unknown1) : (void*)E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DPerformance_BeginEvent=D3DPerformance_BeginEvent_ASM")
+#endif
 
+#ifdef PROXY_D3D_PERF_END_EVENT
         void* D3DPerformance_EndEvent_(void** unknown0)
         {
             /**
@@ -526,7 +579,11 @@ namespace d3d11 {
             void* result = fn ? fn(unknown0) : (void*)E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DPerformance_EndEvent=D3DPerformance_EndEvent_ASM")
+#endif
 
+#ifdef PROXY_D3D_PERF_SET_MARKER
         UINT D3DPerformance_SetMarker_(void* unknown0, void* unknown1)
         {
             /**
@@ -542,7 +599,11 @@ namespace d3d11 {
             UINT result = fn ? fn(unknown0, unknown1) : (UINT)E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DPerformance_SetMarker=D3DPerformance_SetMarker_ASM")
+#endif
 
+#ifdef PROXY_D3D_PERF_GET_STATUS
         void* D3DPerformance_GetStatus_(void** unknown0)
         {
             /**
@@ -556,6 +617,9 @@ namespace d3d11 {
             void* result = fn ? fn(unknown0) : (void*)E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DPerformance_GetStatus=D3DPerformance_GetStatus_ASM")
+#endif
 
         // ============================================================================
         // SECTION 5: Kernel-Mode Thunks (D3DKMT)
@@ -565,6 +629,7 @@ namespace d3d11 {
         // 5.A: Adapter & Device Management
         // ============================================================================
 
+#ifdef PROXY_D3DKMT_OPEN_ADAPTER_FROM_HDC
         HRESULT WINAPI D3DKMTOpenAdapterFromHdc_()
         {
             /**
@@ -579,7 +644,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTOpenAdapterFromHdc=D3DKMTOpenAdapterFromHdc_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_QUERY_ADAPTER_INFO
         HRESULT WINAPI D3DKMTQueryAdapterInfo_()
         {
             /**
@@ -594,7 +663,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTQueryAdapterInfo=D3DKMTQueryAdapterInfo_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_CREATE_DEVICE
         HRESULT WINAPI D3DKMTCreateDevice_()
         {
             /**
@@ -612,7 +685,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTCreateDevice=D3DKMTCreateDevice_ASM")
+#endif
         
+#ifdef PROXY_D3DKMT_GET_DEVICE_STATE
         HRESULT WINAPI D3DKMTGetDeviceState_()
         {
             /**
@@ -630,7 +707,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTGetDeviceState=D3DKMTGetDeviceState_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_DESTROY_DEVICE
         HRESULT WINAPI D3DKMTDestroyDevice_()
         {
             /**
@@ -647,7 +728,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTDestroyDevice=D3DKMTDestroyDevice_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_CLOSE_ADAPTER
         HRESULT WINAPI D3DKMTCloseAdapter_()
         {
             /**
@@ -662,11 +747,15 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTCloseAdapter=D3DKMTCloseAdapter_ASM")
+#endif
 
         // ============================================================================
         // 5.B: Context & Scheduling
         // ============================================================================
 
+#ifdef PROXY_D3DKMT_CREATE_CONTEXT
         HRESULT WINAPI D3DKMTCreateContext_()
         {
             /**
@@ -683,7 +772,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTCreateContext=D3DKMTCreateContext_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_GET_CONTEXT_SCHED_PRIO
         HRESULT WINAPI D3DKMTGetContextSchedulingPriority_()
         {
             /**
@@ -701,7 +794,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTGetContextSchedulingPriority=D3DKMTGetContextSchedulingPriority_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_SET_CONTEXT_SCHED_PRIO
         HRESULT WINAPI D3DKMTSetContextSchedulingPriority_()
         {
             /**
@@ -715,7 +812,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTSetContextSchedulingPriority=D3DKMTSetContextSchedulingPriority_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_DESTROY_CONTEXT
         HRESULT WINAPI D3DKMTDestroyContext_()
         {
             /**
@@ -732,11 +833,15 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTDestroyContext=D3DKMTDestroyContext_ASM")
+#endif
 
         // ============================================================================
         // 5.C: Allocation & Resource Management
         // ============================================================================
 
+#ifdef PROXY_D3DKMT_CREATE_ALLOCATION
         HRESULT WINAPI D3DKMTCreateAllocation_()
         {
             /**
@@ -753,7 +858,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTCreateAllocation=D3DKMTCreateAllocation_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_QUERY_RESOURCE_INFO
         HRESULT WINAPI D3DKMTQueryResourceInfo_()
         {
             /**
@@ -768,7 +877,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTQueryResourceInfo=D3DKMTQueryResourceInfo_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_OPEN_RESOURCE
         HRESULT WINAPI D3DKMTOpenResource_()
         {
             /**
@@ -783,7 +896,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTOpenResource=D3DKMTOpenResource_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_GET_SHARED_PRIMARY
         HRESULT WINAPI D3DKMTGetSharedPrimaryHandle_()
         {
             /**
@@ -800,7 +917,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTGetSharedPrimaryHandle=D3DKMTGetSharedPrimaryHandle_ASM")
+#endif
         
+#ifdef PROXY_D3DKMT_LOCK
         HRESULT WINAPI D3DKMTLock_()
         {
             /**
@@ -818,7 +939,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTLock=D3DKMTLock_ASM")
+#endif
         
+#ifdef PROXY_D3DKMT_UNLOCK
         HRESULT WINAPI D3DKMTUnlock_()
         {
             /**
@@ -832,7 +957,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTUnlock=D3DKMTUnlock_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_QUERY_ALLOC_RESIDENCY
         HRESULT WINAPI D3DKMTQueryAllocationResidency_()
         {
             /**
@@ -847,7 +976,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTQueryAllocationResidency=D3DKMTQueryAllocationResidency_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_SET_ALLOC_PRIORITY
         HRESULT WINAPI D3DKMTSetAllocationPriority_()
         {
             /**
@@ -862,7 +995,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTSetAllocationPriority=D3DKMTSetAllocationPriority_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_DESTROY_ALLOCATION
         HRESULT WINAPI D3DKMTDestroyAllocation_()
         {
             /**
@@ -880,11 +1017,15 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTDestroyAllocation=D3DKMTDestroyAllocation_ASM")
+#endif
 
         // ============================================================================
         // 5.D: Rendering & Display
         // ============================================================================
 
+#ifdef PROXY_D3DKMT_SET_VIDPN_SOURCE_OWNER
         HRESULT WINAPI D3DKMTSetVidPnSourceOwner_()
         {
             /**
@@ -899,7 +1040,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTSetVidPnSourceOwner=D3DKMTSetVidPnSourceOwner_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_SET_DISPLAY_MODE
         HRESULT WINAPI D3DKMTSetDisplayMode_()
         {
             /**
@@ -913,68 +1058,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTSetDisplayMode=D3DKMTSetDisplayMode_ASM")
+#endif
 
-        HRESULT WINAPI D3DKMTSetDisplayPrivateDriverFormat_()
-        {
-            /**
-             * @note IMPLEMENTATION DETAILS:
-             * A specialized thunk used for driver-specific optimizations.
-             * Since the structure can be vendor-dependent (IHV specific),
-             * a transparent forward without parameter manipulation is
-             * mandatory to ensure compatibility.
-             */
-
-            auto fn = reinterpret_cast<D3DKMTSetDisplayPrivateDriverFormat_t>(proc_D3DKMTSetDisplayPrivateDriverFormat);
-            HRESULT result = fn ? fn() : E_NOTIMPL;
-            return result;
-        }
-
-        HRESULT WINAPI D3DKMTSetGammaRamp_()
-        {
-            /**
-             * @note IMPLEMENTATION DETAILS:
-             * This function is commonly used by calibration software or in-game
-             * brightness sliders. Since it accesses the monitor's hardware LUT
-             * (Lookup Table), any failure in forwarding can lead to color
-             * distortion across the entire desktop.
-             */
-
-            auto fn = reinterpret_cast<D3DKMTSetGammaRamp_t>(proc_D3DKMTSetGammaRamp);
-            HRESULT result = fn ? fn() : E_NOTIMPL;
-            return result;
-        }
-
-        HRESULT WINAPI D3DKMTRender_()
-        {
-            /**
-             * @note IMPLEMENTATION DETAIL:
-             * This is arguably the most performance-critical KMT thunk.
-             * 1. It is called multiple times per frame to flush command batches.
-             * 2. The 'pData' in RCX contains the command buffer address and size.
-             * 3. Any latency introduced here directly translates to CPU-side stutter.
-             */
-
-            auto fn = reinterpret_cast<D3DKMTRender_t>(proc_D3DKMTRender);
-            HRESULT result = fn ? fn() : E_NOTIMPL;
-            return result;
-        }
-
-        HRESULT WINAPI D3DKMTPresent_()
-        {
-            /**
-             * @note IMPLEMENTATION DETAIL:
-             * CRITICAL: This is a high-frequency call (once per frame).
-             * 1. This is the ultimate "Hook Point" for measuring Frame Time.
-             * 2. Any overhead introduced here will directly impact the game's FPS.
-             * 3. The 'pData' pointer in RCX contains the vertical sync (VSync)
-             * settings and the source/destination surface handles.
-             */
-
-            auto fn = reinterpret_cast<D3DKMTPresent_t>(proc_D3DKMTPresent);
-            HRESULT result = fn ? fn() : E_NOTIMPL;
-            return result;
-        }
-
+#ifdef PROXY_D3DKMT_GET_DISPLAY_MODE_LIST
         HRESULT WINAPI D3DKMTGetDisplayModeList_()
         {
             /**
@@ -992,7 +1080,49 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTGetDisplayModeList=D3DKMTGetDisplayModeList_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_SET_DISPLAY_PRIV_DRIVER
+        HRESULT WINAPI D3DKMTSetDisplayPrivateDriverFormat_()
+        {
+            /**
+             * @note IMPLEMENTATION DETAILS:
+             * A specialized thunk used for driver-specific optimizations.
+             * Since the structure can be vendor-dependent (IHV specific),
+             * a transparent forward without parameter manipulation is
+             * mandatory to ensure compatibility.
+             */
+
+            auto fn = reinterpret_cast<D3DKMTSetDisplayPrivateDriverFormat_t>(proc_D3DKMTSetDisplayPrivateDriverFormat);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
+            return result;
+        }
+#else
+#pragma comment(linker, "/export:D3DKMTSetDisplayPrivateDriverFormat=D3DKMTSetDisplayPrivateDriverFormat_ASM")
+#endif
+
+#ifdef PROXY_D3DKMT_SET_GAMMA_RAMP
+        HRESULT WINAPI D3DKMTSetGammaRamp_()
+        {
+            /**
+             * @note IMPLEMENTATION DETAILS:
+             * This function is commonly used by calibration software or in-game
+             * brightness sliders. Since it accesses the monitor's hardware LUT
+             * (Lookup Table), any failure in forwarding can lead to color
+             * distortion across the entire desktop.
+             */
+
+            auto fn = reinterpret_cast<D3DKMTSetGammaRamp_t>(proc_D3DKMTSetGammaRamp);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
+            return result;
+        }
+#else
+#pragma comment(linker, "/export:D3DKMTSetGammaRamp=D3DKMTSetGammaRamp_ASM")
+#endif
+
+#ifdef PROXY_D3DKMT_GET_MULTISAMPLE_LIST
         HRESULT WINAPI D3DKMTGetMultisampleMethodList_()
         {
             /**
@@ -1010,7 +1140,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTGetMultisampleMethodList=D3DKMTGetMultisampleMethodList_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_WAIT_FOR_VBLANK
         HRESULT WINAPI D3DKMTWaitForVerticalBlankEvent_()
         {
             /**
@@ -1026,11 +1160,54 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTWaitForVerticalBlankEvent=D3DKMTWaitForVerticalBlankEvent_ASM")
+#endif
+
+#ifdef PROXY_D3DKMT_RENDER
+        HRESULT WINAPI D3DKMTRender_()
+        {
+            /**
+             * @note IMPLEMENTATION DETAIL:
+             * This is arguably the most performance-critical KMT thunk.
+             * 1. It is called multiple times per frame to flush command batches.
+             * 2. The 'pData' in RCX contains the command buffer address and size.
+             * 3. Any latency introduced here directly translates to CPU-side stutter.
+             */
+
+            auto fn = reinterpret_cast<D3DKMTRender_t>(proc_D3DKMTRender);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
+            return result;
+        }
+#else
+#pragma comment(linker, "/export:D3DKMTRender=D3DKMTRender_ASM")
+#endif
+
+#ifdef PROXY_D3DKMT_PRESENT
+        HRESULT WINAPI D3DKMTPresent_()
+        {
+            /**
+             * @note IMPLEMENTATION DETAIL:
+             * CRITICAL: This is a high-frequency call (once per frame).
+             * 1. This is the ultimate "Hook Point" for measuring Frame Time.
+             * 2. Any overhead introduced here will directly impact the game's FPS.
+             * 3. The 'pData' pointer in RCX contains the vertical sync (VSync)
+             * settings and the source/destination surface handles.
+             */
+
+            auto fn = reinterpret_cast<D3DKMTPresent_t>(proc_D3DKMTPresent);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
+            return result;
+        }
+#else
+#pragma comment(linker, "/export:D3DKMTPresent=D3DKMTPresent_ASM")
+#endif
 
         // ============================================================================
         // 5.E: Synchronization
         // ============================================================================
 
+#ifdef PROXY_D3DKMT_CREATE_SYNC_OBJ
         HRESULT WINAPI D3DKMTCreateSynchronizationObject_()
         {
             /**
@@ -1048,7 +1225,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTCreateSynchronizationObject=D3DKMTCreateSynchronizationObject_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_SIGNAL_SYNC_OBJ
         HRESULT WINAPI D3DKMTSignalSynchronizationObject_()
         {
             /**
@@ -1063,7 +1244,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTSignalSynchronizationObject=D3DKMTSignalSynchronizationObject_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_WAIT_FOR_SYNC_OBJ
         HRESULT WINAPI D3DKMTWaitForSynchronizationObject_()
         {
             /**
@@ -1080,7 +1265,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTWaitForSynchronizationObject=D3DKMTWaitForSynchronizationObject_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_DESTROY_SYNC_OBJ
         HRESULT WINAPI D3DKMTDestroySynchronizationObject_()
         {
             /**
@@ -1099,11 +1288,15 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTDestroySynchronizationObject=D3DKMTDestroySynchronizationObject_ASM")
+#endif
 
         // ============================================================================
         // 5.F: System & Misc
         // ============================================================================
 
+#ifdef PROXY_D3DKMT_ESCAPE
         HRESULT WINAPI D3DKMTEscape_()
         {
             /**
@@ -1121,7 +1314,11 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTEscape=D3DKMTEscape_ASM")
+#endif
 
+#ifdef PROXY_D3DKMT_GET_RUNTIME_DATA
         HRESULT WINAPI D3DKMTGetRuntimeData_()
         {
             /**
@@ -1139,6 +1336,9 @@ namespace d3d11 {
             HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
+#else
+#pragma comment(linker, "/export:D3DKMTGetRuntimeData=D3DKMTGetRuntimeData_ASM")
+#endif
 
     }
 
