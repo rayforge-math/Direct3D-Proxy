@@ -15,6 +15,7 @@ namespace d3d11 {
 		extern FARPROC proc_D3D11CreateDeviceAndSwapChain;
 		extern FARPROC proc_D3D11CreateDeviceForD3D12;
 		extern FARPROC proc_D3D11On12CreateDevice;
+		extern FARPROC proc_EnableFeatureLevelUpgrade;
 		extern FARPROC proc_D3DKMTCloseAdapter;
 		extern FARPROC proc_D3DKMTCreateAllocation;
 		extern FARPROC proc_D3DKMTCreateContext;
@@ -53,7 +54,6 @@ namespace d3d11 {
 		extern FARPROC proc_D3DPerformance_EndEvent;
 		extern FARPROC proc_D3DPerformance_GetStatus;
 		extern FARPROC proc_D3DPerformance_SetMarker;
-		extern FARPROC proc_EnableFeatureLevelUpgrade;
 		extern FARPROC proc_OpenAdapter10;
 		extern FARPROC proc_OpenAdapter10_2;
 	}

@@ -52,8 +52,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\d3d11\d3d11_impl.def">
+    <MASM Include="src\d3d11\jump_stubs.asm">
       <Filter>Source Files\d3d11</Filter>
-    </None>
+    </MASM>
   </ItemGroup>
 </Project>

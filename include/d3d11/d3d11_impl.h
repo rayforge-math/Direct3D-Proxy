@@ -5,6 +5,7 @@
         https://chromium.googlesource.com/external/p3/regal/+/cass/src/apitrace/wrappers/d3d11stubs.cpp
         https://github.com/wine-mirror/wine/blob/master/dlls/d3d11/d3d11_main.c
         https://github.com/apitrace/dxsdk/blob/master/Include/d3d11.h
+        https://github.com/crosire/reshade/blob/main/source/d3d11/d3d11.cpp
 */
 #pragma once
 
@@ -16,98 +17,122 @@
 // ============================================================================
 // Comment out a define to disable the C++ Hook and use the ASM Pass-Through.
 
-// [1] PUBLIC SDK APIs
-#define PROXY_SECTION_1
-#ifdef PROXY_SECTION_1
-    #define PROXY_D3D11_CREATE_DEVICE
-    #define PROXY_D3D11_CREATE_DEVICE_AND_SWCHAIN
-    #define PROXY_D3D11_ON12_CREATE_DEVICE
-    #define PROXY_CREATE_D3D11_DEV_FROM_DXGI
-    #define PROXY_CREATE_D3D11_SURF_FROM_DXGI
-#endif
+//#define PROXY_BYPASS_ALL
+#ifndef PROXY_BYPASS_ALL
 
-// [2] INTERNAL & UNDOCUMENTED "CORE" APIs
-#define PROXY_SECTION_2
-#ifdef PROXY_SECTION_2
-    #define PROXY_D3D11_CORE_CREATE_DEVICE
-    #define PROXY_D3D11_CORE_REGISTER_LAYERS
-    #define PROXY_D3D11_CORE_CREATE_LAYERED_DEV
-    #define PROXY_D3D11_CORE_GET_LAYERED_SIZE
-    #define PROXY_D3D11_CREATE_DEVICE_FOR_D3D12
-    #define PROXY_ENABLE_FEATURE_LEVEL_UPGRADE
-#endif
+    // [1] PUBLIC SDK APIs
+    #define PROXY_SECTION_1
+    #ifdef PROXY_SECTION_1
+        #define PROXY_D3D11_CREATE_DEVICE
+        #define PROXY_D3D11_CREATE_DEVICE_AND_SWCHAIN
+        #define PROXY_D3D11_ON12_CREATE_DEVICE
+        #define PROXY_CREATE_D3D11_DEV_FROM_DXGI
+        #define PROXY_CREATE_D3D11_SURF_FROM_DXGI
+    #endif
 
-// [3] USER-MODE DRIVER
-#define PROXY_SECTION_3
-#ifdef PROXY_SECTION_3
-    #define PROXY_OPEN_ADAPTER_10
-    #define PROXY_OPEN_ADAPTER_10_2
-#endif
+    // [2] INTERNAL & UNDOCUMENTED "CORE" APIs
+    //#define PROXY_SECTION_2
+    #ifdef PROXY_SECTION_2
+        #define PROXY_D3D11_CORE_CREATE_DEVICE
+        #define PROXY_D3D11_CORE_REGISTER_LAYERS
+        #define PROXY_D3D11_CORE_CREATE_LAYERED_DEV
+        #define PROXY_D3D11_CORE_GET_LAYERED_SIZE
+        #define PROXY_D3D11_CREATE_DEVICE_FOR_D3D12
+        #define PROXY_ENABLE_FEATURE_LEVEL_UPGRADE
+    #endif
 
-// [4] D3D PERFORMANCE TOOLING
-#define PROXY_SECTION_4
-#ifdef PROXY_SECTION_4
-    #define PROXY_D3D_PERF_BEGIN_EVENT
-    #define PROXY_D3D_PERF_END_EVENT
-    #define PROXY_D3D_PERF_SET_MARKER
-    #define PROXY_D3D_PERF_GET_STATUS
-#endif
+    // [3] USER-MODE DRIVER
+    //#define PROXY_SECTION_3
+    #ifdef PROXY_SECTION_3
+        #define PROXY_OPEN_ADAPTER_10
+        #define PROXY_OPEN_ADAPTER_10_2
+    #endif
 
-// [5] KERNEL-MODE THUNKS (D3DKMT)
-#define PROXY_SECTION_5
-#ifdef PROXY_SECTION_5
+    // [4] D3D PERFORMANCE TOOLING
+    //#define PROXY_SECTION_4
+    #ifdef PROXY_SECTION_4
+        #define PROXY_D3D_PERF_BEGIN_EVENT
+        #define PROXY_D3D_PERF_END_EVENT
+        #define PROXY_D3D_PERF_SET_MARKER
+        #define PROXY_D3D_PERF_GET_STATUS
+    #endif
 
-    // A. Adapter & Device Management
-    #define PROXY_D3DKMT_OPEN_ADAPTER_FROM_HDC
-    #define PROXY_D3DKMT_QUERY_ADAPTER_INFO
-    #define PROXY_D3DKMT_CLOSE_ADAPTER
-    #define PROXY_D3DKMT_CREATE_DEVICE
-    #define PROXY_D3DKMT_GET_DEVICE_STATE
-    #define PROXY_D3DKMT_DESTROY_DEVICE
+    // [5] KERNEL-MODE THUNKS (D3DKMT)
+    //#define PROXY_SECTION_5
+    #ifdef PROXY_SECTION_5
 
-    // B. Context & Scheduling
-    #define PROXY_D3DKMT_CREATE_CONTEXT
-    #define PROXY_D3DKMT_GET_CONTEXT_SCHED_PRIO
-    #define PROXY_D3DKMT_SET_CONTEXT_SCHED_PRIO
-    #define PROXY_D3DKMT_DESTROY_CONTEXT
+        // A. Adapter & Device Management
+        #define PROXY_SECTION_5_A
+        #ifdef PROXY_SECTION_5_A
+            #define PROXY_D3DKMT_OPEN_ADAPTER_FROM_HDC
+            #define PROXY_D3DKMT_QUERY_ADAPTER_INFO
+            #define PROXY_D3DKMT_CLOSE_ADAPTER
+            #define PROXY_D3DKMT_CREATE_DEVICE
+            #define PROXY_D3DKMT_GET_DEVICE_STATE
+            #define PROXY_D3DKMT_DESTROY_DEVICE
+        #endif
 
-    // C. Allocation & Resource Management
-    #define PROXY_D3DKMT_CREATE_ALLOCATION
-    #define PROXY_D3DKMT_QUERY_RESOURCE_INFO
-    #define PROXY_D3DKMT_OPEN_RESOURCE
-    #define PROXY_D3DKMT_GET_SHARED_PRIMARY
-    #define PROXY_D3DKMT_LOCK
-    #define PROXY_D3DKMT_UNLOCK
-    #define PROXY_D3DKMT_QUERY_ALLOC_RESIDENCY
-    #define PROXY_D3DKMT_SET_ALLOC_PRIORITY
-    #define PROXY_D3DKMT_DESTROY_ALLOCATION
+        // B. Context & Scheduling
+        #define PROXY_SECTION_5_B
+        #ifdef PROXY_SECTION_5_B
+            #define PROXY_D3DKMT_CREATE_CONTEXT
+            #define PROXY_D3DKMT_GET_CONTEXT_SCHED_PRIO
+            #define PROXY_D3DKMT_SET_CONTEXT_SCHED_PRIO
+            #define PROXY_D3DKMT_DESTROY_CONTEXT
+        #endif
 
-    // D. Rendering & Display
-    #define PROXY_D3DKMT_SET_VIDPN_SOURCE_OWNER
-    #define PROXY_D3DKMT_SET_DISPLAY_MODE
-    #define PROXY_D3DKMT_GET_DISPLAY_MODE_LIST
-    #define PROXY_D3DKMT_SET_DISPLAY_PRIV_DRIVER
-    #define PROXY_D3DKMT_SET_GAMMA_RAMP
-    #define PROXY_D3DKMT_GET_MULTISAMPLE_LIST
-    #define PROXY_D3DKMT_WAIT_FOR_VBLANK
-    #define PROXY_D3DKMT_RENDER
-    #define PROXY_D3DKMT_PRESENT
+        // C. Allocation & Resource Management
+        #define PROXY_SECTION_5_C
+        #ifdef PROXY_SECTION_5_C
+            #define PROXY_D3DKMT_CREATE_ALLOCATION
+            #define PROXY_D3DKMT_QUERY_RESOURCE_INFO
+            #define PROXY_D3DKMT_OPEN_RESOURCE
+            #define PROXY_D3DKMT_GET_SHARED_PRIMARY
+            #define PROXY_D3DKMT_LOCK
+            #define PROXY_D3DKMT_UNLOCK
+            #define PROXY_D3DKMT_QUERY_ALLOC_RESIDENCY
+            #define PROXY_D3DKMT_SET_ALLOC_PRIORITY
+            #define PROXY_D3DKMT_DESTROY_ALLOCATION
+        #endif
 
-    // E. Synchronization
-    #define PROXY_D3DKMT_CREATE_SYNC_OBJ
-    #define PROXY_D3DKMT_SIGNAL_SYNC_OBJ
-    #define PROXY_D3DKMT_WAIT_FOR_SYNC_OBJ
-    #define PROXY_D3DKMT_DESTROY_SYNC_OBJ
+        // D. Rendering & Display
+        #define PROXY_SECTION_5_D
+        #ifdef PROXY_SECTION_5_D
+            #define PROXY_D3DKMT_SET_VIDPN_SOURCE_OWNER
+            #define PROXY_D3DKMT_SET_DISPLAY_MODE
+            #define PROXY_D3DKMT_GET_DISPLAY_MODE_LIST
+            #define PROXY_D3DKMT_SET_DISPLAY_PRIV_DRIVER
+            #define PROXY_D3DKMT_SET_GAMMA_RAMP
+            #define PROXY_D3DKMT_GET_MULTISAMPLE_LIST
+            #define PROXY_D3DKMT_WAIT_FOR_VBLANK
+            #define PROXY_D3DKMT_RENDER
+            #define PROXY_D3DKMT_PRESENT
+        #endif
 
-    // F. System & Misc
-    #define PROXY_D3DKMT_ESCAPE
-    #define PROXY_D3DKMT_GET_RUNTIME_DATA
+        // E. Synchronization
+        #define PROXY_SECTION_5_E
+        #ifdef PROXY_SECTION_5_E
+            #define PROXY_D3DKMT_CREATE_SYNC_OBJ
+            #define PROXY_D3DKMT_SIGNAL_SYNC_OBJ
+            #define PROXY_D3DKMT_WAIT_FOR_SYNC_OBJ
+            #define PROXY_D3DKMT_DESTROY_SYNC_OBJ
+        #endif
+
+        // F. System & Misc
+        #define PROXY_SECTION_5_F
+        #ifdef PROXY_SECTION_5_F
+            #define PROXY_D3DKMT_ESCAPE
+            #define PROXY_D3DKMT_GET_RUNTIME_DATA
+        #endif
+
+    #endif
+
 #endif
 
 // ============================================================================
 // ARCHITECTURAL FALLBACK MAPPING
 // ============================================================================
-// This internal logic maps disabled hooks to their legacy ASM counterparts.
+// This internal logic enables legacy options for proxy functions.
 
 #ifdef PROXY_D3D11_CORE_CREATE_DEVICE
 #define PROXY_D3D11_CORE_CREATE_DEVICE_LEGACY

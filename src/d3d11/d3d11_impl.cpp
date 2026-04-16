@@ -5,6 +5,7 @@
         https://chromium.googlesource.com/external/p3/regal/+/cass/src/apitrace/wrappers/d3d11stubs.cpp
         https://github.com/wine-mirror/wine/blob/master/dlls/d3d11/d3d11_main.c
         https://github.com/apitrace/dxsdk/blob/master/Include/d3d11.h
+        https://github.com/crosire/reshade/blob/main/source/d3d11/d3d11.cpp
 */
 
 #include "d3d11/d3d11_impl.h"
@@ -122,6 +123,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3D11_CREATE_DEVICE
+#pragma comment(linker, "/export:D3D11CreateDevice=D3D11CreateDevice_")
         HRESULT WINAPI D3D11CreateDevice_(
             _In_opt_ IDXGIAdapter* pAdapter,
             D3D_DRIVER_TYPE DriverType,
@@ -163,6 +165,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D11_CREATE_DEVICE_AND_SWCHAIN
+#pragma comment(linker, "/export:D3D11CreateDeviceAndSwapChain=D3D11CreateDeviceAndSwapChain_")
         HRESULT WINAPI D3D11CreateDeviceAndSwapChain_(
             _In_opt_ IDXGIAdapter* pAdapter,
             D3D_DRIVER_TYPE DriverType,
@@ -208,6 +211,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D11_ON12_CREATE_DEVICE
+#pragma comment(linker, "/export:D3D11On12CreateDevice=D3D11On12CreateDevice_")
         HRESULT WINAPI D3D11On12CreateDevice_(
             _In_ IUnknown* pDevice,
             UINT Flags,
@@ -251,6 +255,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_CREATE_D3D11_DEV_FROM_DXGI
+#pragma comment(linker, "/export:CreateDirect3D11DeviceFromDXGIDevice=CreateDirect3D11DeviceFromDXGIDevice_")
         HRESULT WINAPI CreateDirect3D11DeviceFromDXGIDevice_(_In_ IDXGIDevice* dxgiDevice, _Out_ IInspectable** graphicsDevice)
         {
             /**
@@ -271,6 +276,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_CREATE_D3D11_SURF_FROM_DXGI
+#pragma comment(linker, "/export:CreateDirect3D11SurfaceFromDXGISurface=CreateDirect3D11SurfaceFromDXGISurface_")
         HRESULT WINAPI CreateDirect3D11SurfaceFromDXGISurface_(IDXGISurface* dxgiSurface, _Out_ IInspectable** graphicsSurface)
         {
             /**
@@ -296,6 +302,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3D11_CORE_CREATE_DEVICE
+#pragma comment(linker, "/export:D3D11CoreCreateDevice=D3D11CoreCreateDevice_")
 #ifdef PROXY_D3D11_CORE_CREATE_DEVICE_LEGACY
         HRESULT WINAPI D3D11CoreCreateDevice_(
             IDXGIFactory* pFactory,
@@ -366,6 +373,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D11_CORE_REGISTER_LAYERS
+#pragma comment(linker, "/export:D3D11CoreRegisterLayers=D3D11CoreRegisterLayers_")
         HRESULT WINAPI D3D11CoreRegisterLayers_(const void* pLayerInfo, DWORD LayerCount)
         {
             /**
@@ -389,6 +397,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D11_CORE_CREATE_LAYERED_DEV
+#pragma comment(linker, "/export:D3D11CoreCreateLayeredDevice=D3D11CoreCreateLayeredDevice_")
         HRESULT WINAPI D3D11CoreCreateLayeredDevice_(
             const void* pLayerContexts,
             DWORD ContextCount,
@@ -418,6 +427,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D11_CORE_GET_LAYERED_SIZE
+#pragma comment(linker, "/export:D3D11CoreGetLayeredDeviceSize=D3D11CoreGetLayeredDeviceSize_")
         SIZE_T WINAPI D3D11CoreGetLayeredDeviceSize_(const void* pLayerContexts, DWORD ContextCount)
         {
             /**
@@ -441,6 +451,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D11_CREATE_DEVICE_FOR_D3D12
+#pragma comment(linker, "/export:D3D11CreateDeviceForD3D12=D3D11CreateDeviceForD3D12_")
         HRESULT WINAPI D3D11CreateDeviceForD3D12_(
             IUnknown* pDevice,
             UINT Flags,
@@ -481,6 +492,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_ENABLE_FEATURE_LEVEL_UPGRADE
+#pragma comment(linker, "/export:EnableFeatureLevelUpgrade=EnableFeatureLevelUpgrade_")
         void* WINAPI EnableFeatureLevelUpgrade_()
         {
             /**
@@ -505,6 +517,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_OPEN_ADAPTER_10
+#pragma comment(linker, "/export:OpenAdapter10=OpenAdapter10_")
         HRESULT WINAPI OpenAdapter10_(_Inout_ void* pOpenData)
         {
             /**
@@ -524,6 +537,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_OPEN_ADAPTER_10_2
+#pragma comment(linker, "/export:OpenAdapter10_2=OpenAdapter10_2_")
         HRESULT WINAPI OpenAdapter10_2_(_Inout_ void* pOpenData)
         {
             /**
@@ -547,6 +561,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3D_PERF_BEGIN_EVENT
+#pragma comment(linker, "/export:D3DPerformance_BeginEvent=D3DPerformance_BeginEvent_")
         void* D3DPerformance_BeginEvent_(void* unknown0, void* unknown1)
         {
             /**
@@ -566,6 +581,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D_PERF_END_EVENT
+#pragma comment(linker, "/export:D3DPerformance_EndEvent=D3DPerformance_EndEvent_")
         void* D3DPerformance_EndEvent_(void** unknown0)
         {
             /**
@@ -584,6 +600,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D_PERF_SET_MARKER
+#pragma comment(linker, "/export:D3DPerformance_SetMarker=D3DPerformance_SetMarker_")
         UINT D3DPerformance_SetMarker_(void* unknown0, void* unknown1)
         {
             /**
@@ -604,6 +621,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3D_PERF_GET_STATUS
+#pragma comment(linker, "/export:D3DPerformance_GetStatus=D3DPerformance_GetStatus_")
         void* D3DPerformance_GetStatus_(void** unknown0)
         {
             /**
@@ -630,6 +648,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3DKMT_OPEN_ADAPTER_FROM_HDC
+#pragma comment(linker, "/export:D3DKMTOpenAdapterFromHdc=D3DKMTOpenAdapterFromHdc_")
         HRESULT WINAPI D3DKMTOpenAdapterFromHdc_()
         {
             /**
@@ -649,6 +668,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_QUERY_ADAPTER_INFO
+#pragma comment(linker, "/export:D3DKMTQueryAdapterInfo=D3DKMTQueryAdapterInfo_")
         HRESULT WINAPI D3DKMTQueryAdapterInfo_()
         {
             /**
@@ -668,6 +688,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_CREATE_DEVICE
+#pragma comment(linker, "/export:D3DKMTCreateDevice=D3DKMTCreateDevice_")
         HRESULT WINAPI D3DKMTCreateDevice_()
         {
             /**
@@ -690,6 +711,7 @@ namespace d3d11 {
 #endif
         
 #ifdef PROXY_D3DKMT_GET_DEVICE_STATE
+#pragma comment(linker, "/export:D3DKMTGetDeviceState=D3DKMTGetDeviceState_")
         HRESULT WINAPI D3DKMTGetDeviceState_()
         {
             /**
@@ -712,6 +734,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_DESTROY_DEVICE
+#pragma comment(linker, "/export:D3DKMTDestroyDevice=D3DKMTDestroyDevice_")
         HRESULT WINAPI D3DKMTDestroyDevice_()
         {
             /**
@@ -733,6 +756,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_CLOSE_ADAPTER
+#pragma comment(linker, "/export:D3DKMTCloseAdapter=D3DKMTCloseAdapter_")
         HRESULT WINAPI D3DKMTCloseAdapter_()
         {
             /**
@@ -756,6 +780,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3DKMT_CREATE_CONTEXT
+#pragma comment(linker, "/export:D3DKMTCreateContext=D3DKMTCreateContext_")
         HRESULT WINAPI D3DKMTCreateContext_()
         {
             /**
@@ -777,6 +802,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_GET_CONTEXT_SCHED_PRIO
+#pragma comment(linker, "/export:D3DKMTGetContextSchedulingPriority=D3DKMTGetContextSchedulingPriority_")
         HRESULT WINAPI D3DKMTGetContextSchedulingPriority_()
         {
             /**
@@ -799,6 +825,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_SET_CONTEXT_SCHED_PRIO
+#pragma comment(linker, "/export:D3DKMTSetContextSchedulingPriority=D3DKMTSetContextSchedulingPriority_")
         HRESULT WINAPI D3DKMTSetContextSchedulingPriority_()
         {
             /**
@@ -817,6 +844,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_DESTROY_CONTEXT
+#pragma comment(linker, "/export:D3DKMTDestroyContext=D3DKMTDestroyContext_")
         HRESULT WINAPI D3DKMTDestroyContext_()
         {
             /**
@@ -842,6 +870,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3DKMT_CREATE_ALLOCATION
+#pragma comment(linker, "/export:D3DKMTCreateAllocation=D3DKMTCreateAllocation_")
         HRESULT WINAPI D3DKMTCreateAllocation_()
         {
             /**
@@ -863,6 +892,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_QUERY_RESOURCE_INFO
+#pragma comment(linker, "/export:D3DKMTQueryResourceInfo=D3DKMTQueryResourceInfo_")
         HRESULT WINAPI D3DKMTQueryResourceInfo_()
         {
             /**
@@ -882,6 +912,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_OPEN_RESOURCE
+#pragma comment(linker, "/export:D3DKMTOpenResource=D3DKMTOpenResource_")
         HRESULT WINAPI D3DKMTOpenResource_()
         {
             /**
@@ -901,6 +932,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_GET_SHARED_PRIMARY
+#pragma comment(linker, "/export:D3DKMTGetSharedPrimaryHandle=D3DKMTGetSharedPrimaryHandle_")
         HRESULT WINAPI D3DKMTGetSharedPrimaryHandle_()
         {
             /**
@@ -922,6 +954,7 @@ namespace d3d11 {
 #endif
         
 #ifdef PROXY_D3DKMT_LOCK
+#pragma comment(linker, "/export:D3DKMTLock=D3DKMTLock_")
         HRESULT WINAPI D3DKMTLock_()
         {
             /**
@@ -944,6 +977,7 @@ namespace d3d11 {
 #endif
         
 #ifdef PROXY_D3DKMT_UNLOCK
+#pragma comment(linker, "/export:D3DKMTUnlock=D3DKMTUnlock_")
         HRESULT WINAPI D3DKMTUnlock_()
         {
             /**
@@ -962,6 +996,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_QUERY_ALLOC_RESIDENCY
+#pragma comment(linker, "/export:D3DKMTQueryAllocationResidency=D3DKMTQueryAllocationResidency_")
         HRESULT WINAPI D3DKMTQueryAllocationResidency_()
         {
             /**
@@ -981,6 +1016,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_SET_ALLOC_PRIORITY
+#pragma comment(linker, "/export:D3DKMTSetAllocationPriority=D3DKMTSetAllocationPriority_")
         HRESULT WINAPI D3DKMTSetAllocationPriority_()
         {
             /**
@@ -1000,6 +1036,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_DESTROY_ALLOCATION
+#pragma comment(linker, "/export:D3DKMTDestroyAllocation=D3DKMTDestroyAllocation_")
         HRESULT WINAPI D3DKMTDestroyAllocation_()
         {
             /**
@@ -1026,6 +1063,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3DKMT_SET_VIDPN_SOURCE_OWNER
+#pragma comment(linker, "/export:D3DKMTSetVidPnSourceOwner=D3DKMTSetVidPnSourceOwner_")
         HRESULT WINAPI D3DKMTSetVidPnSourceOwner_()
         {
             /**
@@ -1045,6 +1083,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_SET_DISPLAY_MODE
+#pragma comment(linker, "/export:D3DKMTSetDisplayMode=D3DKMTSetDisplayMode_")
         HRESULT WINAPI D3DKMTSetDisplayMode_()
         {
             /**
@@ -1063,6 +1102,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_GET_DISPLAY_MODE_LIST
+#pragma comment(linker, "/export:D3DKMTGetDisplayModeList=D3DKMTGetDisplayModeList_")
         HRESULT WINAPI D3DKMTGetDisplayModeList_()
         {
             /**
@@ -1085,6 +1125,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_SET_DISPLAY_PRIV_DRIVER
+#pragma comment(linker, "/export:D3DKMTSetDisplayPrivateDriverFormat=D3DKMTSetDisplayPrivateDriverFormat_")
         HRESULT WINAPI D3DKMTSetDisplayPrivateDriverFormat_()
         {
             /**
@@ -1104,6 +1145,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_SET_GAMMA_RAMP
+#pragma comment(linker, "/export:D3DKMTSetGammaRamp=D3DKMTSetGammaRamp_")
         HRESULT WINAPI D3DKMTSetGammaRamp_()
         {
             /**
@@ -1123,6 +1165,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_GET_MULTISAMPLE_LIST
+#pragma comment(linker, "/export:D3DKMTGetMultisampleMethodList=D3DKMTGetMultisampleMethodList_")
         HRESULT WINAPI D3DKMTGetMultisampleMethodList_()
         {
             /**
@@ -1145,6 +1188,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_WAIT_FOR_VBLANK
+#pragma comment(linker, "/export:D3DKMTWaitForVerticalBlankEvent=D3DKMTWaitForVerticalBlankEvent_")
         HRESULT WINAPI D3DKMTWaitForVerticalBlankEvent_()
         {
             /**
@@ -1165,6 +1209,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_RENDER
+#pragma comment(linker, "/export:D3DKMTRender=D3DKMTRender_")
         HRESULT WINAPI D3DKMTRender_()
         {
             /**
@@ -1184,6 +1229,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_PRESENT
+#pragma comment(linker, "/export:D3DKMTPresent=D3DKMTPresent_")
         HRESULT WINAPI D3DKMTPresent_()
         {
             /**
@@ -1208,6 +1254,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3DKMT_CREATE_SYNC_OBJ
+#pragma comment(linker, "/export:D3DKMTCreateSynchronizationObject=D3DKMTCreateSynchronizationObject_")
         HRESULT WINAPI D3DKMTCreateSynchronizationObject_()
         {
             /**
@@ -1230,6 +1277,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_SIGNAL_SYNC_OBJ
+#pragma comment(linker, "/export:D3DKMTSignalSynchronizationObject=D3DKMTSignalSynchronizationObject_")
         HRESULT WINAPI D3DKMTSignalSynchronizationObject_()
         {
             /**
@@ -1249,6 +1297,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_WAIT_FOR_SYNC_OBJ
+#pragma comment(linker, "/export:D3DKMTWaitForSynchronizationObject=D3DKMTWaitForSynchronizationObject_")
         HRESULT WINAPI D3DKMTWaitForSynchronizationObject_()
         {
             /**
@@ -1270,6 +1319,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_DESTROY_SYNC_OBJ
+#pragma comment(linker, "/export:D3DKMTDestroySynchronizationObject=D3DKMTDestroySynchronizationObject_")
         HRESULT WINAPI D3DKMTDestroySynchronizationObject_()
         {
             /**
@@ -1297,6 +1347,7 @@ namespace d3d11 {
         // ============================================================================
 
 #ifdef PROXY_D3DKMT_ESCAPE
+#pragma comment(linker, "/export:D3DKMTEscape=D3DKMTEscape_")
         HRESULT WINAPI D3DKMTEscape_()
         {
             /**
@@ -1319,6 +1370,7 @@ namespace d3d11 {
 #endif
 
 #ifdef PROXY_D3DKMT_GET_RUNTIME_DATA
+#pragma comment(linker, "/export:D3DKMTGetRuntimeData=D3DKMTGetRuntimeData_")
         HRESULT WINAPI D3DKMTGetRuntimeData_()
         {
             /**

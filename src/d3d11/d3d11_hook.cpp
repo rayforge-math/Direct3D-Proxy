@@ -27,6 +27,7 @@ namespace d3d11 {
 		FARPROC proc_D3D11CreateDeviceAndSwapChain = nullptr;
 		FARPROC proc_D3D11CreateDeviceForD3D12 = nullptr;
 		FARPROC proc_D3D11On12CreateDevice = nullptr;
+		FARPROC proc_EnableFeatureLevelUpgrade = nullptr;
 		FARPROC proc_D3DKMTCloseAdapter = nullptr;
 		FARPROC proc_D3DKMTCreateAllocation = nullptr;
 		FARPROC proc_D3DKMTCreateContext = nullptr;
@@ -65,7 +66,6 @@ namespace d3d11 {
 		FARPROC proc_D3DPerformance_EndEvent = nullptr;
 		FARPROC proc_D3DPerformance_GetStatus = nullptr;
 		FARPROC proc_D3DPerformance_SetMarker = nullptr;
-		FARPROC proc_EnableFeatureLevelUpgrade = nullptr;
 		FARPROC proc_OpenAdapter10 = nullptr;
 		FARPROC proc_OpenAdapter10_2 = nullptr;
 	}
