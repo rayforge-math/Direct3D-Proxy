@@ -201,7 +201,7 @@ namespace d3d11 {
             const D3D_FEATURE_LEVEL*,
             UINT,
             ID3D11Device**
-        );
+            );
         /**
          * @brief Internal core function to create a Direct3D 11 device.
          * This function is an internal entry point used by the D3D11 runtime to
@@ -239,7 +239,7 @@ namespace d3d11 {
             UINT SDKVersion,
             ID3D11Device** ppDevice,
             D3D_FEATURE_LEVEL* pOutFeatureLevel
-        );
+            );
         /**
          * @brief Internal core function to create a Direct3D 11 device.
          * This is the actual internal entry point within d3d11.dll that the public

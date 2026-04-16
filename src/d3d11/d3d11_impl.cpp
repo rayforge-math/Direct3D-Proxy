@@ -143,7 +143,18 @@ namespace d3d11 {
              * own proxy classes to intercept all subsequent rendering calls.
              */
 
-            HRESULT result = D3D11CreateDevice_t(dx_func(D3D11CreateDevice_i))(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
+            HRESULT result = reinterpret_cast<D3D11CreateDevice_t>(proc_D3D11CreateDevice)(
+                pAdapter,
+                DriverType,
+                Software,
+                Flags,
+                pFeatureLevels,
+                FeatureLevels,
+                SDKVersion,
+                ppDevice,
+                pFeatureLevel,
+                ppImmediateContext
+                );
             return result;
         }
 
@@ -171,7 +182,20 @@ namespace d3d11 {
              * rendering usually happens.
              */
 
-            HRESULT result = D3D11CreateDeviceAndSwapChain_t(dx_func(D3D11CreateDeviceAndSwapChain_i))(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
+            HRESULT result = reinterpret_cast<D3D11CreateDeviceAndSwapChain_t>(proc_D3D11CreateDeviceAndSwapChain)(
+                pAdapter,
+                DriverType,
+                Software,
+                Flags,
+                pFeatureLevels,
+                FeatureLevels,
+                SDKVersion,
+                pSwapChainDesc,
+                ppSwapChain,
+                ppDevice,
+                pFeatureLevel,
+                ppImmediateContext
+                );
             return result;
         }
 
@@ -199,7 +223,18 @@ namespace d3d11 {
              * can be wrapped in your D3D11 proxy class.
              */
 
-            HRESULT result = D3D11On12CreateDevice_t(dx_func(D3D11On12CreateDevice_i))(pDevice, Flags, pFeatureLevels, FeatureLevels, ppCommandQueues, NumQueues, NodeMask, ppDevice, ppImmediateContext, pChosenFeatureLevel);
+            HRESULT result = reinterpret_cast<D3D11On12CreateDevice_t>(proc_D3D11On12CreateDevice)(
+                pDevice,
+                Flags,
+                pFeatureLevels,
+                FeatureLevels,
+                ppCommandQueues,
+                NumQueues,
+                NodeMask,
+                ppDevice,
+                ppImmediateContext,
+                pChosenFeatureLevel
+                );
             return result;
         }
 
@@ -212,7 +247,10 @@ namespace d3d11 {
              * to maintain the hook chain into the WinRT/UWP environment.
              */
 
-            HRESULT result = CreateDirect3D11DeviceFromDXGIDevice_t(dx_func(CreateDirect3D11DeviceFromDXGIDevice_i))(dxgiDevice, graphicsDevice);
+            HRESULT result = reinterpret_cast<CreateDirect3D11DeviceFromDXGIDevice_t>(proc_CreateDirect3D11DeviceFromDXGIDevice)(
+                dxgiDevice,
+                graphicsDevice
+                );
             return result;
         }
 
@@ -226,7 +264,10 @@ namespace d3d11 {
              * correctly to maintain the proxy chain.
              */
 
-            HRESULT result = CreateDirect3D11SurfaceFromDXGISurface_t(dx_func(CreateDirect3D11SurfaceFromDXGISurface_i))(dxgiSurface, graphicsSurface);
+            HRESULT result = reinterpret_cast<CreateDirect3D11SurfaceFromDXGISurface_t>(proc_CreateDirect3D11SurfaceFromDXGISurface)(
+                dxgiSurface,
+                graphicsSurface
+                );
             return result;
         }
 
@@ -253,7 +294,14 @@ namespace d3d11 {
              * here to capture devices created via internal runtime paths.
              */
 
-            HRESULT result = D3D11CoreCreateDevice_t(dx_func(D3D11CoreCreateDevice_i))(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
+            HRESULT result = reinterpret_cast<D3D11CoreCreateDevice_t>(proc_D3D11CoreCreateDevice)(
+                pFactory, 
+                pAdapter, 
+                Flags, 
+                pFeatureLevels, 
+                FeatureLevels, 
+                ppDevice
+                );
             return result;
         }
 
@@ -280,7 +328,7 @@ namespace d3d11 {
              * here to capture devices created via internal runtime paths.
              */
 
-            HRESULT result = D3D11CoreCreateDevice_t(dx_func(D3D11CoreCreateDevice_i))(
+            HRESULT result = reinterpret_cast<D3D11CoreCreateDevice_t>(proc_D3D11CoreCreateDevice)(
                 pFactory,
                 pAdapter,
                 DriverType,
@@ -291,7 +339,7 @@ namespace d3d11 {
                 SDKVersion,
                 ppDevice,
                 pOutFeatureLevel
-            );
+                );
             return result;
         }
 
@@ -309,7 +357,10 @@ namespace d3d11 {
              * effectively breaking features like the DirectX Debug Layer.
              */
 
-            HRESULT result = D3D11CoreRegisterLayers_t(dx_func(D3D11CoreRegisterLayers_i))(pLayerInfo, LayerCount);
+            HRESULT result = reinterpret_cast<D3D11CoreRegisterLayers_t>(proc_D3D11CoreRegisterLayers)(
+                pLayerInfo,
+                LayerCount
+                );
             return result;
         }
 
@@ -328,7 +379,13 @@ namespace d3d11 {
              * will likely result in an immediate crash or device loss.
              */
 
-            HRESULT result = D3D11CoreCreateLayeredDevice_t(dx_func(D3D11CoreCreateLayeredDevice_i))(pLayerContexts, ContextCount, pDeviceDesc, riid, ppvDevice);
+            HRESULT result = reinterpret_cast<D3D11CoreCreateLayeredDevice_t>(proc_D3D11CoreCreateLayeredDevice)(
+                pLayerContexts,
+                ContextCount,
+                pDeviceDesc,
+                riid,
+                ppvDevice
+                );
             return result;
         }
 
@@ -344,7 +401,10 @@ namespace d3d11 {
              * device memory.
              */
 
-            SIZE_T result = D3D11CoreGetLayeredDeviceSize_t(dx_func(D3D11CoreGetLayeredDeviceSize_i))(pLayerContexts, ContextCount);
+            SIZE_T result = reinterpret_cast<D3D11CoreGetLayeredDeviceSize_t>(proc_D3D11CoreGetLayeredDeviceSize)(
+                pLayerContexts,
+                ContextCount
+                );
             return result;
         }
 
@@ -370,7 +430,17 @@ namespace d3d11 {
              * hybrid environments or modern Windows "System" apps.
              */
 
-            HRESULT result = D3D11CreateDeviceForD3D12_t(dx_func(D3D11CreateDeviceForD3D12_i))(pDevice, Flags, pFeatureLevels, FeatureLevels, NumQueues, NodeMask, ppDevice, ppImmediateContext, pChosenFeatureLevel);
+            HRESULT result = reinterpret_cast<D3D11CreateDeviceForD3D12_t>(proc_D3D11CreateDeviceForD3D12)(
+                pDevice,
+                Flags,
+                pFeatureLevels,
+                FeatureLevels,
+                NumQueues,
+                NodeMask,
+                ppDevice,
+                ppImmediateContext,
+                pChosenFeatureLevel
+                );
             return result;
         }
 
@@ -385,8 +455,8 @@ namespace d3d11 {
              * the GPU technically supports them.
              */
 
-            auto fn = dx_func(EnableFeatureLevelUpgrade_i);
-            void* result = fn ? EnableFeatureLevelUpgrade_t(fn)() : (void*)E_NOTIMPL;
+            auto fn = reinterpret_cast<EnableFeatureLevelUpgrade_t>(proc_EnableFeatureLevelUpgrade);
+            void* result = fn ? fn() : (void*)E_NOTIMPL;
             return result;
         }
 
@@ -405,7 +475,7 @@ namespace d3d11 {
              * change how the runtime perceives the GPU's capabilities.
              */
 
-            HRESULT result = OpenAdapter10_t(dx_func(OpenAdapter10_i))(pOpenData);
+            HRESULT result = reinterpret_cast<OpenAdapter10_t>(proc_OpenAdapter10)(pOpenData);
             return result;
         }
 
@@ -420,7 +490,7 @@ namespace d3d11 {
              * the full performance of the WDDM 1.1+ driver model.
              */
 
-            HRESULT result = OpenAdapter10_2_t(dx_func(OpenAdapter10_2_i))(pOpenData);
+            HRESULT result = reinterpret_cast<OpenAdapter10_2_t>(proc_OpenAdapter10_2)(pOpenData);
             return result;
         }
 
@@ -438,8 +508,8 @@ namespace d3d11 {
              * in 'Debug' or 'Profile' builds of games.
              */
 
-            auto fn = dx_func(D3DPerformance_BeginEvent_i);
-            void* result = fn ? D3DPerformance_BeginEvent_t(fn)(unknown0, unknown1) : (void*)E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DPerformance_BeginEvent_t>(proc_D3DPerformance_BeginEvent);
+            void* result = fn ? fn(unknown0, unknown1) : (void*)E_NOTIMPL;
             return result;
         }
 
@@ -452,8 +522,8 @@ namespace d3d11 {
              * by logging the string names passed to BeginEvent.
              */
 
-            auto fn = dx_func(D3DPerformance_EndEvent_i);
-            void* result = fn ? D3DPerformance_EndEvent_t(fn)(unknown0) : (void*)E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DPerformance_EndEvent_t>(proc_D3DPerformance_EndEvent);
+            void* result = fn ? fn(unknown0) : (void*)E_NOTIMPL;
             return result;
         }
 
@@ -468,8 +538,8 @@ namespace d3d11 {
              * within a massive capture of GPU commands.
              */
 
-            auto fn = dx_func(D3DPerformance_SetMarker_i);
-            UINT result = fn ? D3DPerformance_SetMarker_t(fn)(unknown0, unknown1) : (UINT)E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DPerformance_SetMarker_t>(proc_D3DPerformance_SetMarker);
+            UINT result = fn ? fn(unknown0, unknown1) : (UINT)E_NOTIMPL;
             return result;
         }
 
@@ -482,8 +552,8 @@ namespace d3d11 {
              * detailed metadata than it normally would in a production environment.
              */
 
-            auto fn = dx_func(D3DPerformance_GetStatus_i);
-            void* result = fn ? D3DPerformance_GetStatus_t(fn)(unknown0) : (void*)E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DPerformance_GetStatus_t>(proc_D3DPerformance_GetStatus);
+            void* result = fn ? fn(unknown0) : (void*)E_NOTIMPL;
             return result;
         }
 
@@ -505,8 +575,8 @@ namespace d3d11 {
              * for the application to correctly identify its primary GPU.
              */
 
-            auto fn = dx_func(D3DKMTOpenAdapterFromHdc_i);
-            HRESULT result = fn ? D3DKMTOpenAdapterFromHdc_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTOpenAdapterFromHdc_t>(proc_D3DKMTOpenAdapterFromHdc);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -520,8 +590,8 @@ namespace d3d11 {
              * correctly interpret the specific sub-query being performed.
              */
 
-            auto fn = dx_func(D3DKMTQueryAdapterInfo_i);
-            HRESULT result = fn ? D3DKMTQueryAdapterInfo_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTQueryAdapterInfo_t>(proc_D3DKMTQueryAdapterInfo);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -538,8 +608,8 @@ namespace d3d11 {
              * the 'pData' pointer are passed to the destination function unmodified.
              */
 
-            auto fn = dx_func(D3DKMTCreateDevice_i);
-            HRESULT result = fn ? D3DKMTCreateDevice_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTCreateDevice_t>(proc_D3DKMTCreateDevice);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
         
@@ -556,8 +626,8 @@ namespace d3d11 {
              * result in an invalid memory write and a system crash.
              */
 
-            auto fn = dx_func(D3DKMTGetDeviceState_i);
-            HRESULT result = fn ? D3DKMTGetDeviceState_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTGetDeviceState_t>(proc_D3DKMTGetDeviceState);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -573,8 +643,8 @@ namespace d3d11 {
              * the correct pointer to the D3DKMT_DESTROYDEVICE structure.
              */
 
-            auto fn = dx_func(D3DKMTDestroyDevice_i);
-            HRESULT result = fn ? D3DKMTDestroyDevice_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTDestroyDevice_t>(proc_D3DKMTDestroyDevice);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -588,8 +658,8 @@ namespace d3d11 {
              * or in registers when jumping to the original function.
              */
 
-            auto fn = dx_func(D3DKMTCloseAdapter_i);
-            HRESULT result = fn ? D3DKMTCloseAdapter_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTCloseAdapter_t>(proc_D3DKMTCloseAdapter);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -609,8 +679,8 @@ namespace d3d11 {
              * volatile registers or the caller's stack frame.
              */
 
-            auto fn = dx_func(D3DKMTCreateContext_i);
-            HRESULT result = fn ? D3DKMTCreateContext_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTCreateContext_t>(proc_D3DKMTCreateContext);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -627,8 +697,8 @@ namespace d3d11 {
              * data to an invalid memory address, resulting in an immediate crash.
              */
 
-            auto fn = dx_func(D3DKMTGetContextSchedulingPriority_i);
-            HRESULT result = fn ? D3DKMTGetContextSchedulingPriority_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTGetContextSchedulingPriority_t>(proc_D3DKMTGetContextSchedulingPriority);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -641,8 +711,8 @@ namespace d3d11 {
              * the application being unfairly starved of GPU time by the OS.
              */
 
-            auto fn = dx_func(D3DKMTSetContextSchedulingPriority_i);
-            HRESULT result = fn ? D3DKMTSetContextSchedulingPriority_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTSetContextSchedulingPriority_t>(proc_D3DKMTSetContextSchedulingPriority);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -658,8 +728,8 @@ namespace d3d11 {
              * original function receives the correct pointer to the destroy structure.
              */
 
-            auto fn = dx_func(D3DKMTDestroyContext_i);
-            HRESULT result = fn ? D3DKMTDestroyContext_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTDestroyContext_t>(proc_D3DKMTDestroyContext);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -679,8 +749,8 @@ namespace d3d11 {
              * Check Failure (BSOD) or heap corruption in the graphics subsystem.
              */
 
-            auto fn = dx_func(D3DKMTCreateAllocation_i);
-            HRESULT result = fn ? D3DKMTCreateAllocation_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTCreateAllocation_t>(proc_D3DKMTCreateAllocation);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -694,8 +764,8 @@ namespace d3d11 {
              * memory corruption.
              */
 
-            auto fn = dx_func(D3DKMTQueryResourceInfo_i);
-            HRESULT result = fn ? D3DKMTQueryResourceInfo_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTQueryResourceInfo_t>(proc_D3DKMTQueryResourceInfo);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -709,8 +779,8 @@ namespace d3d11 {
              * shared surfaces from being visible across process boundaries.
              */
 
-            auto fn = dx_func(D3DKMTOpenResource_i);
-            HRESULT result = fn ? D3DKMTOpenResource_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTOpenResource_t>(proc_D3DKMTOpenResource);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -726,8 +796,8 @@ namespace d3d11 {
              * corruption will cause a memory access violation (BSOD or process crash).
              */
 
-            auto fn = dx_func(D3DKMTGetSharedPrimaryHandle_i);
-            HRESULT result = fn ? D3DKMTGetSharedPrimaryHandle_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTGetSharedPrimaryHandle_t>(proc_D3DKMTGetSharedPrimaryHandle);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
         
@@ -744,8 +814,8 @@ namespace d3d11 {
              * TDR (Timeout Detection and Recovery) event.
              */
 
-            auto fn = dx_func(D3DKMTLock_i);
-            HRESULT result = fn ? D3DKMTLock_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTLock_t>(proc_D3DKMTLock);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
         
@@ -758,8 +828,8 @@ namespace d3d11 {
              * long the CPU is 'stalling' the GPU by holding onto shared allocations.
              */
 
-            auto fn = dx_func(D3DKMTUnlock_i);
-            HRESULT result = fn ? D3DKMTUnlock_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTUnlock_t>(proc_D3DKMTUnlock);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -773,8 +843,8 @@ namespace d3d11 {
              * can lead to "Device Lost" errors as the runtime loses track of VRAM state.
              */
 
-            auto fn = dx_func(D3DKMTQueryAllocationResidency_i);
-            HRESULT result = fn ? D3DKMTQueryAllocationResidency_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTQueryAllocationResidency_t>(proc_D3DKMTQueryAllocationResidency);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -788,8 +858,8 @@ namespace d3d11 {
              * frustum) remain intact.
              */
 
-            auto fn = dx_func(D3DKMTSetAllocationPriority_i);
-            HRESULT result = fn ? D3DKMTSetAllocationPriority_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTSetAllocationPriority_t>(proc_D3DKMTSetAllocationPriority);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -806,8 +876,8 @@ namespace d3d11 {
              * invalid memory access within the kernel context.
              */
 
-            auto fn = dx_func(D3DKMTDestroyAllocation_i);
-            HRESULT result = fn ? D3DKMTDestroyAllocation_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTDestroyAllocation_t>(proc_D3DKMTDestroyAllocation);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -825,8 +895,8 @@ namespace d3d11 {
              * or loss of windowed/fullscreen exclusivity.
              */
 
-            auto fn = dx_func(D3DKMTSetVidPnSourceOwner_i);
-            HRESULT result = fn ? D3DKMTSetVidPnSourceOwner_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTSetVidPnSourceOwner_t>(proc_D3DKMTSetVidPnSourceOwner);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -839,8 +909,8 @@ namespace d3d11 {
              * directly with the VidPN (Video Present Network) manager.
              */
 
-            auto fn = dx_func(D3DKMTSetDisplayMode_i);
-            HRESULT result = fn ? D3DKMTSetDisplayMode_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTSetDisplayMode_t>(proc_D3DKMTSetDisplayMode);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -854,8 +924,8 @@ namespace d3d11 {
              * mandatory to ensure compatibility.
              */
 
-            auto fn = dx_func(D3DKMTSetDisplayPrivateDriverFormat_i);
-            HRESULT result = fn ? D3DKMTSetDisplayPrivateDriverFormat_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTSetDisplayPrivateDriverFormat_t>(proc_D3DKMTSetDisplayPrivateDriverFormat);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -869,8 +939,8 @@ namespace d3d11 {
              * distortion across the entire desktop.
              */
 
-            auto fn = dx_func(D3DKMTSetGammaRamp_i);
-            HRESULT result = fn ? D3DKMTSetGammaRamp_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTSetGammaRamp_t>(proc_D3DKMTSetGammaRamp);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -884,8 +954,8 @@ namespace d3d11 {
              * 3. Any latency introduced here directly translates to CPU-side stutter.
              */
 
-            auto fn = dx_func(D3DKMTRender_i);
-            HRESULT result = fn ? D3DKMTRender_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTRender_t>(proc_D3DKMTRender);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -900,8 +970,8 @@ namespace d3d11 {
              * settings and the source/destination surface handles.
              */
 
-            auto fn = dx_func(D3DKMTPresent_i);
-            HRESULT result = fn ? D3DKMTPresent_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTPresent_t>(proc_D3DKMTPresent);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -918,8 +988,8 @@ namespace d3d11 {
              * ensures this back-and-forth negotiation works correctly.
              */
 
-            auto fn = dx_func(D3DKMTGetDisplayModeList_i);
-            HRESULT result = fn ? D3DKMTGetDisplayModeList_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTGetDisplayModeList_t>(proc_D3DKMTGetDisplayModeList);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -936,8 +1006,8 @@ namespace d3d11 {
              * memory corruption and a likely system crash.
              */
 
-            auto fn = dx_func(D3DKMTGetMultisampleMethodList_i);
-            HRESULT result = fn ? D3DKMTGetMultisampleMethodList_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTGetMultisampleMethodList_t>(proc_D3DKMTGetMultisampleMethodList);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -952,8 +1022,8 @@ namespace d3d11 {
              * and 'Display Lag' relative to the hardware refresh cycle.
              */
 
-            auto fn = dx_func(D3DKMTWaitForVerticalBlankEvent_i);
-            HRESULT result = fn ? D3DKMTWaitForVerticalBlankEvent_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTWaitForVerticalBlankEvent_t>(proc_D3DKMTWaitForVerticalBlankEvent);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -974,8 +1044,8 @@ namespace d3d11 {
              * registers before the jump to 'fn'.
              */
 
-            auto fn = dx_func(D3DKMTCreateSynchronizationObject_i);
-            HRESULT result = fn ? D3DKMTCreateSynchronizationObject_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTCreateSynchronizationObject_t>(proc_D3DKMTCreateSynchronizationObject);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -989,8 +1059,8 @@ namespace d3d11 {
              * will lead to intermittent GPU hangs or "TDR" resets.
              */
 
-            auto fn = dx_func(D3DKMTSignalSynchronizationObject_i);
-            HRESULT result = fn ? D3DKMTSignalSynchronizationObject_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTSignalSynchronizationObject_t>(proc_D3DKMTSignalSynchronizationObject);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -1006,8 +1076,8 @@ namespace d3d11 {
              * scenarios in VRAM.
              */
 
-            auto fn = dx_func(D3DKMTWaitForSynchronizationObject_i);
-            HRESULT result = fn ? D3DKMTWaitForSynchronizationObject_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTWaitForSynchronizationObject_t>(proc_D3DKMTWaitForSynchronizationObject);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -1025,8 +1095,8 @@ namespace d3d11 {
              * a system hang or BSOD.
              */
 
-            auto fn = dx_func(D3DKMTDestroySynchronizationObject_i);
-            HRESULT result = fn ? D3DKMTDestroySynchronizationObject_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTDestroySynchronizationObject_t>(proc_D3DKMTDestroySynchronizationObject);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -1047,8 +1117,8 @@ namespace d3d11 {
              * unpredictable driver behavior or system instability.
              */
 
-            auto fn = dx_func(D3DKMTEscape_i);
-            HRESULT result = fn ? D3DKMTEscape_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTEscape_t>(proc_D3DKMTEscape);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 
@@ -1065,8 +1135,8 @@ namespace d3d11 {
              * compatibility without needing to track internal structure changes.
              */
 
-            auto fn = dx_func(D3DKMTGetRuntimeData_i);
-            HRESULT result = fn ? D3DKMTGetRuntimeData_t(fn)() : E_NOTIMPL;
+            auto fn = reinterpret_cast<D3DKMTGetRuntimeData_t>(proc_D3DKMTGetRuntimeData);
+            HRESULT result = fn ? fn() : E_NOTIMPL;
             return result;
         }
 

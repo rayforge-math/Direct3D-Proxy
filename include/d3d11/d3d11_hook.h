@@ -4,63 +4,61 @@
 
 namespace d3d11 {
 
-	enum func_index {
-		CreateDirect3D11DeviceFromDXGIDevice_i,
-		CreateDirect3D11SurfaceFromDXGISurface_i,
-		D3D11CoreCreateDevice_i,
-		D3D11CoreCreateLayeredDevice_i,
-		D3D11CoreGetLayeredDeviceSize_i,
-		D3D11CoreRegisterLayers_i,
-		D3D11CreateDevice_i,
-		D3D11CreateDeviceAndSwapChain_i,
-		D3D11CreateDeviceForD3D12_i,
-		D3D11On12CreateDevice_i,
-		D3DKMTCloseAdapter_i,
-		D3DKMTCreateAllocation_i,
-		D3DKMTCreateContext_i,
-		D3DKMTCreateDevice_i,
-		D3DKMTCreateSynchronizationObject_i,
-		D3DKMTDestroyAllocation_i,
-		D3DKMTDestroyContext_i,
-		D3DKMTDestroyDevice_i,
-		D3DKMTDestroySynchronizationObject_i,
-		D3DKMTEscape_i,
-		D3DKMTGetContextSchedulingPriority_i,
-		D3DKMTGetDeviceState_i,
-		D3DKMTGetDisplayModeList_i,
-		D3DKMTGetMultisampleMethodList_i,
-		D3DKMTGetRuntimeData_i,
-		D3DKMTGetSharedPrimaryHandle_i,
-		D3DKMTLock_i,
-		D3DKMTOpenAdapterFromHdc_i,
-		D3DKMTOpenResource_i,
-		D3DKMTPresent_i,
-		D3DKMTQueryAdapterInfo_i,
-		D3DKMTQueryAllocationResidency_i,
-		D3DKMTQueryResourceInfo_i,
-		D3DKMTRender_i,
-		D3DKMTSetAllocationPriority_i,
-		D3DKMTSetContextSchedulingPriority_i,
-		D3DKMTSetDisplayMode_i,
-		D3DKMTSetDisplayPrivateDriverFormat_i,
-		D3DKMTSetGammaRamp_i,
-		D3DKMTSetVidPnSourceOwner_i,
-		D3DKMTSignalSynchronizationObject_i,
-		D3DKMTUnlock_i,
-		D3DKMTWaitForSynchronizationObject_i,
-		D3DKMTWaitForVerticalBlankEvent_i,
-		D3DPerformance_BeginEvent_i,
-		D3DPerformance_EndEvent_i,
-		D3DPerformance_GetStatus_i,
-		D3DPerformance_SetMarker_i,
-		EnableFeatureLevelUpgrade_i,
-		OpenAdapter10_i,
-		OpenAdapter10_2_i
-	};
+	extern "C" {
+		extern FARPROC proc_CreateDirect3D11DeviceFromDXGIDevice;
+		extern FARPROC proc_CreateDirect3D11SurfaceFromDXGISurface;
+		extern FARPROC proc_D3D11CoreCreateDevice;
+		extern FARPROC proc_D3D11CoreCreateLayeredDevice;
+		extern FARPROC proc_D3D11CoreGetLayeredDeviceSize;
+		extern FARPROC proc_D3D11CoreRegisterLayers;
+		extern FARPROC proc_D3D11CreateDevice;
+		extern FARPROC proc_D3D11CreateDeviceAndSwapChain;
+		extern FARPROC proc_D3D11CreateDeviceForD3D12;
+		extern FARPROC proc_D3D11On12CreateDevice;
+		extern FARPROC proc_D3DKMTCloseAdapter;
+		extern FARPROC proc_D3DKMTCreateAllocation;
+		extern FARPROC proc_D3DKMTCreateContext;
+		extern FARPROC proc_D3DKMTCreateDevice;
+		extern FARPROC proc_D3DKMTCreateSynchronizationObject;
+		extern FARPROC proc_D3DKMTDestroyAllocation;
+		extern FARPROC proc_D3DKMTDestroyContext;
+		extern FARPROC proc_D3DKMTDestroyDevice;
+		extern FARPROC proc_D3DKMTDestroySynchronizationObject;
+		extern FARPROC proc_D3DKMTEscape;
+		extern FARPROC proc_D3DKMTGetContextSchedulingPriority;
+		extern FARPROC proc_D3DKMTGetDeviceState;
+		extern FARPROC proc_D3DKMTGetDisplayModeList;
+		extern FARPROC proc_D3DKMTGetMultisampleMethodList;
+		extern FARPROC proc_D3DKMTGetRuntimeData;
+		extern FARPROC proc_D3DKMTGetSharedPrimaryHandle;
+		extern FARPROC proc_D3DKMTLock;
+		extern FARPROC proc_D3DKMTOpenAdapterFromHdc;
+		extern FARPROC proc_D3DKMTOpenResource;
+		extern FARPROC proc_D3DKMTPresent;
+		extern FARPROC proc_D3DKMTQueryAdapterInfo;
+		extern FARPROC proc_D3DKMTQueryAllocationResidency;
+		extern FARPROC proc_D3DKMTQueryResourceInfo;
+		extern FARPROC proc_D3DKMTRender;
+		extern FARPROC proc_D3DKMTSetAllocationPriority;
+		extern FARPROC proc_D3DKMTSetContextSchedulingPriority;
+		extern FARPROC proc_D3DKMTSetDisplayMode;
+		extern FARPROC proc_D3DKMTSetDisplayPrivateDriverFormat;
+		extern FARPROC proc_D3DKMTSetGammaRamp;
+		extern FARPROC proc_D3DKMTSetVidPnSourceOwner;
+		extern FARPROC proc_D3DKMTSignalSynchronizationObject;
+		extern FARPROC proc_D3DKMTUnlock;
+		extern FARPROC proc_D3DKMTWaitForSynchronizationObject;
+		extern FARPROC proc_D3DKMTWaitForVerticalBlankEvent;
+		extern FARPROC proc_D3DPerformance_BeginEvent;
+		extern FARPROC proc_D3DPerformance_EndEvent;
+		extern FARPROC proc_D3DPerformance_GetStatus;
+		extern FARPROC proc_D3DPerformance_SetMarker;
+		extern FARPROC proc_EnableFeatureLevelUpgrade;
+		extern FARPROC proc_OpenAdapter10;
+		extern FARPROC proc_OpenAdapter10_2;
+	}
 
 	BOOL hook_exports();
 	BOOL unhook_exports();
-
-	extern "C" inline FARPROC dx_func(func_index idx);
 
 } // namespace d3d11
