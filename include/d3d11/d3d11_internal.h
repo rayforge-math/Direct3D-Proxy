@@ -1,6 +1,4 @@
-#pragma once
-
-#include "D3D11.h"
+#include <minwindef.h>
 
 namespace d3d11 {
 
@@ -57,8 +55,5 @@ namespace d3d11 {
 		extern FARPROC proc_OpenAdapter10;
 		extern FARPROC proc_OpenAdapter10_2;
 	}
-
-	BOOL hook_exports();
-	BOOL unhook_exports();
 
 } // namespace d3d11

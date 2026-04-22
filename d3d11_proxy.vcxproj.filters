@@ -19,6 +19,12 @@
     <Filter Include="Source Files\d3d11">
       <UniqueIdentifier>{e21b55a3-be41-432b-b368-712b7424e70c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\dxgi">
+      <UniqueIdentifier>{788a44b6-11df-48f2-aaed-4526e6f80af4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dxgi">
+      <UniqueIdentifier>{8165fa20-6029-440c-975d-23b4ef8a63a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\logger.h">
@@ -27,7 +33,7 @@
     <ClInclude Include="include\dllmain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\d3d11\d3d11_hook.h">
+    <ClInclude Include="include\d3d11\D3D11HookExporter.h">
       <Filter>Header Files\d3d11</Filter>
     </ClInclude>
     <ClInclude Include="include\d3d11\d3d11_impl.h">
@@ -39,16 +45,52 @@
     <ClInclude Include="include\debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\d3d11\D3D11Inspector.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d11\d3d11_version.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d11\d3d11_internal.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d11\ProxyD3D11Device.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d11\ProxyD3D11DeviceContext.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\sdk_version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dxgi\dxgi_version.h">
+      <Filter>Header Files\dxgi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dxgi\ProxyDXGISwapChain.h">
+      <Filter>Header Files\dxgi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\d3d11\d3d11_hook.cpp">
+    <ClCompile Include="src\d3d11\D3D11HookExporter.cpp">
       <Filter>Source Files\d3d11</Filter>
     </ClCompile>
     <ClCompile Include="src\d3d11\d3d11_impl.cpp">
       <Filter>Source Files\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d11\D3D11Inspector.cpp">
+      <Filter>Source Files\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d11\ProxyD3D11Device.cpp">
+      <Filter>Source Files\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d11\ProxyD3D11DeviceContext.cpp">
+      <Filter>Source Files\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dxgi\ProxyDXGISwapChain.cpp">
+      <Filter>Source Files\dxgi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

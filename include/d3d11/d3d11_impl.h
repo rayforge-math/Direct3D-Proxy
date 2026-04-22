@@ -9,7 +9,8 @@
 */
 #pragma once
 
-#include "D3D11.h"
+#include "d3d11/d3d11_version.h"
+#include "dxgi/dxgi_version.h"
 #include "Windows.Graphics.DirectX.Direct3D11.interop.h"
 
 // ============================================================================

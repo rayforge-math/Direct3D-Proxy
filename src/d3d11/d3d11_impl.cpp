@@ -9,7 +9,14 @@
 */
 
 #include "d3d11/d3d11_impl.h"
-#include "d3d11/d3d11_hook.h"
+#include "d3d11/d3d11_internal.h"
+#include "d3d11/D3D11Inspector.h"
+#include "d3d11/ProxyD3D11Device.h"
+#include "d3d11/ProxyD3D11DeviceContext.h"
+#include "dxgi/ProxyDXGISwapChain.h"
+#include "debug.h"
+
+using namespace dxgi;
 
 /**
  * @file d3d11_impl.cpp
@@ -158,6 +165,43 @@ namespace d3d11 {
                 pFeatureLevel,
                 ppImmediateContext
                 );
+
+#ifdef ENABLE_PROXY_LOGGING
+            if (SUCCEEDED(result) && ppDevice && *ppDevice) {
+                DeviceInfo info = D3D11Inspector::CollectDeviceInfo(
+                    *ppDevice,
+                    pAdapter,
+                    pFeatureLevel,
+                    Flags
+                );
+
+                LOG_VARS(
+                    info.CreationFlags,
+                    info.SelectedFeatureLevel,
+                    info.AdapterDesc.VendorId,
+                    info.AdapterDesc.DeviceId,
+                    info.AdapterDesc.DedicatedVideoMemory,
+                    info.DriverConcurrentCreates,
+                    info.DriverCommandLists,
+                    info.Features.DoublePrecision,
+                    info.Features.OutputMergerLogicOp,
+                    info.Architecture.IsTileBased
+                );
+            }
+            else {
+                LOG_RESULT(result);
+            }
+#endif
+
+            if (SUCCEEDED(result)) {
+                if (ppDevice && *ppDevice) {
+                    *ppDevice = new ProxyD3D11Device(*ppDevice);
+                }
+                if (ppImmediateContext && *ppImmediateContext) {
+                    *ppImmediateContext = new ProxyD3D11DeviceContext(*ppImmediateContext);
+                }
+            }
+
             return result;
         }
 #else
@@ -204,6 +248,62 @@ namespace d3d11 {
                 pFeatureLevel,
                 ppImmediateContext
                 );
+            
+#ifdef ENABLE_PROXY_LOGGING
+            if (SUCCEEDED(result)) {
+                // device
+                if (ppDevice && *ppDevice) {
+                    DeviceInfo devInfo = D3D11Inspector::CollectDeviceInfo(
+                        *ppDevice,
+                        pAdapter,
+                        pFeatureLevel,
+                        Flags
+                    );
+
+                    LOG_VARS(
+                        devInfo.CreationFlags,
+                        devInfo.SelectedFeatureLevel,
+                        devInfo.AdapterDesc.VendorId,
+                        devInfo.AdapterDesc.DeviceId,
+                        devInfo.AdapterDesc.DedicatedVideoMemory,
+                        devInfo.DriverConcurrentCreates,
+                        devInfo.DriverCommandLists,
+                        devInfo.Features.DoublePrecision,
+                        devInfo.Features.OutputMergerLogicOp,
+                        devInfo.Architecture.IsTileBased
+                    );
+                }
+
+                // swapchain
+                if (ppSwapChain && *ppSwapChain) {
+                    SwapChainInfo swInfo = D3D11Inspector::CollectSwapChainInfo(*ppSwapChain);
+
+                    LOG_VARS(
+                        swInfo.OutputWindow,
+                        swInfo.Desc.BufferDesc.Width,
+                        swInfo.Desc.BufferDesc.Height,
+                        swInfo.EffectiveRefreshRate,
+                        swInfo.IsModernFlipModel
+                    );
+                }
+            }
+            else {
+                LOG_RESULT(result);
+            }
+#endif
+
+            if (SUCCEEDED(result)) {
+                if (ppSwapChain && *ppSwapChain) {
+                    *ppSwapChain = new ProxyDXGISwapChain(*ppSwapChain);
+                }
+                if (ppDevice && *ppDevice) {
+                    *ppDevice = new ProxyD3D11Device(*ppDevice);
+                }
+                if (ppImmediateContext && *ppImmediateContext) {
+                    *ppImmediateContext = new ProxyD3D11DeviceContext(*ppImmediateContext);
+                }
+            }
+
             return result;
         }
 #else
@@ -248,6 +348,45 @@ namespace d3d11 {
                 ppImmediateContext,
                 pChosenFeatureLevel
                 );
+
+#ifdef ENABLE_PROXY_LOGGING
+            if (SUCCEEDED(result) && ppDevice && *ppDevice) {
+                DeviceInfo info = D3D11Inspector::CollectDeviceInfo(
+                    *ppDevice,
+                    nullptr,
+                    pChosenFeatureLevel,
+                    Flags
+                );
+
+                LOG_VARS(
+                    info.CreationFlags,
+                    info.SelectedFeatureLevel,
+                    info.AdapterDesc.VendorId,
+                    info.AdapterDesc.DeviceId,
+                    info.AdapterDesc.DedicatedVideoMemory,
+                    info.DriverConcurrentCreates,
+                    info.DriverCommandLists,
+                    info.Features.DoublePrecision,
+                    info.Features.OutputMergerLogicOp,
+                    info.Architecture.IsTileBased
+                );
+
+                //D3D11Inspector::CollectInteropInfo("D3D11On12_Mapping", pDevice, *ppDevice);
+            }
+            else {
+                LOG_RESULT(result);
+            }
+#endif
+
+            if (SUCCEEDED(result)) {
+                if (ppDevice && *ppDevice) {
+                    *ppDevice = new ProxyD3D11Device(*ppDevice);
+                }
+                if (ppImmediateContext && *ppImmediateContext) {
+                    *ppImmediateContext = new ProxyD3D11DeviceContext(*ppImmediateContext);
+                }
+            }
+
             return result;
         }
 #else
@@ -269,6 +408,39 @@ namespace d3d11 {
                 dxgiDevice,
                 graphicsDevice
                 );
+
+#ifdef ENABLE_PROXY_LOGGING
+            if (SUCCEEDED(result) && dxgiDevice) {
+                DeviceInfo info = D3D11Inspector::CollectDeviceInfo(dxgiDevice);
+
+                LOG_VARS(
+                    info.CreationFlags,
+                    info.SelectedFeatureLevel,
+                    info.AdapterDesc.VendorId,
+                    info.AdapterDesc.DeviceId,
+                    info.AdapterDesc.DedicatedVideoMemory,
+                    info.DriverConcurrentCreates,
+                    info.DriverCommandLists,
+                    info.Features.DoublePrecision,
+                    info.Features.OutputMergerLogicOp,
+                    info.Architecture.IsTileBased
+                );
+
+                /*
+                if (graphicsDevice && *graphicsDevice) {
+                    D3D11Inspector::CollectInteropInfo(
+                        "COM_to_WinRT_Bridge",
+                        dxgiDevice,
+                        *graphicsDevice
+                    );
+                }
+                */
+            }
+            else if (FAILED(result)) {
+                LOG_RESULT(result);
+            }
+#endif
+
             return result;
         }
 #else
@@ -291,6 +463,32 @@ namespace d3d11 {
                 dxgiSurface,
                 graphicsSurface
                 );
+
+#ifdef ENABLE_PROXY_LOGGING
+            if (SUCCEEDED(result) && dxgiSurface) {
+                SurfaceInfo sInfo = D3D11Inspector::CollectSurfaceInfo(dxgiSurface);
+
+                LOG_VARS(
+                    sInfo.Desc.Width,
+                    sInfo.Desc.Height,
+                    sInfo.Desc.Format,
+                    sInfo.MultisampleCount,
+                    sInfo.IsSharedResource
+                );
+
+                /*
+                D3D11Inspector::CollectInteropInfo(
+                    "Surface_Bridge_Handover",
+                    dxgiSurface,
+                    (graphicsSurface && *graphicsSurface) ? *graphicsSurface : nullptr
+                );
+                */
+            }
+            else {
+                LOG_RESULT(result);
+            }
+#endif
+
             return result;
         }
 #else

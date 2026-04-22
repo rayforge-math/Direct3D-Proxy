@@ -1,20 +1,8 @@
-#include "d3d11/d3d11_hook.h"
+#include "d3d11/D3D11HookExporter.h"
 #include "debug.h"
 #include <string>
-#include <vector>
 
 namespace d3d11 {
-
-	struct ProxyMapping {
-		const char* name;
-		FARPROC* target;
-	};
-
-	struct ProxyExport {
-		void* address;
-		const char* name;
-		unsigned short ordinal;
-	};
 
 	extern "C" {
 		FARPROC proc_CreateDirect3D11DeviceFromDXGIDevice = nullptr;
@@ -70,7 +58,7 @@ namespace d3d11 {
 		FARPROC proc_OpenAdapter10_2 = nullptr;
 	}
 
-	static const ProxyMapping s_proxy_map[] = {
+	const ProxyMapping D3D11HookExporter::s_ProxyMap[] = {
 		{ "CreateDirect3D11DeviceFromDXGIDevice", &proc_CreateDirect3D11DeviceFromDXGIDevice },
 		{ "CreateDirect3D11SurfaceFromDXGISurface", &proc_CreateDirect3D11SurfaceFromDXGISurface },
 		{ "D3D11CoreCreateDevice", &proc_D3D11CoreCreateDevice },
@@ -124,17 +112,12 @@ namespace d3d11 {
 		{ "OpenAdapter10_2", &proc_OpenAdapter10_2 }
 	};
 
-	static constexpr size_t mapping_count = sizeof(s_proxy_map) / sizeof(ProxyMapping);
-	static constexpr const char* file_name = "d3d11.dll";
-	static constexpr size_t func_count = 51; // func_count = 42 on Windows 7
+	const size_t D3D11HookExporter::s_MappingCount = sizeof(s_ProxyMap) / sizeof(ProxyMapping);
 
-	static HMODULE s_chain = NULL;
-	static std::vector<ProxyExport> s_export_cache;
+	HMODULE D3D11HookExporter::s_Chain = NULL;
+	std::vector<ProxyExport> D3D11HookExporter::s_ExportCache;
 
-	static bool enumerate_exports(HMODULE handle, std::vector<ProxyExport>& out_exports);
-	static int map_functions(const std::vector<ProxyExport>& exports, const ProxyMapping* mapping, size_t count);
-
-	BOOL hook_exports()
+	BOOL D3D11HookExporter::HookExports()
 	{
 		char sysDir[MAX_PATH];
 
@@ -144,41 +127,41 @@ namespace d3d11 {
 			return FALSE;
 		}
 
-		std::string path = std::string(sysDir) + "\\" + file_name;
+		std::string path = std::string(sysDir) + "\\" + s_FileName;
 		LOG_MSG("Original DLL found:");
 		LOG_VARS(path);
 
 		// load actual directx dll
-		s_chain = LoadLibraryA(path.c_str());
+		s_Chain = LoadLibraryA(path.c_str());
 
-		if (!s_chain)
+		if (!s_Chain)
 		{
 			LOG_MSG("Error: Original DLL could not be loaded! (", path.c_str(), ")");
 			return FALSE;
 		}
 
-		if (!enumerate_exports(s_chain, s_export_cache)) {
+		if (!EnumerateExports()) {
 			LOG_MSG("Error: Failed to enumerate exports!");
 			return FALSE;
 		}
 
 		// cache all function pointers
-		int found = map_functions(s_export_cache, s_proxy_map, mapping_count);
+		int found = MapFunctions();
 
-		LOG_VARS(mapping_count, found);
+		LOG_VARS(s_MappingCount, found);
 		return (found > 0);
 	}
 
-	BOOL unhook_exports()
+	BOOL D3D11HookExporter::UnhookExports()
 	{
-		if (s_chain)
+		if (s_Chain)
 		{
-			BOOL result = FreeLibrary(s_chain);
+			BOOL result = FreeLibrary(s_Chain);
 			if (result) {
-				s_chain = nullptr;
+				s_Chain = nullptr;
 			}
 			else {
-				LOG_VARS(E_FAIL, s_chain);
+				LOG_VARS(E_FAIL, s_Chain);
 			}
 			return result;
 		}
@@ -186,10 +169,10 @@ namespace d3d11 {
 		return TRUE;
 	}
 
-	static bool enumerate_exports(HMODULE handle, std::vector<ProxyExport>& out_exports) {
-		if (handle == nullptr) return false;
+	bool D3D11HookExporter::EnumerateExports() {
+		if (s_Chain == nullptr) return false;
 
-		const auto image_base = reinterpret_cast<const BYTE*>(handle);
+		const auto image_base = reinterpret_cast<const BYTE*>(s_Chain);
 		const auto dos_header = reinterpret_cast<const IMAGE_DOS_HEADER*>(image_base);
 
 		if (dos_header->e_magic != IMAGE_DOS_SIGNATURE) return false;
@@ -208,8 +191,8 @@ namespace d3d11 {
 		const DWORD* name_table = reinterpret_cast<const DWORD*>(image_base + export_dir->AddressOfNames);
 		const WORD* ordinal_table = reinterpret_cast<const WORD*>(image_base + export_dir->AddressOfNameOrdinals);
 
-		out_exports.clear();
-		out_exports.reserve(export_dir->NumberOfNames);
+		s_ExportCache.clear();
+		s_ExportCache.reserve(export_dir->NumberOfNames);
 
 		for (DWORD i = 0; i < export_dir->NumberOfNames; ++i) {
 			ProxyExport e;
@@ -219,25 +202,25 @@ namespace d3d11 {
 			e.ordinal = static_cast<unsigned short>(export_dir->Base + func_index);
 			e.address = const_cast<BYTE*>(image_base + func_table[func_index]);
 
-			out_exports.push_back(e);
+			s_ExportCache.push_back(e);
 		}
 
-		return !out_exports.empty();
+		return !s_ExportCache.empty();
 	}
 
-	static int map_functions(const std::vector<ProxyExport>& exports, const ProxyMapping* mapping, size_t count) {
+	int D3D11HookExporter::MapFunctions() {
 		int found_count = 0;
 
-		for (size_t i = 0; i < count; ++i) {
-			const char* target_name = mapping[i].name;
-			FARPROC* target_ptr = mapping[i].target;
+		for (size_t i = 0; i < s_MappingCount; ++i) {
+			const char* target_name = s_ProxyMap[i].name;
+			FARPROC* target_ptr = s_ProxyMap[i].target;
 
-			auto it = std::find_if(exports.begin(), exports.end(),
+			auto it = std::find_if(s_ExportCache.begin(), s_ExportCache.end(),
 				[target_name](const ProxyExport& e) {
 					return (e.name != nullptr && strcmp(e.name, target_name) == 0);
 				});
 
-			if (it != exports.end()) {
+			if (it != s_ExportCache.end()) {
 				*target_ptr = reinterpret_cast<FARPROC>(it->address);
 				LOG_MSG("Successfully mapped function: ", target_name, " at address: ", it->address);
 				found_count++;

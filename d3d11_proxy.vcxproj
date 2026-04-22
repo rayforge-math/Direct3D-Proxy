@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -27,17 +27,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\d3d11\d3d11_hook.h" />
+    <ClInclude Include="include\d3d11\D3D11Inspector.h" />
+    <ClInclude Include="include\d3d11\D3D11HookExporter.h" />
+    <ClInclude Include="include\d3d11\ProxyD3D11Device.h" />
+    <ClInclude Include="include\d3d11\ProxyD3D11DeviceContext.h" />
     <ClInclude Include="include\d3d11\d3d11_impl.h" />
+    <ClInclude Include="include\d3d11\d3d11_internal.h" />
+    <ClInclude Include="include\d3d11\d3d11_version.h" />
     <ClInclude Include="include\debug.h" />
+    <ClInclude Include="include\dxgi\dxgi_version.h" />
+    <ClInclude Include="include\dxgi\ProxyDXGISwapChain.h" />
     <ClInclude Include="include\logger.h" />
     <ClInclude Include="include\dllmain.h" />
     <ClInclude Include="include\globals.h" />
+    <ClInclude Include="include\sdk_version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\d3d11\d3d11_hook.cpp" />
+    <ClCompile Include="src\d3d11\D3D11Inspector.cpp" />
+    <ClCompile Include="src\d3d11\D3D11HookExporter.cpp" />
+    <ClCompile Include="src\d3d11\ProxyD3D11Device.cpp" />
+    <ClCompile Include="src\d3d11\ProxyD3D11DeviceContext.cpp" />
     <ClCompile Include="src\d3d11\d3d11_impl.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\dxgi\ProxyDXGISwapChain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\d3d11\jump_stubs.asm" />
@@ -47,7 +59,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{d7241ebb-bab3-41cf-8f80-88aae63e8479}</ProjectGuid>
     <RootNamespace>d3d11proxy</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -119,31 +131,43 @@
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)build\</IntDir>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)build\</IntDir>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Logging|x64'">
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)build\</IntDir>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <TargetName>d3d11</TargetName>
     <IntDir>$(OutDir)build\</IntDir>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <TargetName>d3d11</TargetName>
     <IntDir>$(OutDir)build\</IntDir>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Logging|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <TargetName>d3d11</TargetName>
     <IntDir>$(OutDir)build\</IntDir>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
