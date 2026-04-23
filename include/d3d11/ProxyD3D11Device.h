@@ -1,5 +1,6 @@
 #pragma once
 
+#include "d3d/ProxyD3D.h"
 #include "d3d11/d3d11_version.h"
 
 namespace d3d11 {
@@ -33,24 +34,9 @@ namespace d3d11 {
      * 3. **Validation Layer:** Providing a custom diagnostic layer to log resource creation
      * parameters that may be inconsistent with modern hardware requirements.
      */
-    class ProxyD3D11Device : public ID3D11Device {
-    private:
-        ID3D11Device* m_pReal;
-        ULONG m_RefCount;
-
-        virtual ~ProxyD3D11Device();
-
+    class ProxyD3D11Device : public ProxyD3D<ID3D11Device> {
     public:
         ProxyD3D11Device(ID3D11Device* pReal);
-
-        // --- Rule of Three: Disable copying ---
-        ProxyD3D11Device(const ProxyD3D11Device&) = delete;
-        ProxyD3D11Device& operator=(const ProxyD3D11Device&) = delete;
-
-        // --- IUnknown Methods ---
-        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
-        virtual ULONG STDMETHODCALLTYPE AddRef() override;
-        virtual ULONG STDMETHODCALLTYPE Release() override;
 
         // --- ID3D11Device Methods ---
         virtual HRESULT STDMETHODCALLTYPE CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Buffer** ppBuffer) override;

@@ -4,42 +4,9 @@
 
 namespace d3d11 {
 
-    ProxyD3D11Device::ProxyD3D11Device(ID3D11Device* pReal)
-        : m_pReal(pReal), m_RefCount(1)
-    {
-        if (m_pReal) {
-            m_pReal->AddRef();
-        }
-    }
-
-    ProxyD3D11Device::~ProxyD3D11Device() {
-        if (m_pReal) {
-            m_pReal->Release();
-            m_pReal = nullptr;
-        }
-    }
-
-    // --- IUnknown Methods ---
-    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::QueryInterface(REFIID riid, void** ppvObject) {
-        if (riid == __uuidof(ID3D11Device) || riid == __uuidof(IUnknown)) {
-            AddRef();
-            *ppvObject = this;
-            return S_OK;
-        }
-        return m_pReal->QueryInterface(riid, ppvObject);
-    }
-
-    ULONG STDMETHODCALLTYPE ProxyD3D11Device::AddRef() {
-        m_pReal->AddRef();
-        return InterlockedIncrement(&m_RefCount);
-    }
-
-    ULONG STDMETHODCALLTYPE ProxyD3D11Device::Release() {
-        m_pReal->Release();
-        ULONG count = InterlockedDecrement(&m_RefCount);
-        if (count == 0) delete this;
-        return count;
-    }
+    ProxyD3D11Device::ProxyD3D11Device(ID3D11Device* device)
+        : ProxyD3D<ID3D11Device>(device)
+    { }
 
     // --- ID3D11Device Methods ---
 

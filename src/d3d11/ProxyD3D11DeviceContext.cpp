@@ -8,49 +8,8 @@ namespace d3d11 {
     // --- Constructor & Destructor ---
 
     ProxyD3D11DeviceContext::ProxyD3D11DeviceContext(ID3D11DeviceContext* context)
-        : m_pReal(context), m_RefCount(1) 
-    {
-        if (m_pReal) {
-            m_pReal->AddRef();
-        }
-    }
-
-    ProxyD3D11DeviceContext::~ProxyD3D11DeviceContext() {
-        if (m_pReal) {
-            m_pReal->Release();
-            m_pReal = nullptr;
-        }
-    }
-
-    // --- IUnknown methods ---
-
-    HRESULT STDMETHODCALLTYPE ProxyD3D11DeviceContext::QueryInterface(REFIID riid, void** ppvObject) {
-        if (!ppvObject) return E_POINTER;
-
-        if (riid == __uuidof(ID3D11DeviceContext) ||
-            riid == __uuidof(ID3D11DeviceChild) ||
-            riid == __uuidof(IUnknown)) {
-            AddRef();
-            *ppvObject = static_cast<ID3D11DeviceContext*>(this);
-            return S_OK;
-        }
-
-        // Forward other interface requests to the internal context
-        return m_pReal->QueryInterface(riid, ppvObject);
-    }
-
-    ULONG STDMETHODCALLTYPE ProxyD3D11DeviceContext::AddRef() {
-        return InterlockedIncrement(&m_RefCount);
-    }
-
-    ULONG STDMETHODCALLTYPE ProxyD3D11DeviceContext::Release() {
-        ULONG count = InterlockedDecrement(&m_RefCount);
-        if (count == 0) {
-            delete this;
-            return 0;
-        }
-        return count;
-    }
+        : ProxyD3D<ID3D11DeviceContext>(context)
+    { }
 
     // --- ID3D11DeviceChild methods ---
 

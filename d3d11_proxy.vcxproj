@@ -35,6 +35,7 @@
     <ClInclude Include="include\d3d11\d3d11_internal.h" />
     <ClInclude Include="include\d3d11\d3d11_version.h" />
     <ClInclude Include="include\d3d\D3DInspector.h" />
+    <ClInclude Include="include\d3d\ProxyD3D.h" />
     <ClInclude Include="include\d3d\d3d_version.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\dxgi\DXGIInspector.h" />

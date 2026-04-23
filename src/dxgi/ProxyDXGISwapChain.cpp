@@ -5,44 +5,8 @@
 namespace dxgi {
 
     ProxyDXGISwapChain::ProxyDXGISwapChain(IDXGISwapChain* swapChain)
-        : m_pReal(swapChain), m_RefCount(1)
-    {
-        if (m_pReal) {
-            m_pReal->AddRef();
-        }
-    }
-
-    ProxyDXGISwapChain::~ProxyDXGISwapChain() {
-        if (m_pReal) {
-            m_pReal->Release();
-            m_pReal = nullptr;
-        }
-    }
-
-    // --- IUnknown Implementation ---
-
-    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::QueryInterface(REFIID riid, void** ppvObject) {
-        if (riid == __uuidof(IDXGISwapChain) || riid == __uuidof(IUnknown)) {
-            AddRef();
-            *ppvObject = this;
-            return S_OK;
-        }
-        return m_pReal->QueryInterface(riid, ppvObject);
-    }
-
-    ULONG STDMETHODCALLTYPE ProxyDXGISwapChain::AddRef() {
-        m_pReal->AddRef();
-        return InterlockedIncrement(&m_RefCount);
-    }
-
-    ULONG STDMETHODCALLTYPE ProxyDXGISwapChain::Release() {
-        m_pReal->Release();
-        ULONG newCount = InterlockedDecrement(&m_RefCount);
-        if (newCount == 0) {
-            delete this;
-        }
-        return newCount;
-    }
+        : ProxyD3D<IDXGISwapChain>(swapChain)
+    { }
 
     // --- IDXGIObject Methods ---
 

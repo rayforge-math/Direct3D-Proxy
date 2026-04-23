@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dxgi.h"
+#include "d3d/ProxyD3D.h"
 #include "dxgi/dxgi_version.h"
 
 namespace dxgi {
@@ -34,24 +34,9 @@ namespace dxgi {
      * 3. **Window Management:** Preventing or handling forced fullscreen transitions that
      * might otherwise break external window focus or overlay stability.
      */
-    class ProxyDXGISwapChain : public IDXGISwapChain {
-    private:
-        IDXGISwapChain* m_pReal;
-        ULONG m_RefCount;
-
-        virtual ~ProxyDXGISwapChain();
-
+    class ProxyDXGISwapChain : public ProxyD3D<IDXGISwapChain> {
     public:
         ProxyDXGISwapChain(IDXGISwapChain* pReal);
-
-        // --- Rule of Three: Disable copying ---
-        ProxyDXGISwapChain(const ProxyDXGISwapChain&) = delete;
-        ProxyDXGISwapChain& operator=(const ProxyDXGISwapChain&) = delete;
-
-        // --- IUnknown Methods ---
-        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
-        virtual ULONG STDMETHODCALLTYPE AddRef() override;
-        virtual ULONG STDMETHODCALLTYPE Release() override;
 
         // --- IDXGIObject Methods ---
         virtual HRESULT STDMETHODCALLTYPE SetPrivateData(REFGUID Name, UINT DataSize, const void* pData) override;

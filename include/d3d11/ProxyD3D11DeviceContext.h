@@ -1,5 +1,6 @@
 #pragma once
 
+#include "d3d/ProxyD3D.h"
 #include "d3d11/d3d11_version.h"
 
 namespace d3d11 {
@@ -29,25 +30,10 @@ namespace d3d11 {
      * 3. **Feature Augmentation:** Implementing modern features (like post-processing effects)
      * into legacy applications by intercepting the final execution stages.
      */
-    class ProxyD3D11DeviceContext : public ID3D11DeviceContext {
-    private:
-        ID3D11DeviceContext* m_pReal;
-        ULONG m_RefCount;
-
-        virtual ~ProxyD3D11DeviceContext();
-
+    class ProxyD3D11DeviceContext : public ProxyD3D<ID3D11DeviceContext> {
     public:
         ProxyD3D11DeviceContext(ID3D11DeviceContext* context);
         
-        // --- Rule of Three: Disable copying ---
-        ProxyD3D11DeviceContext(const ProxyD3D11DeviceContext&) = delete;
-        ProxyD3D11DeviceContext& operator=(const ProxyD3D11DeviceContext&) = delete;
-
-        // --- IUnknown methods ---
-        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
-        virtual ULONG STDMETHODCALLTYPE AddRef() override;
-        virtual ULONG STDMETHODCALLTYPE Release() override;
-
         // --- ID3D11DeviceChild methods ---
         virtual void STDMETHODCALLTYPE GetDevice(ID3D11Device** ppDevice) override;
         virtual HRESULT STDMETHODCALLTYPE GetPrivateData(REFGUID guid, UINT* pDataSize, void* pData) override;
