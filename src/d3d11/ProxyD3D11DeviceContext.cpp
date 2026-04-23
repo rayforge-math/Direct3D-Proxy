@@ -1,6 +1,7 @@
 #pragma once
 
 #include "d3d11/ProxyD3D11DeviceContext.h"
+#include "debug.h"
 
 namespace d3d11 {
 

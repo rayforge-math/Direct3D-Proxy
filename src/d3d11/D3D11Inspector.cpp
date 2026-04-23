@@ -2,8 +2,8 @@
 
 namespace d3d11 {
 
-    DeviceInfo D3D11Inspector::CollectDeviceInfo(ID3D11Device* dev, IDXGIAdapter* pInAdapter, D3D_FEATURE_LEVEL* pInFLevel, UINT creationFlags) {
-        DeviceInfo info = {};
+    dxgi::DeviceInfo D3D11Inspector::CollectDeviceInfo(ID3D11Device* dev, IDXGIAdapter* pInAdapter, D3D_FEATURE_LEVEL* pInFLevel, UINT creationFlags) {
+        dxgi::DeviceInfo info = {};
         info.CreationFlags = creationFlags;
         if (pInFLevel) info.SelectedFeatureLevel = *pInFLevel;
 
@@ -90,8 +90,8 @@ namespace d3d11 {
         return info;
     }
 
-    DeviceInfo D3D11Inspector::CollectDeviceInfo(IDXGIDevice* dxgiDev) {
-        DeviceInfo info = {};
+    dxgi::DeviceInfo D3D11Inspector::CollectDeviceInfo(IDXGIDevice* dxgiDev) {
+        dxgi::DeviceInfo info = {};
         if (!dxgiDev) return info;
 
         // In D3D11, the DXGI Device is an interface implemented by the same object
@@ -117,50 +117,8 @@ namespace d3d11 {
         return info;
     }
 
-    SwapChainInfo D3D11Inspector::CollectSwapChainInfo(IDXGISwapChain* swChain) {
-        SwapChainInfo info = {};
-        if (!swChain) return info;
-
-        // Legacy Desc
-        if (FAILED(swChain->GetDesc(&info.Desc))) {
-            return info;
-        }
-        info.OutputWindow = info.Desc.OutputWindow;
-
-        // Extended Desc (DXGI 1.2+)
-        IDXGISwapChain1* swChain1 = nullptr;
-        if (SUCCEEDED(swChain->QueryInterface(__uuidof(IDXGISwapChain1), (void**)&swChain1))) {
-            if (SUCCEEDED(swChain1->GetDesc1(&info.Desc1))) {
-                info.IsModernFlipModel = (info.Desc1.SwapEffect == DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL ||
-                    info.Desc1.SwapEffect == DXGI_SWAP_EFFECT_FLIP_DISCARD);
-            }
-            swChain1->Release();
-        }
-
-        // Calculate actual refresh rate
-        if (info.Desc.BufferDesc.RefreshRate.Denominator > 0) {
-            info.EffectiveRefreshRate = static_cast<float>(info.Desc.BufferDesc.RefreshRate.Numerator) /
-                static_cast<float>(info.Desc.BufferDesc.RefreshRate.Denominator);
-        }
-        else {
-            info.EffectiveRefreshRate = 0.0f;
-        }
-
-        return info;
-    }
-
-    InteropInfo D3D11Inspector::CollectInteropInfo(const char* type, void* input, void* output) {
-        InteropInfo info = {};
-        info.BridgeType = (type) ? type : "Unknown";
-        info.InputPointer = input;
-        info.OutputPointer = output;
-        info.IsValidChain = (input != nullptr && output != nullptr);
-
-        return info;
-    }
-
-    SurfaceInfo D3D11Inspector::CollectSurfaceInfo(IDXGISurface* dxgiSurface) {
-        SurfaceInfo info = {};
+    dxgi::SurfaceInfo D3D11Inspector::CollectSurfaceInfo(IDXGISurface* dxgiSurface) {
+        dxgi::SurfaceInfo info = {};
         if (!dxgiSurface) return info;
 
         // Provides resolution and pixel format

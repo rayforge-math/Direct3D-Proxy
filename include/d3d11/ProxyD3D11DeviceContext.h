@@ -4,6 +4,31 @@
 
 namespace d3d11 {
 
+    /**
+     * @class ProxyD3D11DeviceContext
+     * @brief A high-fidelity interceptor class for the ID3D11DeviceContext interface.
+     *
+     * @details
+     * This class implements a "shim" or "proxy" layer within the Direct3D 11 execution pipeline.
+     * By wrapping the original provider (m_pReal), it establishes a transparent monitoring
+     * and control point between the application and the graphics driver.
+     *
+     * Core Functional Purposes:
+     * - **Telemetry & Profiling:** Provides a hook to count draw calls, track state changes,
+     * and measure GPU command frequency without modifying the host application's binary.
+     * - **Pipeline Redirection:** Enables the redirection of output from one render target
+     * to another or the duplication of commands across multiple contexts.
+     * - **Input Validation:** Acts as a safety layer to log or prevent invalid API calls
+     * that might lead to TDR (Timeout Detection and Recovery) or driver crashes.
+     * - **Dynamic Modification:** Allows for the real-time modification of shaders, constant
+     * buffers, or texture pointers as they are bound to the pipeline.
+     *
+     * Use Cases in Proxy Engineering:
+     * 1. **Debugging:** Logging the exact sequence of commands leading to a specific visual glitch.
+     * 2. **Performance Analysis:** Identifying bottlenecks by timing specific stage calls (e.g., Map/Unmap).
+     * 3. **Feature Augmentation:** Implementing modern features (like post-processing effects)
+     * into legacy applications by intercepting the final execution stages.
+     */
     class ProxyD3D11DeviceContext : public ID3D11DeviceContext {
     private:
         ID3D11DeviceContext* m_pReal;
@@ -12,10 +37,9 @@ namespace d3d11 {
         virtual ~ProxyD3D11DeviceContext();
 
     public:
-        // Constructor
         ProxyD3D11DeviceContext(ID3D11DeviceContext* context);
         
-        // Disable copy and assignment
+        // --- Rule of Three: Disable copying ---
         ProxyD3D11DeviceContext(const ProxyD3D11DeviceContext&) = delete;
         ProxyD3D11DeviceContext& operator=(const ProxyD3D11DeviceContext&) = delete;
 

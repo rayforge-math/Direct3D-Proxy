@@ -175,9 +175,11 @@ namespace d3d11 {
                     Flags
                 );
 
+                auto featureLevel = d3d::D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
+
                 LOG_VARS(
                     info.CreationFlags,
-                    info.SelectedFeatureLevel,
+                    featureLevel,
                     info.AdapterDesc.VendorId,
                     info.AdapterDesc.DeviceId,
                     info.AdapterDesc.DedicatedVideoMemory,
@@ -260,9 +262,11 @@ namespace d3d11 {
                         Flags
                     );
 
+                    auto featureLevel = d3d::D3DInspector::FeatureLevelToString(devInfo.SelectedFeatureLevel);
+
                     LOG_VARS(
                         devInfo.CreationFlags,
-                        devInfo.SelectedFeatureLevel,
+                        featureLevel,
                         devInfo.AdapterDesc.VendorId,
                         devInfo.AdapterDesc.DeviceId,
                         devInfo.AdapterDesc.DedicatedVideoMemory,
@@ -276,7 +280,7 @@ namespace d3d11 {
 
                 // swapchain
                 if (ppSwapChain && *ppSwapChain) {
-                    SwapChainInfo swInfo = D3D11Inspector::CollectSwapChainInfo(*ppSwapChain);
+                    SwapChainInfo swInfo = DXGIInspector::CollectSwapChainInfo(*ppSwapChain);
 
                     LOG_VARS(
                         swInfo.OutputWindow,
@@ -358,9 +362,11 @@ namespace d3d11 {
                     Flags
                 );
 
+                auto featureLevel = d3d::D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
+
                 LOG_VARS(
                     info.CreationFlags,
-                    info.SelectedFeatureLevel,
+                    featureLevel,
                     info.AdapterDesc.VendorId,
                     info.AdapterDesc.DeviceId,
                     info.AdapterDesc.DedicatedVideoMemory,
@@ -413,9 +419,11 @@ namespace d3d11 {
             if (SUCCEEDED(result) && dxgiDevice) {
                 DeviceInfo info = D3D11Inspector::CollectDeviceInfo(dxgiDevice);
 
+                auto featureLevel = d3d::D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
+
                 LOG_VARS(
                     info.CreationFlags,
-                    info.SelectedFeatureLevel,
+                    featureLevel,
                     info.AdapterDesc.VendorId,
                     info.AdapterDesc.DeviceId,
                     info.AdapterDesc.DedicatedVideoMemory,

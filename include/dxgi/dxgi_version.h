@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sdk_version.h"
+#include "d3d/d3d_version.h"
 
 #include <dxgi.h>
 

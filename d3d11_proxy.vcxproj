@@ -34,13 +34,15 @@
     <ClInclude Include="include\d3d11\d3d11_impl.h" />
     <ClInclude Include="include\d3d11\d3d11_internal.h" />
     <ClInclude Include="include\d3d11\d3d11_version.h" />
+    <ClInclude Include="include\d3d\D3DInspector.h" />
+    <ClInclude Include="include\d3d\d3d_version.h" />
     <ClInclude Include="include\debug.h" />
+    <ClInclude Include="include\dxgi\DXGIInspector.h" />
     <ClInclude Include="include\dxgi\dxgi_version.h" />
     <ClInclude Include="include\dxgi\ProxyDXGISwapChain.h" />
     <ClInclude Include="include\logger.h" />
     <ClInclude Include="include\dllmain.h" />
     <ClInclude Include="include\globals.h" />
-    <ClInclude Include="include\sdk_version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\d3d11\D3D11Inspector.cpp" />
@@ -48,7 +50,9 @@
     <ClCompile Include="src\d3d11\ProxyD3D11Device.cpp" />
     <ClCompile Include="src\d3d11\ProxyD3D11DeviceContext.cpp" />
     <ClCompile Include="src\d3d11\d3d11_impl.cpp" />
+    <ClCompile Include="src\d3d\D3DInspector.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\dxgi\DXGIInspector.cpp" />
     <ClCompile Include="src\dxgi\ProxyDXGISwapChain.cpp" />
   </ItemGroup>
   <ItemGroup>

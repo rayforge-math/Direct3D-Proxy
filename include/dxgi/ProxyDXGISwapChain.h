@@ -5,6 +5,35 @@
 
 namespace dxgi {
 
+    /**
+     * @class ProxyDXGISwapChain
+     * @brief A virtualization wrapper for the IDXGISwapChain interface, controlling the presentation layer.
+     *
+     * @details
+     * This class serves as the final interceptor in the graphics pipeline, sitting between the
+     * rendered frame buffers and the OS windowing system. It is the most critical point for
+     * synchronization and frame-based logic.
+     *
+     * Core Functional Purposes:
+     * - **Frame Interception (The Render Loop):** By hooking the 'Present' method, this class
+     * gains control over the exact moment a frame is finished, allowing for custom logic to
+     * execute before the image is sent to the display.
+     * - **Output Redirection:** Facilitates the capturing of backbuffers via 'GetBuffer' to
+     * redirect or copy the final image to external consumers (e.g., shared textures or video encoders).
+     * - **Resolution & State Monitoring:** Observes 'ResizeBuffers' and 'SetFullscreenState'
+     * to ensure that internal bridge components (like overlay dimensions) stay in sync with
+     * the application's window size and display mode.
+     * - **Performance Telemetry:** Provides access to 'GetFrameStatistics', enabling the
+     * measurement of frame times, refresh rates, and presentation latency.
+     *
+     * Use Cases in Proxy Engineering:
+     * 1. **Final Frame Injection:** The ideal location to trigger the rendering of external
+     * UI, overlays, or post-processing effects right before the swap chain flips.
+     * 2. **Buffer Manipulation:** Modifying swap chain flags or formats during 'ResizeBuffers'
+     * to force modern features like the Flip Model (FLIP_DISCARD) on older applications.
+     * 3. **Window Management:** Preventing or handling forced fullscreen transitions that
+     * might otherwise break external window focus or overlay stability.
+     */
     class ProxyDXGISwapChain : public IDXGISwapChain {
     private:
         IDXGISwapChain* m_pReal;

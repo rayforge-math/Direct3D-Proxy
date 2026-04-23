@@ -25,6 +25,12 @@
     <Filter Include="Source Files\dxgi">
       <UniqueIdentifier>{8165fa20-6029-440c-975d-23b4ef8a63a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\d3d">
+      <UniqueIdentifier>{d3ee1e73-f343-4dff-b3dc-ab7a35d50d42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\d3d">
+      <UniqueIdentifier>{18d1f041-8359-42be-baad-d15efb010831}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\logger.h">
@@ -60,14 +66,20 @@
     <ClInclude Include="include\d3d11\ProxyD3D11DeviceContext.h">
       <Filter>Header Files\d3d11</Filter>
     </ClInclude>
-    <ClInclude Include="include\sdk_version.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\dxgi\dxgi_version.h">
       <Filter>Header Files\dxgi</Filter>
     </ClInclude>
     <ClInclude Include="include\dxgi\ProxyDXGISwapChain.h">
       <Filter>Header Files\dxgi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d\D3DInspector.h">
+      <Filter>Header Files\d3d</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dxgi\DXGIInspector.h">
+      <Filter>Header Files\dxgi</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d\d3d_version.h">
+      <Filter>Header Files\d3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +102,12 @@
       <Filter>Source Files\d3d11</Filter>
     </ClCompile>
     <ClCompile Include="src\dxgi\ProxyDXGISwapChain.cpp">
+      <Filter>Source Files\dxgi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d\D3DInspector.cpp">
+      <Filter>Source Files\d3d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dxgi\DXGIInspector.cpp">
       <Filter>Source Files\dxgi</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,6 +4,35 @@
 
 namespace d3d11 {
 
+    /**
+     * @class ProxyD3D11Device
+     * @brief A virtualized wrapper for the ID3D11Device interface, serving as a resource factory interceptor.
+     *
+     * @details
+     * This class implements the Proxy pattern for the primary Direct3D 11 resource creator.
+     * By intercepting the creation of all graphical objects, it provides a centralized
+     * point for resource management and metadata tracking.
+     *
+     * Core Functional Purposes:
+     * - **Resource Lifetime Tracking:** Monitors the allocation and deallocation of buffers,
+     * textures, and shaders to detect resource leaks or excessive memory usage.
+     * - **Descriptor Modification:** Allows for the real-time modification of resource
+     * descriptions (e.g., adding D3D11_RESOURCE_MISC_SHARED flags to textures) before
+     * they are finalized by the real driver.
+     * - **Automatic Proxy Wrapping:** Ensures that any child objects created (like
+     * Immediate or Deferred Contexts) are automatically wrapped in their respective
+     * proxy classes before being returned to the application.
+     * - **Capability Shimming:** Intercepts hardware capability queries (CheckFeatureSupport)
+     * to report specific compatibility profiles or to hide certain features from the application.
+     *
+     * Use Cases in Proxy Engineering:
+     * 1. **Asset Interception:** Capturing shader bytecode or texture data during the creation
+     * phase for export or external analysis.
+     * 2. **Shared Resource Injection:** Facilitating cross-API interoperability by injecting
+     * sharing flags into resources that the host application originally intended to be private.
+     * 3. **Validation Layer:** Providing a custom diagnostic layer to log resource creation
+     * parameters that may be inconsistent with modern hardware requirements.
+     */
     class ProxyD3D11Device : public ID3D11Device {
     private:
         ID3D11Device* m_pReal;
