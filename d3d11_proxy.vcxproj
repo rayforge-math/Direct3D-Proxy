@@ -29,11 +29,13 @@
   <ItemGroup>
     <ClInclude Include="include\d3d11\D3D11Inspector.h" />
     <ClInclude Include="include\d3d11\D3D11HookExporter.h" />
+    <ClInclude Include="include\d3d11\ProxyD3D11Buffer.h" />
     <ClInclude Include="include\d3d11\ProxyD3D11Device.h" />
     <ClInclude Include="include\d3d11\ProxyD3D11DeviceContext.h" />
     <ClInclude Include="include\d3d11\d3d11_impl.h" />
     <ClInclude Include="include\d3d11\d3d11_internal.h" />
     <ClInclude Include="include\d3d11\d3d11_version.h" />
+    <ClInclude Include="include\d3d11\ProxyD3D11Resource.h" />
     <ClInclude Include="include\d3d\D3DInspector.h" />
     <ClInclude Include="include\d3d\ProxyD3D.h" />
     <ClInclude Include="include\d3d\d3d_version.h" />
@@ -48,6 +50,7 @@
   <ItemGroup>
     <ClCompile Include="src\d3d11\D3D11Inspector.cpp" />
     <ClCompile Include="src\d3d11\D3D11HookExporter.cpp" />
+    <ClCompile Include="src\d3d11\ProxyD3D11Buffer.cpp" />
     <ClCompile Include="src\d3d11\ProxyD3D11Device.cpp" />
     <ClCompile Include="src\d3d11\ProxyD3D11DeviceContext.cpp" />
     <ClCompile Include="src\d3d11\d3d11_impl.cpp" />

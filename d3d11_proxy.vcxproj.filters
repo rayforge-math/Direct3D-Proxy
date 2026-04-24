@@ -84,6 +84,12 @@
     <ClInclude Include="include\d3d\ProxyD3D.h">
       <Filter>Header Files\d3d</Filter>
     </ClInclude>
+    <ClInclude Include="include\d3d11\ProxyD3D11Resource.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d11\ProxyD3D11Buffer.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -112,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="src\dxgi\DXGIInspector.cpp">
       <Filter>Source Files\dxgi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d11\ProxyD3D11Buffer.cpp">
+      <Filter>Source Files\d3d11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
