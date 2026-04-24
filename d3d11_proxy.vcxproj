@@ -36,9 +36,13 @@
     <ClInclude Include="include\d3d11\d3d11_internal.h" />
     <ClInclude Include="include\d3d11\d3d11_version.h" />
     <ClInclude Include="include\d3d11\ProxyD3D11Resource.h" />
+    <ClInclude Include="include\d3d11\ProxyD3D11Wrapper.h" />
+    <ClInclude Include="include\d3d\concepts.h" />
     <ClInclude Include="include\d3d\D3DInspector.h" />
     <ClInclude Include="include\d3d\ProxyD3D.h" />
     <ClInclude Include="include\d3d\d3d_version.h" />
+    <ClInclude Include="include\d3d\ProxyRegistry.h" />
+    <ClInclude Include="include\d3d\ProxyWrapper.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\dxgi\DXGIInspector.h" />
     <ClInclude Include="include\dxgi\dxgi_version.h" />
@@ -55,6 +59,7 @@
     <ClCompile Include="src\d3d11\ProxyD3D11DeviceContext.cpp" />
     <ClCompile Include="src\d3d11\d3d11_impl.cpp" />
     <ClCompile Include="src\d3d\D3DInspector.cpp" />
+    <ClCompile Include="src\d3d\ProxyRegistry.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\dxgi\DXGIInspector.cpp" />
     <ClCompile Include="src\dxgi\ProxyDXGISwapChain.cpp" />

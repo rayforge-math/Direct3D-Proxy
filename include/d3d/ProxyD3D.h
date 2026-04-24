@@ -1,15 +1,16 @@
 #pragma once
 
+#include "d3d/concepts.h"
 #include "d3dcommon.h"
 #include <concepts>
 
 namespace d3d {
 
-    template <typename T>
-    concept IsCOMInterface = std::derived_from<T, IUnknown>;
-
     template <IsCOMInterface T>
     class ProxyD3D : public T {
+    public:
+        using InterfaceType = T;
+
     protected:
         T* m_pReal;
         ULONG m_RefCount;
@@ -73,5 +74,8 @@ namespace d3d {
             return count;
         }
     };
+
+    template<typename TProxy, typename TResource>
+    concept IsProxyFor = std::derived_from<TProxy, ProxyD3D<TResource>>;
 
 } // namespace d3d

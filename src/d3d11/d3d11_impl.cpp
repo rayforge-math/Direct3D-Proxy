@@ -13,10 +13,12 @@
 #include "d3d11/D3D11Inspector.h"
 #include "d3d11/ProxyD3D11Device.h"
 #include "d3d11/ProxyD3D11DeviceContext.h"
+#include "d3d/ProxyWrapper.h"
 #include "dxgi/ProxyDXGISwapChain.h"
 #include "debug.h"
 
 using namespace dxgi;
+using namespace d3d;
 
 /**
  * @file d3d11_impl.cpp
@@ -175,7 +177,7 @@ namespace d3d11 {
                     Flags
                 );
 
-                auto featureLevel = d3d::D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
+                auto featureLevel = D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
 
                 LOG_VARS(
                     info.CreationFlags,
@@ -196,12 +198,8 @@ namespace d3d11 {
 #endif
 
             if (SUCCEEDED(result)) {
-                if (ppDevice && *ppDevice) {
-                    *ppDevice = new ProxyD3D11Device(*ppDevice);
-                }
-                if (ppImmediateContext && *ppImmediateContext) {
-                    *ppImmediateContext = new ProxyD3D11DeviceContext(*ppImmediateContext);
-                }
+                ProxyWrapper::Wrap<ProxyD3D11Device>(ppDevice);
+                ProxyWrapper::Wrap<ProxyD3D11DeviceContext>(ppImmediateContext);
             }
 
             return result;
@@ -262,7 +260,7 @@ namespace d3d11 {
                         Flags
                     );
 
-                    auto featureLevel = d3d::D3DInspector::FeatureLevelToString(devInfo.SelectedFeatureLevel);
+                    auto featureLevel = D3DInspector::FeatureLevelToString(devInfo.SelectedFeatureLevel);
 
                     LOG_VARS(
                         devInfo.CreationFlags,
@@ -297,15 +295,9 @@ namespace d3d11 {
 #endif
 
             if (SUCCEEDED(result)) {
-                if (ppSwapChain && *ppSwapChain) {
-                    *ppSwapChain = new ProxyDXGISwapChain(*ppSwapChain);
-                }
-                if (ppDevice && *ppDevice) {
-                    *ppDevice = new ProxyD3D11Device(*ppDevice);
-                }
-                if (ppImmediateContext && *ppImmediateContext) {
-                    *ppImmediateContext = new ProxyD3D11DeviceContext(*ppImmediateContext);
-                }
+                ProxyWrapper::Wrap<ProxyDXGISwapChain>(ppSwapChain);
+                ProxyWrapper::Wrap<ProxyD3D11Device>(ppDevice);
+                ProxyWrapper::Wrap<ProxyD3D11DeviceContext>(ppImmediateContext);
             }
 
             return result;
@@ -362,7 +354,7 @@ namespace d3d11 {
                     Flags
                 );
 
-                auto featureLevel = d3d::D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
+                auto featureLevel = D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
 
                 LOG_VARS(
                     info.CreationFlags,
@@ -385,12 +377,8 @@ namespace d3d11 {
 #endif
 
             if (SUCCEEDED(result)) {
-                if (ppDevice && *ppDevice) {
-                    *ppDevice = new ProxyD3D11Device(*ppDevice);
-                }
-                if (ppImmediateContext && *ppImmediateContext) {
-                    *ppImmediateContext = new ProxyD3D11DeviceContext(*ppImmediateContext);
-                }
+                ProxyWrapper::Wrap<ProxyD3D11Device>(ppDevice);
+                ProxyWrapper::Wrap<ProxyD3D11DeviceContext>(ppImmediateContext);
             }
 
             return result;
@@ -419,7 +407,7 @@ namespace d3d11 {
             if (SUCCEEDED(result) && dxgiDevice) {
                 DeviceInfo info = D3D11Inspector::CollectDeviceInfo(dxgiDevice);
 
-                auto featureLevel = d3d::D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
+                auto featureLevel = D3DInspector::FeatureLevelToString(info.SelectedFeatureLevel);
 
                 LOG_VARS(
                     info.CreationFlags,

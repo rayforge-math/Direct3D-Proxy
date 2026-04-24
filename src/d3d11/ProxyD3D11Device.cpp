@@ -1,6 +1,10 @@
 #pragma once
 
 #include "d3d11/ProxyD3D11Device.h"
+#include "d3d11/ProxyD3D11Buffer.h"
+#include "d3d/ProxyWrapper.h"
+
+using namespace d3d;
 
 namespace d3d11 {
 
@@ -11,7 +15,13 @@ namespace d3d11 {
     // --- ID3D11Device Methods ---
 
     HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Buffer** ppBuffer) {
-        return m_pReal->CreateBuffer(pDesc, pInitialData, ppBuffer);
+        HRESULT hr = m_pReal->CreateBuffer(pDesc, pInitialData, ppBuffer);
+        /*
+        if (SUCCEEDED(hr)) {
+            hr = ProxyWrapper::Wrap<ProxyD3D11Buffer>(ppBuffer, pDesc);
+        }
+        */
+        return hr;
     }
 
     HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateTexture1D(const D3D11_TEXTURE1D_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Texture1D** ppTexture1D) {
