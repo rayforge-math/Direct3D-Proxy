@@ -90,7 +90,7 @@
     <ClInclude Include="include\d3d11\ProxyD3D11Buffer.h">
       <Filter>Header Files\d3d11</Filter>
     </ClInclude>
-    <ClInclude Include="include\d3d\ProxyRegistry.h">
+    <ClInclude Include="include\d3d\COMRegistry.h">
       <Filter>Header Files\d3d</Filter>
     </ClInclude>
     <ClInclude Include="include\d3d\concepts.h">
@@ -133,9 +133,6 @@
     </ClCompile>
     <ClCompile Include="src\d3d11\ProxyD3D11Buffer.cpp">
       <Filter>Source Files\d3d11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\d3d\ProxyRegistry.cpp">
-      <Filter>Source Files\d3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "d3d/ProxyRegistry.h"
+#include "d3d/COMRegistry.h"
 #include "d3d/ProxyD3D.h"
 
 namespace d3d {
@@ -29,29 +29,30 @@ namespace d3d {
          * Wraps a raw COM pointer. Checks Registry first to prevent duplicate proxies.
          */
         template <typename TProxy, typename... Args>
+            requires IsProxyFor<TProxy, typename TProxy::InterfaceType>
         static HRESULT Wrap(typename TProxy::InterfaceType** ppInterface, Args&&... args) {
-            using TInterface = typename TProxy::InterfaceType;
+            using TResource = typename TProxy::InterfaceType;
 
             if (!ppInterface || !*ppInterface) return S_OK;
 
-            TInterface* pReal = *ppInterface;
-            /*
-            // 1. Check if this real object is already proxied
-            TProxy* pExisting = ProxyRegistry<TInterface, TProxy>::Find(pReal);
+            TResource* pReal = *ppInterface;
+            
+            TProxy* pExisting = COMRegistry<TProxy>::Find(static_cast<IUnknown*>(pReal));
             if (pExisting) {
                 pExisting->AddRef();
-                *ppInterface = pExisting;
-                pReal->Release(); // Release extra ref from the 'Get' call
+                pReal->Release();
+
+                *ppInterface = static_cast<TResource*>(pExisting);
                 return S_OK;
             }
-            */
-            // 2. Not found: Create new proxy via Perfect Forwarding
+            
             TProxy* pProxy = new TProxy(pReal, std::forward<Args>(args)...);
-            if (!pProxy) return E_OUTOFMEMORY;
+            if (!pProxy) {
+                pReal->Release();
+                return E_OUTOFMEMORY;
+            }
 
-            // Note: The TProxy constructor should call ProxyRegistry::Register()
-            *ppInterface = pProxy;
-            pReal->Release();
+            *ppInterface = static_cast<TResource*>(pProxy);
 
             return S_OK;
         }

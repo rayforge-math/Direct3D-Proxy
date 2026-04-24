@@ -1,5 +1,6 @@
 #pragma once
 
+#include "d3d/COMRegistry.h"
 #include "d3d/concepts.h"
 #include "d3dcommon.h"
 #include <concepts>
@@ -12,7 +13,7 @@ namespace d3d {
         using InterfaceType = T;
 
     protected:
-        T* m_pReal;
+        InterfaceType* m_pReal;
         ULONG m_RefCount;
 
         /**
@@ -21,6 +22,7 @@ namespace d3d {
          */
         virtual ~ProxyD3D() {
             if (m_pReal) {
+                COMRegistry<ProxyD3D<InterfaceType>>::Unregister(m_pReal);
                 m_pReal->Release();
                 m_pReal = nullptr;
             }
@@ -31,14 +33,15 @@ namespace d3d {
          * Constructor: Ownership Strategy.
          * We increment the real object's count once to ensure it lives as long as this proxy.
          */
-        ProxyD3D(T* pReal) : m_pReal(pReal), m_RefCount(1) {
+        ProxyD3D(InterfaceType* pReal) : m_pReal(pReal), m_RefCount(1)
+        {
             if (m_pReal) {
-                m_pReal->AddRef();
+                COMRegistry<ProxyD3D<InterfaceType>>::Register(m_pReal, this);
             }
         }
 
         // Accessor for the real object (needed for unwrapping in the Context)
-        T* GetReal() const { return m_pReal; }
+        InterfaceType* GetReal() const { return m_pReal; }
 
         // Disable copying (Rule of Three/Five)
         ProxyD3D(const ProxyD3D&) = delete;
@@ -46,8 +49,9 @@ namespace d3d {
 
         // --- IUnknown Methods ---
         virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override {
-            // Basic COM logic: if they ask for the interface T or IUnknown, return this proxy
-            if (riid == __uuidof(T) || riid == __uuidof(IUnknown)) {
+            if (!ppvObject) return E_POINTER;
+            // Basic COM logic: if they ask for the interface InterfaceType or IUnknown, return this proxy
+            if (riid == __uuidof(InterfaceType) || riid == __uuidof(IUnknown)) {
                 AddRef();
                 *ppvObject = this;
                 return S_OK;
@@ -64,13 +68,9 @@ namespace d3d {
         virtual ULONG STDMETHODCALLTYPE Release() override {
             // We only decrement our local proxy counter.
             ULONG count = InterlockedDecrement(&m_RefCount);
-
-            // This triggers the virtual destructor chain:
-            // ~ProxyD3D11Buffer() -> ~ProxyD3D11Resource() -> ~ProxyD3D() -> ~<T>()
             if (count == 0) {
                 delete this;
             }
-
             return count;
         }
     };
