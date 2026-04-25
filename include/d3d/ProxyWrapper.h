@@ -5,97 +5,108 @@
 
 namespace d3d {
 
-    /**
-     * Container for stack-allocated unwrapping of proxy arrays.
-     * Used to pass real COM pointers to the underlying D3D driver.
-     */
     template <typename T, size_t MaxCount>
     struct UnwrappedArray {
         T* Data[MaxCount];
-
-        /**
-         * Implicit conversion to the pointer-to-pointer type expected by D3D.
-         */
         inline operator T* const* () const { return Data; }
     };
 
     /**
-     * Static Utility for Zero-Copy Proxy Management.
-     * Manages the transformation between Real COM Objects and Proxy Objects.
+     * Static utility for zero-copy proxy management.
+     * Version-agnostic base — no D3D11/D3D12-specific slot counts or types.
+     * Registry write is owned by the proxy constructor/destructor — ProxyWrapper is read-only.
      */
     class ProxyWrapper {
     public:
         /**
-         * Wraps a raw COM pointer. Checks Registry first to prevent duplicate proxies.
+         * Wraps a raw COM pointer into a proxy.
+         * Checks the registry first — reuses an existing proxy if present,
+         * otherwise creates a new one and takes ownership of the raw reference.
          */
         template <typename TProxy, typename... Args>
             requires IsProxyFor<TProxy, typename TProxy::InterfaceType>
-        static HRESULT Wrap(typename TProxy::InterfaceType** ppInterface, Args&&... args) {
-            using TResource = typename TProxy::InterfaceType;
-
+        static HRESULT Wrap(typename TProxy::InterfaceType** ppInterface, Args&&... args)
+        {
+            using TReal = typename TProxy::InterfaceType;
             if (!ppInterface || !*ppInterface) return S_OK;
+            TReal* pReal = *ppInterface;
 
-            TResource* pReal = *ppInterface;
-            
-            TProxy* pExisting = COMRegistry<TProxy>::Find(static_cast<IUnknown*>(pReal));
-            if (pExisting) {
+            if (TProxy* pExisting = COMRegistry<TReal, TProxy>::Find(pReal)) {
                 pExisting->AddRef();
                 pReal->Release();
-
-                *ppInterface = static_cast<TResource*>(pExisting);
+                *ppInterface = static_cast<TReal*>(pExisting);
                 return S_OK;
             }
-            
+
             TProxy* pProxy = new TProxy(pReal, std::forward<Args>(args)...);
             if (!pProxy) {
                 pReal->Release();
                 return E_OUTOFMEMORY;
             }
 
-            *ppInterface = static_cast<TResource*>(pProxy);
-
+            *ppInterface = static_cast<TReal*>(pProxy);
             return S_OK;
         }
 
         /**
-         * In-place wrapping for arrays (e.g., from 'Get' methods).
+         * In-place wrapping for arrays (e.g. from Get-methods returning multiple objects).
+         * Stops and returns the first failure HRESULT if any element fails.
+         */
+        template <typename TProxy, typename... Args>
+            requires IsProxyFor<TProxy, typename TProxy::InterfaceType>
+        static HRESULT WrapArray(typename TProxy::InterfaceType** ppInterfaces, UINT count, Args&&... args)
+        {
+            if (!ppInterfaces || count == 0) return S_OK;
+            for (UINT i = 0; i < count; ++i) {
+                if (ppInterfaces[i]) {
+                    HRESULT hr = Wrap<TProxy>(&ppInterfaces[i], std::forward<Args>(args)...);
+                    if (FAILED(hr)) return hr;
+                }
+            }
+            return S_OK;
+        }
+
+        /**
+         * Extracts the real COM pointer from a proxy.
+         * TProxy must be explicit — the registry maps interface -> concrete proxy type.
+         * Returns the pointer as-is if it is not a known proxy (already unwrapped or external).
+         *
+         * Usage:  ProxyWrapper::Unwrap<ProxyD3D11Buffer>(pBuffer)
          */
         template <typename TProxy>
-        static void WrapArray(typename TProxy::InterfaceType** ppInterfaces, UINT count) {
-            if (!ppInterfaces || count == 0) return;
-
-            for (UINT i = 0; i < count; ++i) {
-                if (ppInterfaces[i] != nullptr) {
-                    Wrap<TProxy>(&ppInterfaces[i]);
-                }
-            }
-        }
-
-        /**
-         * Extracts the real COM pointer.
-         * Uses the IsProxyFor concept implicitly through static_cast.
-         */
-        template <typename T>
-        static inline T* Unwrap(T* pInterface) {
+            requires IsProxy<TProxy>
+        static inline typename TProxy::InterfaceType* Unwrap(typename TProxy::InterfaceType* pInterface)
+        {
+            using TReal = typename TProxy::InterfaceType;
             if (!pInterface) return nullptr;
-            return static_cast<ProxyD3D<T>*>(pInterface)->GetReal();
+
+            if (TProxy* pProxy = COMRegistry<TReal, TProxy>::Find(pInterface))
+                return pProxy->GetReal();
+
+            return pInterface; // already unwrapped or external — pass through
         }
 
         /**
-         * Optimized stack-allocated unwrap for array-based 'Set' calls.
+         * Stack-allocated unwrap for array-based Set-calls.
+         * MaxCount must be provided explicitly — use a version-specific wrapper
+         * (e.g. ProxyD3D11Wrapper) to bind slot counts to types.
+         *
+         * Usage:  auto real = ProxyWrapper::UnwrapArray<ProxyD3D11Buffer, 14>(ppBuffers, count);
+         *         ctx->VSSetConstantBuffers(0, count, real);
          */
-        template <typename T, size_t MaxCount>
-        static inline UnwrappedArray<T, MaxCount> UnwrapArray(T* const* ppProxies, UINT count) {
-            UnwrappedArray<T, MaxCount> container = { nullptr };
-
+        template <typename TProxy, size_t MaxCount>
+            requires IsProxy<TProxy>
+        static inline UnwrappedArray<typename TProxy::InterfaceType, MaxCount>
+            UnwrapArray(typename TProxy::InterfaceType* const* ppProxies, UINT count)
+        {
+            using TReal = typename TProxy::InterfaceType;
+            UnwrappedArray<TReal, MaxCount> result{};
             if (ppProxies) {
-                const UINT actualCount = (count < MaxCount) ? count : (UINT)MaxCount;
-
-                for (UINT i = 0; i < actualCount; ++i) {
-                    container.Data[i] = Unwrap(ppProxies[i]);
-                }
+                const UINT n = (count < MaxCount) ? count : static_cast<UINT>(MaxCount);
+                for (UINT i = 0; i < n; ++i)
+                    result.Data[i] = Unwrap<TProxy>(ppProxies[i]);
             }
-            return container;
+            return result;
         }
     };
 

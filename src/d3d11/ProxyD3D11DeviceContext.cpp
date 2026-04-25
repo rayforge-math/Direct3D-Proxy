@@ -12,7 +12,7 @@ namespace d3d11 {
     // --- Constructor & Destructor ---
 
     ProxyD3D11DeviceContext::ProxyD3D11DeviceContext(ID3D11DeviceContext* context)
-        : ProxyD3D<ID3D11DeviceContext>(context)
+        : ProxyD3D<ID3D11DeviceContext, ProxyD3D11DeviceContext>(context)
     { }
 
     // --- ID3D11DeviceChild methods ---

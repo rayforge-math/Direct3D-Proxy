@@ -34,7 +34,7 @@ namespace dxgi {
      * 3. **Window Management:** Preventing or handling forced fullscreen transitions that
      * might otherwise break external window focus or overlay stability.
      */
-    class ProxyDXGISwapChain : public d3d::ProxyD3D<IDXGISwapChain> {
+    class ProxyDXGISwapChain : public d3d::ProxyD3D<IDXGISwapChain, ProxyDXGISwapChain> {
     public:
         ProxyDXGISwapChain(IDXGISwapChain* pReal);
 

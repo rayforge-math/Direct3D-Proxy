@@ -5,7 +5,7 @@
 namespace dxgi {
 
     ProxyDXGISwapChain::ProxyDXGISwapChain(IDXGISwapChain* swapChain)
-        : ProxyD3D<IDXGISwapChain>(swapChain)
+        : ProxyD3D<IDXGISwapChain, ProxyDXGISwapChain>(swapChain)
     { }
 
     // --- IDXGIObject Methods ---

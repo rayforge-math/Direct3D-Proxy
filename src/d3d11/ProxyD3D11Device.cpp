@@ -9,7 +9,7 @@ using namespace d3d;
 namespace d3d11 {
 
     ProxyD3D11Device::ProxyD3D11Device(ID3D11Device* device)
-        : ProxyD3D<ID3D11Device>(device)
+        : ProxyD3D<ID3D11Device, ProxyD3D11Device>(device)
     { }
 
     // --- ID3D11Device Methods ---
