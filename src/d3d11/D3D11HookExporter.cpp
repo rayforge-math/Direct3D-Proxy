@@ -128,8 +128,7 @@ namespace d3d11 {
 		}
 
 		std::string path = std::string(sysDir) + "\\" + s_FileName;
-		LOG_MSG("Original DLL found:");
-		LOG_VARS(path);
+		LOG_MSG("Original DLL found:", path);
 
 		// load actual directx dll
 		s_Chain = LoadLibraryA(path.c_str());

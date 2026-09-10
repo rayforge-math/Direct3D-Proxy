@@ -1,7 +1,7 @@
 #pragma once
 
 #include "d3d11/d3d11_version.h"
-#include "ProxyD3D11Resource.h"
+#include "d3d11/ProxyD3D11Resource.h"
 
 namespace d3d11 {
 

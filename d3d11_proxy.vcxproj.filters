@@ -102,6 +102,15 @@
     <ClInclude Include="include\d3d11\ProxyD3D11Wrapper.h">
       <Filter>Header Files\d3d11</Filter>
     </ClInclude>
+    <ClInclude Include="include\d3d11\ProxyD3D11Texture1D.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d11\ProxyD3D11Texture2D.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d11\ProxyD3D11Texture3D.h">
+      <Filter>Header Files\d3d11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -132,6 +141,15 @@
       <Filter>Source Files\dxgi</Filter>
     </ClCompile>
     <ClCompile Include="src\d3d11\ProxyD3D11Buffer.cpp">
+      <Filter>Source Files\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d11\ProxyD3D11Texture1D.cpp">
+      <Filter>Source Files\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d11\ProxyD3D11Texture2D.cpp">
+      <Filter>Source Files\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d11\ProxyD3D11Texture3D.cpp">
       <Filter>Source Files\d3d11</Filter>
     </ClCompile>
   </ItemGroup>

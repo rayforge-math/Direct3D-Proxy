@@ -36,6 +36,9 @@
     <ClInclude Include="include\d3d11\d3d11_internal.h" />
     <ClInclude Include="include\d3d11\d3d11_version.h" />
     <ClInclude Include="include\d3d11\ProxyD3D11Resource.h" />
+    <ClInclude Include="include\d3d11\ProxyD3D11Texture1D.h" />
+    <ClInclude Include="include\d3d11\ProxyD3D11Texture2D.h" />
+    <ClInclude Include="include\d3d11\ProxyD3D11Texture3D.h" />
     <ClInclude Include="include\d3d11\ProxyD3D11Wrapper.h" />
     <ClInclude Include="include\d3d\concepts.h" />
     <ClInclude Include="include\d3d\D3DInspector.h" />
@@ -58,6 +61,9 @@
     <ClCompile Include="src\d3d11\ProxyD3D11Device.cpp" />
     <ClCompile Include="src\d3d11\ProxyD3D11DeviceContext.cpp" />
     <ClCompile Include="src\d3d11\d3d11_impl.cpp" />
+    <ClCompile Include="src\d3d11\ProxyD3D11Texture1D.cpp" />
+    <ClCompile Include="src\d3d11\ProxyD3D11Texture2D.cpp" />
+    <ClCompile Include="src\d3d11\ProxyD3D11Texture3D.cpp" />
     <ClCompile Include="src\d3d\D3DInspector.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\dxgi\DXGIInspector.cpp" />

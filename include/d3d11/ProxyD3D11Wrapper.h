@@ -1,21 +1,28 @@
 #pragma once
-
 #include "d3d/ProxyWrapper.h"
 #include "d3d11/ProxyD3D11Buffer.h"
+// Inkludiere hier bei Bedarf weitere Proxy-Header (z.B. SRV, RTV, Sampler etc.)
+// #include "d3d11/ProxyD3D11ShaderResourceView.h"
+// #include "d3d11/ProxyD3D11RenderTargetView.h"
+// #include "d3d11/ProxyD3D11UnorderedAccessView.h"
+// #include "d3d11/ProxyD3D11DepthStencilView.h"
+// #include "d3d11/ProxyD3D11SamplerState.h"
+// #include "d3d11/ProxyD3D11Resource.h"
+#include "debug.h"
 
 using namespace d3d;
 
 namespace d3d11 {
 
-    /**
-     * Binds a D3D11 COM interface type (or buffer context tag) to its maximum pipeline slot count.
-     * Specialise for every interface that appears in array-based Set/Get calls.
-     *
-     * Buffer context tags (ID3D11Buffer is context-dependent):
-     *   D3D11SlotCount<D3D11CB>  — constant buffers  (14 slots)
-     *   D3D11SlotCount<D3D11VB>  — vertex buffers    (32 slots)
-     *   D3D11SlotCount<D3D11SOB> — stream-output     ( 4 slots)
-     */
+    /**     
+    * Binds a D3D11 COM interface type (or buffer context tag) to its maximum pipeline slot count.     
+    * Specialise for every interface that appears in array-based Set/Get calls.     
+    *     
+    * Buffer context tags (ID3D11Buffer is context-dependent):     
+    *   D3D11SlotCount<D3D11CB>  — constant buffers  (14 slots)     
+    *   D3D11SlotCount<D3D11VB>  — vertex buffers    (32 slots)     
+    *   D3D11SlotCount<D3D11SOB> — stream-output     ( 4 slots)     
+    */
     template <typename T>
     struct D3D11SlotCount;
 
@@ -56,12 +63,12 @@ namespace d3d11 {
     template <typename T>
     concept HasD3D11SlotCount = requires { D3D11SlotCount<T>::value; };
 
-    /**
-     * D3D11-specific proxy wrapper.
-     * Binds D3D11 slot counts to types so call sites need no explicit MaxCount.
-     * ID3D11Buffer requires an explicit context tag (D3D11CB / D3D11VB / D3D11SOB)
-     * since its slot count is pipeline-context-dependent.
-     */
+    /**     
+    * D3D11-specific proxy wrapper.     
+    * Binds D3D11 slot counts to types so call sites need no explicit MaxCount.     
+    * ID3D11Buffer requires an explicit context tag (D3D11CB / D3D11VB / D3D11SOB)     
+    * since its slot count is pipeline-context-dependent.     
+    */
     class ProxyD3D11Wrapper {
     public:
         // ================================================================
@@ -69,69 +76,133 @@ namespace d3d11 {
         // ================================================================
 
         static inline HRESULT WrapBuffers(ID3D11Buffer** pp, UINT count) {
+            LOG_MSG("ProxyD3D11Wrapper::WrapBuffers called");
             return ProxyWrapper::WrapArray<ProxyD3D11Buffer>(pp, count);
         }
 
+        static inline HRESULT Wrap(ID3D11Buffer** pp) {
+            LOG_MSG("ProxyD3D11Wrapper::Wrap (Buffer) called");
+            return ProxyWrapper::Wrap<ProxyD3D11Buffer>(pp);
+        }
         /*
-        static inline HRESULT WrapTexture1Ds(ID3D11Texture1D** pp, UINT count) {
-            return ProxyWrapper::WrapArray<ProxyD3D11Texture1D>(pp, count);
+        static inline HRESULT Wrap(ID3D11ShaderResourceView** pp) {
+            LOG_MSG("ProxyD3D11Wrapper::Wrap (SRV) called");
+            return ProxyWrapper::Wrap<ProxyD3D11ShaderResourceView>(pp);
         }
-        static inline HRESULT WrapTexture2Ds(ID3D11Texture2D** pp, UINT count) {
-            return ProxyWrapper::WrapArray<ProxyD3D11Texture2D>(pp, count);
+
+        static inline HRESULT Wrap(ID3D11UnorderedAccessView** pp) {
+            LOG_MSG("ProxyD3D11Wrapper::Wrap (UAV) called");
+            return ProxyWrapper::Wrap<ProxyD3D11UnorderedAccessView>(pp);
         }
-        static inline HRESULT WrapTexture3Ds(ID3D11Texture3D** pp, UINT count) {
-            return ProxyWrapper::WrapArray<ProxyD3D11Texture3D>(pp, count);
+
+        static inline HRESULT Wrap(ID3D11RenderTargetView** pp) {
+            LOG_MSG("ProxyD3D11Wrapper::Wrap (RTV) called");
+            return ProxyWrapper::Wrap<ProxyD3D11RenderTargetView>(pp);
+        }
+
+        static inline HRESULT Wrap(ID3D11DepthStencilView** pp) {
+            LOG_MSG("ProxyD3D11Wrapper::Wrap (DSV) called");
+            return ProxyWrapper::Wrap<ProxyD3D11DepthStencilView>(pp);
+        }
+
+        static inline HRESULT Wrap(ID3D11SamplerState** pp) {
+            LOG_MSG("ProxyD3D11Wrapper::Wrap (Sampler) called");
+            return ProxyWrapper::Wrap<ProxyD3D11SamplerState>(pp);
         }
         */
+        static inline HRESULT Wrap(ID3D11Resource** pp) {
+            LOG_MSG("ProxyD3D11Wrapper::Wrap (Resource) called");
+            if (!pp || !*pp) return S_OK;
+
+            D3D11_RESOURCE_DIMENSION dim = D3D11_RESOURCE_DIMENSION_UNKNOWN;
+            (*pp)->GetType(&dim);
+
+            if (dim == D3D11_RESOURCE_DIMENSION_BUFFER) {
+                return ProxyWrapper::Wrap<ProxyD3D11Buffer>(reinterpret_cast<ID3D11Buffer**>(pp));
+            }/*
+            else if (dim == D3D11_RESOURCE_DIMENSION_TEXTURE2D) {
+                return ProxyWrapper::Wrap<ProxyD3D11Texture2D>(reinterpret_cast<ID3D11Texture2D**>(pp));
+            }
+            else if (dim == D3D11_RESOURCE_DIMENSION_TEXTURE1D) {
+                return ProxyWrapper::Wrap<ProxyD3D11Texture1D>(reinterpret_cast<ID3D11Texture1D**>(pp));
+            }
+            else if (dim == D3D11_RESOURCE_DIMENSION_TEXTURE3D) {
+                return ProxyWrapper::Wrap<ProxyD3D11Texture3D>(reinterpret_cast<ID3D11Texture3D**>(pp));
+            }*/
+
+            return S_OK;
+        }
 
         // ================================================================
         // UNWRAPPING (Input from Game -> Driver)
         // ================================================================
 
-        /**
-         * Unwraps an ID3D11Buffer array for a specific pipeline context.
-         * TSlotContext must be one of: D3D11CB, D3D11VB, D3D11SOB
-         *
-         * Usage:
-         *   UnwrapBuffers<D3D11CB> (pp, count) — constant buffers (14 slots)
-         *   UnwrapBuffers<D3D11VB> (pp, count) — vertex buffers   (32 slots)
-         *   UnwrapBuffers<D3D11SOB>(pp, count) — stream-output    ( 4 slots)
-         */
+        /**         
+        * Unwraps an ID3D11Buffer array for a specific pipeline context.         
+        * TSlotContext must be one of: D3D11CB, D3D11VB, D3D11SOB         
+        */
         template <typename TSlotContext>
             requires HasD3D11SlotCount<TSlotContext>
         static inline auto UnwrapBuffers(ID3D11Buffer* const* pp, UINT count) {
-            return ProxyWrapper::UnwrapArray<ID3D11Buffer,
-                D3D11SlotCount<TSlotContext>::value>(pp, count);
+            LOG_MSG("ProxyD3D11Wrapper::UnwrapBuffers called");
+            return ProxyWrapper::UnwrapArray<ProxyD3D11Buffer, D3D11SlotCount<TSlotContext>::value>(pp, count);
         }
 
-        /**
-         * Unwraps any interface array whose slot count is registered in D3D11SlotCount.
-         * T and MaxCount are fully deduced — no explicit parameters needed.
-         *
-         * Usage:
-         *   UnwrapViews(ppSRVs,    count) — SRVs     (128 slots)
-         *   UnwrapViews(ppUAVs,    count) — UAVs     ( 64 slots)
-         *   UnwrapViews(ppRTVs,    count) — RTVs     (  8 slots)
-         *   UnwrapViews(ppSamplers,count) — Samplers ( 16 slots)
-         */
+        /**         
+        * Unwraps any interface array whose slot count is registered in D3D11SlotCount.         
+        */
         template <typename T>
             requires HasD3D11SlotCount<T>
         static inline auto UnwrapViews(T* const* pp, UINT count) {
+            LOG_MSG("ProxyD3D11Wrapper::UnwrapViews called");
             return ProxyWrapper::UnwrapArray<T, D3D11SlotCount<T>::value>(pp, count);
         }
 
-        /**
-         * Unwraps a single COM pointer through the registry.
-         * T is deduced from the argument — covers DSV, resources, and any other
-         * single-slot interface.
-         *
-         * Usage:
-         *   Unwrap(pDSV)      — depth stencil view
-         *   Unwrap(pResource) — generic resource
-         */
-        template <typename T>
-        static inline T* Unwrap(T* p) {
-            return ProxyWrapper::Unwrap(p);
+        // Single Pointer Unwrapping
+        static inline ID3D11Buffer* Unwrap(ID3D11Buffer* p) {
+            LOG_MSG("ProxyD3D11Wrapper::Unwrap (Buffer) called");
+            return ProxyWrapper::Unwrap<ProxyD3D11Buffer>(p);
+        }
+        /*
+        static inline ID3D11ShaderResourceView* Unwrap(ID3D11ShaderResourceView* p) {
+            LOG_MSG("ProxyD3D11Wrapper::Unwrap (SRV) called");
+            return ProxyWrapper::Unwrap<ProxyD3D11ShaderResourceView>(p);
+        }
+
+        static inline ID3D11UnorderedAccessView* Unwrap(ID3D11UnorderedAccessView* p) {
+            LOG_MSG("ProxyD3D11Wrapper::Unwrap (UAV) called");
+            return ProxyWrapper::Unwrap<ProxyD3D11UnorderedAccessView>(p);
+        }
+
+        static inline ID3D11RenderTargetView* Unwrap(ID3D11RenderTargetView* p) {
+            LOG_MSG("ProxyD3D11Wrapper::Unwrap (RTV) called");
+            return ProxyWrapper::Unwrap<ProxyD3D11RenderTargetView>(p);
+        }
+
+        static inline ID3D11DepthStencilView* Unwrap(ID3D11DepthStencilView* p) {
+            LOG_MSG("ProxyD3D11Wrapper::Unwrap (DSV) called");
+            return ProxyWrapper::Unwrap<ProxyD3D11DepthStencilView>(p);
+        }
+
+        static inline ID3D11SamplerState* Unwrap(ID3D11SamplerState* p) {
+            LOG_MSG("ProxyD3D11Wrapper::Unwrap (Sampler) called");
+            return ProxyWrapper::Unwrap<ProxyD3D11SamplerState>(p);
+        }
+        */
+        static inline ID3D11Resource* Unwrap(ID3D11Resource* p) {
+            LOG_MSG("ProxyD3D11Wrapper::Unwrap (Resource) called");
+            if (!p) return nullptr;
+
+            if (auto* pReal = ProxyWrapper::Unwrap<ProxyD3D11Buffer>(reinterpret_cast<ID3D11Buffer*>(p)))
+                return pReal;/*
+            if (auto* pReal = ProxyWrapper::Unwrap<ProxyD3D11Texture2D>(reinterpret_cast<ID3D11Texture2D*>(p)))
+                return pReal;
+            if (auto* pReal = ProxyWrapper::Unwrap<ProxyD3D11Texture1D>(reinterpret_cast<ID3D11Texture1D*>(p)))
+                return pReal;
+            if (auto* pReal = ProxyWrapper::Unwrap<ProxyD3D11Texture3D>(reinterpret_cast<ID3D11Texture3D*>(p)))
+                return pReal;
+                */
+            return p;
         }
     };
 
