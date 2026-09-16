@@ -3,9 +3,9 @@
 #include "d3dcommon.h"
 #include <concepts>
 
-namespace d3d {
+namespace com {
 
     template <typename T>
     concept IsCOMInterface = std::derived_from<T, IUnknown>;
 
-} // namespace d3d
+} // namespace com

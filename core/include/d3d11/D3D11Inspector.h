@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "coreapi.h"
 #include "d3d11/d3d11_version.h"
 #include "dxgi/DXGIInspector.h"
 
@@ -16,7 +17,7 @@ namespace d3d11 {
      * and capabilities of graphics objects created by the application without
      * interfering with the rendering pipeline.
      */
-    class D3D11Inspector {
+    class CORE_API D3D11Inspector {
     public:
         // data collection
         static dxgi::DeviceInfo CollectDeviceInfo(ID3D11Device* dev, IDXGIAdapter* pInAdapter, D3D_FEATURE_LEVEL* pInFLevel, UINT creationFlags);

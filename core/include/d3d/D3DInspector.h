@@ -1,5 +1,6 @@
 #pragma once
 
+#include "coreapi.h"
 #include "d3dcommon.h"
 #include "d3d/d3d_version.h"
 
@@ -12,7 +13,7 @@ namespace d3d {
      * and capabilities of graphics objects created by the application without
      * interfering with the rendering pipeline.
      */
-    class D3DInspector {
+    class CORE_API D3DInspector {
     public:
         // string resolver
         static const char* FeatureLevelToString(D3D_FEATURE_LEVEL level);

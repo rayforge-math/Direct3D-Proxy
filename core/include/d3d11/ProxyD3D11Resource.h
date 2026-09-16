@@ -2,9 +2,9 @@
 
 #include "d3d11/d3d11_version.h"
 #include "d3d/ProxyD3D.h"
-#include "d3d/COMRegistry.h"
+#include "com/COMRegistry.h"
 #include "d3d11/ProxyD3D11Device.h"
-#include "d3d/concepts.h"
+#include "com/concepts.h"
 #include <concepts>
 #include <atomic>
 
@@ -13,7 +13,7 @@ using namespace d3d;
 namespace d3d11 {
 
     template <typename T>
-    concept IsResourceInterface = d3d::IsCOMInterface<T> && std::derived_from<T, ID3D11Resource>;
+    concept IsResourceInterface = com::IsCOMInterface<T> && std::derived_from<T, ID3D11Resource>;
 
     /**
      * Intermediate Proxy for all ID3D11Resource types.
@@ -61,7 +61,7 @@ namespace d3d11 {
             // Route through the registry so the caller gets the proxy, not the real device.
             // If no proxy is registered for this device, the raw pointer is returned as-is.
             if (*ppDevice) {
-                if (auto* pProxy = d3d::COMRegistry<ID3D11Device, ProxyD3D11Device>::Find(*ppDevice)) {
+                if (auto* pProxy = com::COMRegistry<ID3D11Device, ProxyD3D11Device>::Find(*ppDevice)) {
                     (*ppDevice)->Release(); // release the raw ref from GetDevice
                     pProxy->AddRef();
                     *ppDevice = pProxy;

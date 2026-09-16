@@ -1,13 +1,13 @@
 #pragma once
 
-#include "d3d/COMRegistry.h"
-#include "d3d/concepts.h"
+#include "com/COMRegistry.h"
+#include "com/concepts.h"
 #include "d3dcommon.h"
 #include <concepts>
 
 namespace d3d {
 
-    template <IsCOMInterface T, typename TDerived>
+    template <com::IsCOMInterface T, typename TDerived>
     class ProxyD3D : public T {
     public:
         using InterfaceType = T;
@@ -22,7 +22,7 @@ namespace d3d {
          */
         virtual ~ProxyD3D() noexcept {
             if (m_pReal) {
-                COMRegistry<InterfaceType, TDerived>::Unregister(m_pReal);
+                com::COMRegistry<InterfaceType, TDerived>::Unregister(m_pReal);
                 InterfaceType* pReal = m_pReal;
                 m_pReal = nullptr;
                 pReal->Release();
@@ -37,7 +37,7 @@ namespace d3d {
          */
         explicit ProxyD3D(InterfaceType* pReal) : m_pReal(pReal), m_RefCount(1)
         {
-            COMRegistry<InterfaceType, TDerived>::Register(m_pReal, static_cast<TDerived*>(this));
+            com::COMRegistry<InterfaceType, TDerived>::Register(m_pReal, static_cast<TDerived*>(this));
         }
 
         // Non-copyable, non-movable (Rule of Five)

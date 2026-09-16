@@ -1,5 +1,6 @@
 #pragma once
 
+#include "coreapi.h"
 #include "d3d/ProxyD3D.h"
 #include "d3d11/d3d11_version.h"
 
@@ -34,7 +35,7 @@ namespace d3d11 {
      * 3. **Validation Layer:** Providing a custom diagnostic layer to log resource creation
      * parameters that may be inconsistent with modern hardware requirements.
      */
-    class ProxyD3D11Device : public d3d::ProxyD3D<ID3D11Device, ProxyD3D11Device> {
+    class CORE_API ProxyD3D11Device : public d3d::ProxyD3D<ID3D11Device, ProxyD3D11Device> {
     public:
         ProxyD3D11Device(ID3D11Device* pReal);
 

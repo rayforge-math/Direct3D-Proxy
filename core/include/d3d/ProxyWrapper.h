@@ -1,5 +1,5 @@
 #pragma once
-#include "d3d/COMRegistry.h"
+#include "com/COMRegistry.h"
 #include "d3d/ProxyD3D.h"
 #include "debug.h"
 #include <cassert>
@@ -28,23 +28,19 @@ namespace d3d {
             requires IsProxyFor<TProxy, typename TProxy::InterfaceType>
         static HRESULT Wrap(typename TProxy::InterfaceType** ppInterface, Args&&... args)
         {
-            LOG_MSG("ProxyWrapper::Wrap called");
             using TReal = typename TProxy::InterfaceType;
             if (!ppInterface || !*ppInterface) return S_OK;
             TReal* pReal = *ppInterface;
 
-            if (TProxy* pExisting = COMRegistry<TReal, TProxy>::Find(pReal)) {
-                LOG_MSG("ProxyWrapper::Wrap - Existing proxy found, reusing");
+            if (TProxy* pExisting = com::COMRegistry<TReal, TProxy>::Find(pReal)) {
                 pExisting->AddRef();
                 pReal->Release();
                 *ppInterface = static_cast<TReal*>(pExisting);
                 return S_OK;
             }
 
-            LOG_MSG("ProxyWrapper::Wrap - Creating new proxy instance");
             TProxy* pProxy = new TProxy(pReal, std::forward<Args>(args)...);
             if (!pProxy) {
-                LOG_MSG("ProxyWrapper::Wrap - Failed to allocate new proxy (out of memory)");
                 pReal->Release();
                 return E_OUTOFMEMORY;
             }
@@ -61,13 +57,11 @@ namespace d3d {
             requires IsProxyFor<TProxy, typename TProxy::InterfaceType>
         static HRESULT WrapArray(typename TProxy::InterfaceType** ppInterfaces, UINT count, Args&&... args)
         {
-            LOG_MSG("ProxyWrapper::WrapArray called");
             if (!ppInterfaces || count == 0) return S_OK;
             for (UINT i = 0; i < count; ++i) {
                 if (ppInterfaces[i]) {
                     HRESULT hr = Wrap<TProxy>(&ppInterfaces[i], std::forward<Args>(args)...);
                     if (FAILED(hr)) {
-                        LOG_MSG("ProxyWrapper::WrapArray - Failed at index");
                         return hr;
                     }
                 }
@@ -86,16 +80,13 @@ namespace d3d {
             requires IsProxy<TProxy>
         static inline typename TProxy::InterfaceType* Unwrap(typename TProxy::InterfaceType* pInterface)
         {
-            LOG_MSG("ProxyWrapper::Unwrap called");
             using TReal = typename TProxy::InterfaceType;
             if (!pInterface) return nullptr;
 
-            if (TProxy* pProxy = COMRegistry<TReal, TProxy>::Find(pInterface)) {
-                LOG_MSG("ProxyWrapper::Unwrap - Found proxy in registry, returning real pointer");
+            if (TProxy* pProxy = com::COMRegistry<TReal, TProxy>::Find(pInterface)) {
                 return pProxy->GetReal();
             }
 
-            LOG_MSG("ProxyWrapper::Unwrap - Pointer is not a known proxy, passing through as-is");
             return pInterface; // already unwrapped or external — pass through
         }
 
@@ -112,7 +103,6 @@ namespace d3d {
         static inline UnwrappedArray<typename TProxy::InterfaceType, MaxCount>
             UnwrapArray(typename TProxy::InterfaceType* const* ppProxies, UINT count)
         {
-            LOG_MSG("ProxyWrapper::UnwrapArray called");
             assert(count <= MaxCount && "UnwrapArray: count exceeds MaxCount buffer limit!");
             using TReal = typename TProxy::InterfaceType;
             UnwrappedArray<TReal, MaxCount> result{};

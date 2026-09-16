@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include "coreapi.h"
 #include "dxgi/dxgi_version.h"
 #include "d3d/D3DInspector.h"
 
 namespace dxgi {
 
-    struct DeviceInfo {
+    struct CORE_API DeviceInfo {
         // --- Creation Context ---
         D3D_FEATURE_LEVEL SelectedFeatureLevel;
         UINT CreationFlags;
@@ -53,7 +54,7 @@ namespace dxgi {
         } Features;
     };
 
-    struct SwapChainInfo {
+    struct CORE_API SwapChainInfo {
         DXGI_SWAP_CHAIN_DESC Desc;
         DXGI_SWAP_CHAIN_DESC1 Desc1;   // Extended info for modern Flip-Model
         BOOL IsModernFlipModel;        // Check if using FLIP_SEQUENTIAL/DISCARD
@@ -61,14 +62,14 @@ namespace dxgi {
         float EffectiveRefreshRate;    // Calculated from Num/Denom
     };
 
-    struct InteropInfo {
+    struct CORE_API InteropInfo {
         const char* BridgeType;
         void* InputPointer;
         void* OutputPointer;
         bool IsValidChain;
     };
 
-    struct SurfaceInfo {
+    struct CORE_API SurfaceInfo {
         DXGI_SURFACE_DESC Desc;
         UINT MultisampleCount;
         UINT MultisampleQuality;
@@ -82,7 +83,7 @@ namespace dxgi {
      * and capabilities of graphics objects created by the application without
      * interfering with the rendering pipeline.
      */
-    class DXGIInspector {
+    class CORE_API DXGIInspector {
     public:
         // data collection
         static SwapChainInfo CollectSwapChainInfo(IDXGISwapChain* swChain);

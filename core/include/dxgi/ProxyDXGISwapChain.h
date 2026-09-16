@@ -1,5 +1,6 @@
 #pragma once
 
+#include "coreapi.h"
 #include "d3d/ProxyD3D.h"
 #include "dxgi/dxgi_version.h"
 
@@ -34,7 +35,7 @@ namespace dxgi {
      * 3. **Window Management:** Preventing or handling forced fullscreen transitions that
      * might otherwise break external window focus or overlay stability.
      */
-    class ProxyDXGISwapChain : public d3d::ProxyD3D<IDXGISwapChain, ProxyDXGISwapChain> {
+    class CORE_API ProxyDXGISwapChain : public d3d::ProxyD3D<IDXGISwapChain, ProxyDXGISwapChain> {
     public:
         ProxyDXGISwapChain(IDXGISwapChain* pReal);
 

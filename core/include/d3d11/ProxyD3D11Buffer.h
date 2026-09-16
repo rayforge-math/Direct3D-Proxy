@@ -1,5 +1,6 @@
 #pragma once
 
+#include "coreapi.h"
 #include "d3d11/d3d11_version.h"
 #include "d3d11/ProxyD3D11Resource.h"
 
@@ -10,7 +11,7 @@ namespace d3d11 {
      * Caches the complete D3D11_BUFFER_DESC for high-performance tracking and
      * zero-overhead GetDesc calls.
      */
-    class ProxyD3D11Buffer : public ProxyD3D11Resource<ID3D11Buffer, ProxyD3D11Buffer> {
+    class CORE_API ProxyD3D11Buffer : public ProxyD3D11Resource<ID3D11Buffer, ProxyD3D11Buffer> {
     public:
         ProxyD3D11Buffer(ID3D11Buffer* pReal, const D3D11_BUFFER_DESC* pDesc = nullptr);
 

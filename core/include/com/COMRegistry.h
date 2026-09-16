@@ -2,12 +2,12 @@
 
 #define _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
 
-#include "d3d/concepts.h"
+#include "concepts.h"
 #include "d3dcommon.h"
 #include <unordered_map>
 #include <mutex>
 
-namespace d3d {
+namespace com {
 
     template <IsCOMInterface TInterface, typename TProxy>
     class COMRegistry {
