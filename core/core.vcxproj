@@ -279,7 +279,7 @@
     <ClInclude Include="include\d3d\d3d_version.h" />
     <ClInclude Include="include\d3d\ProxyD3D.h" />
     <ClInclude Include="include\d3d\ProxyWrapper.h" />
-    <ClInclude Include="include\debug.h" />
+    <ClInclude Include="include\debug\debug.h" />
     <ClInclude Include="include\dllmain.h" />
     <ClInclude Include="include\dxgi\DXGIInspector.h" />
     <ClInclude Include="include\dxgi\dxgi_version.h" />

@@ -2,7 +2,7 @@
 
 #include "d3d11/ProxyD3D11DeviceContext.h"
 #include "d3d11/ProxyD3D11Wrapper.h"
-#include "debug_d3d11.h"
+#include "debug/debug_d3d11.h"
 #include <d3d11/ProxyD3D11Buffer.h>
 
 using namespace d3d;
