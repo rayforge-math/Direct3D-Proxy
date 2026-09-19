@@ -33,9 +33,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\dllmain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\d3d11\d3d11_impl.h">
       <Filter>Header Files\d3d11</Filter>
     </ClInclude>

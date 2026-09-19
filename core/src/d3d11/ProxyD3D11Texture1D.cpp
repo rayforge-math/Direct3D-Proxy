@@ -3,7 +3,7 @@
 namespace d3d11 {
 
     ProxyD3D11Texture1D::ProxyD3D11Texture1D(ID3D11Texture1D* pReal, const D3D11_TEXTURE1D_DESC* pDesc)
-        : ProxyD3D11Resource<ID3D11Texture1D, ProxyD3D11Texture1D>(pReal, D3D11_RESOURCE_DIMENSION_TEXTURE1D)
+        : ProxyD3D11Resource<ID3D11Texture1D, ProxyD3D11Texture1D>(pReal)
     {
         if (pDesc) {
             m_Desc = *pDesc;

@@ -1,5 +1,5 @@
 #include "d3d11/D3D11HookExporter.h"
-#include "debug.h"
+#include "debug_d3d11.h"
 #include <string>
 
 namespace d3d11 {

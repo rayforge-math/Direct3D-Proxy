@@ -1,7 +1,6 @@
 #pragma once
 
 #include "logger.h"
-#include "globals.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -17,89 +16,24 @@ namespace debug {
 #ifdef ENABLE_PROXY_LOGGING
 
     template<typename... Args>
-    inline void log_msg(const char* func_name, Args... args) {
-        logger::build_and_log<false>(globals::name, func_name, args...);
+    inline void log_msg(const std::string_view tag, const char* func_name, Args... args) {
+        logger::build_and_log<false>(tag, func_name, args...);
     }
 
     template<typename... Args>
-    inline void log_params(const char* func_name, Args... args) {
-        logger::build_and_log<true>(globals::name, func_name, args...);
+    inline void log_params(const std::string_view tag, const char* func_name, Args... args) {
+        logger::build_and_log<true>(tag, func_name, args...);
     }
 
     template<typename... Args>
-    inline void log_result(const char* func_name, HRESULT hr, Args... args) {
+    inline void log_result(const std::string_view tag, const char* func_name, HRESULT hr, Args... args) {
         char hexbuf[16];
         auto [ptr, ec] = std::to_chars(hexbuf, hexbuf + sizeof(hexbuf), (uint32_t)hr, 16);
 
         std::string_view status = SUCCEEDED(hr) ? " [OK]" : " [FAILED]";
 
-        log_msg(func_name, "Result: 0x", std::string_view(hexbuf, ptr - hexbuf), status, args...);
+        log_msg(tag, func_name, "Result: 0x", std::string_view(hexbuf, ptr - hexbuf), status, args...);
     }
-
-    /*
-    inline std::string get_time() {
-        SYSTEMTIME st;
-        GetLocalTime(&st);
-        char buf[16];
-        sprintf_s(buf, "%02d:%02d:%02d.%03d", st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
-        return std::string(buf);
-    }
-
-    inline void trace_out(const char* func_name, const std::string& msg) {
-        std::stringstream ss;
-        ss << "[D3D11_PROXY] [" << get_time() << "] [" << func_name << "] " << msg;
-        OutputDebugStringA(ss.str().c_str());
-    }
-
-    inline void format_args(std::ostream& os) {
-        // do nothing
-    }
-
-    template<typename T>
-    inline void format_args(std::ostream& os, T value) {
-        os << " | " << value;
-    }
-
-    template<typename T, typename... Args>
-    inline void format_args(std::ostream& os, const char* name, T value, Args... args) {
-        os << " " << name << "->" << value;
-        format_args(os, args...);
-    }
-
-    inline void format_msg(std::ostream& os) {}
-
-    template<typename T, typename... Args>
-    inline void format_msg(std::ostream& os, T value, Args... args) {
-        os << " " << value;
-        format_msg(os, args...);
-    }
-
-    template<typename... Args>
-    inline void log_msg(const char* func_name, Args... args) {
-        std::stringstream ss;
-        format_msg(ss, args...);
-        ss << "\n";
-        trace_out(func_name, ss.str());
-    }
-
-    inline void log_api(const char* func_name, HRESULT hr) {
-        std::stringstream ss;
-        ss << "Result: 0x"
-            << std::hex << std::uppercase << std::setw(8) << std::setfill('0')
-            << (unsigned int)hr
-            << " [" << (SUCCEEDED(hr) ? "OK" : "FAILED") << "]\n";
-        trace_out(func_name, ss.str());
-    }
-
-    template<typename... Args>
-    inline void log_params(const char* func_name, Args... args) {
-        std::stringstream ss;
-        ss << "(";
-        format_args(ss, args...);
-        ss << " )\n";
-        trace_out(func_name, ss.str());
-    }
-    */
 
 #endif // ENABLE_PROXY_LOGGING
 }
@@ -126,16 +60,16 @@ namespace debug {
 
 #define EXPAND_PAIR(v) #v, v
 
-#define LOG_VARS(...) \
-        EXPAND(debug::log_params(__FUNCTION__, FOR_EACH(EXPAND_PAIR, __VA_ARGS__)))
+#define LOG_VARS_INTERNAL(tag, ...) \
+        EXPAND(debug::log_params(tag, __FUNCTION__, FOR_EACH(EXPAND_PAIR, __VA_ARGS__)))
 
-#define LOG_RESULT(hr, ...)     debug::log_result(__FUNCTION__, hr, __VA_ARGS__)
-#define LOG_MSG(...)            debug::log_msg(__FUNCTION__, __VA_ARGS__)
+#define LOG_RESULT_INTERNAL(tag, hr, ...)     debug::log_result(tag, __FUNCTION__, hr, __VA_ARGS__)
+#define LOG_MSG_INTERNAL(tag, ...)            debug::log_msg(tag, __FUNCTION__, __VA_ARGS__)
 
 #else
 
-#define LOG_VARS(hr, ...)
-#define LOG_API(hr)
-#define LOG_MSG(...)
+#define LOG_VARS_INTERNAL(tag, ...)
+#define LOG_RESULT_INTERNAL(tag, hr, ...)
+#define LOG_MSG_INTERNAL(tag, ...)
 
 #endif // ENABLE_PROXY_LOGGING

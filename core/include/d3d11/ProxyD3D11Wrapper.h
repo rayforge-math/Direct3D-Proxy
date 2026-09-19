@@ -8,7 +8,6 @@
 // #include "d3d11/ProxyD3D11DepthStencilView.h"
 // #include "d3d11/ProxyD3D11SamplerState.h"
 // #include "d3d11/ProxyD3D11Resource.h"
-#include "debug.h"
 
 using namespace d3d;
 
@@ -19,9 +18,9 @@ namespace d3d11 {
     * Specialise for every interface that appears in array-based Set/Get calls.     
     *     
     * Buffer context tags (ID3D11Buffer is context-dependent):     
-    *   D3D11SlotCount<D3D11CB>  — constant buffers  (14 slots)     
-    *   D3D11SlotCount<D3D11VB>  — vertex buffers    (32 slots)     
-    *   D3D11SlotCount<D3D11SOB> — stream-output     ( 4 slots)     
+    *   D3D11SlotCount<D3D11CB>  constant buffers  (14 slots)     
+    *   D3D11SlotCount<D3D11VB>  vertex buffers    (32 slots)     
+    *   D3D11SlotCount<D3D11SOB> stream-output     ( 4 slots)     
     */
     template <typename T>
     struct D3D11SlotCount;
@@ -76,42 +75,34 @@ namespace d3d11 {
         // ================================================================
 
         static inline HRESULT WrapBuffers(ID3D11Buffer** pp, UINT count) {
-            LOG_MSG("ProxyD3D11Wrapper::WrapBuffers called");
             return ProxyWrapper::WrapArray<ProxyD3D11Buffer>(pp, count);
         }
 
         static inline HRESULT Wrap(ID3D11Buffer** pp) {
-            LOG_MSG("ProxyD3D11Wrapper::Wrap (Buffer) called");
             return ProxyWrapper::Wrap<ProxyD3D11Buffer>(pp);
         }
         /*
         static inline HRESULT Wrap(ID3D11ShaderResourceView** pp) {
-            LOG_MSG("ProxyD3D11Wrapper::Wrap (SRV) called");
             return ProxyWrapper::Wrap<ProxyD3D11ShaderResourceView>(pp);
         }
 
         static inline HRESULT Wrap(ID3D11UnorderedAccessView** pp) {
-            LOG_MSG("ProxyD3D11Wrapper::Wrap (UAV) called");
             return ProxyWrapper::Wrap<ProxyD3D11UnorderedAccessView>(pp);
         }
 
         static inline HRESULT Wrap(ID3D11RenderTargetView** pp) {
-            LOG_MSG("ProxyD3D11Wrapper::Wrap (RTV) called");
             return ProxyWrapper::Wrap<ProxyD3D11RenderTargetView>(pp);
         }
 
         static inline HRESULT Wrap(ID3D11DepthStencilView** pp) {
-            LOG_MSG("ProxyD3D11Wrapper::Wrap (DSV) called");
             return ProxyWrapper::Wrap<ProxyD3D11DepthStencilView>(pp);
         }
 
         static inline HRESULT Wrap(ID3D11SamplerState** pp) {
-            LOG_MSG("ProxyD3D11Wrapper::Wrap (Sampler) called");
             return ProxyWrapper::Wrap<ProxyD3D11SamplerState>(pp);
         }
         */
         static inline HRESULT Wrap(ID3D11Resource** pp) {
-            LOG_MSG("ProxyD3D11Wrapper::Wrap (Resource) called");
             if (!pp || !*pp) return S_OK;
 
             D3D11_RESOURCE_DIMENSION dim = D3D11_RESOURCE_DIMENSION_UNKNOWN;
@@ -144,7 +135,6 @@ namespace d3d11 {
         template <typename TSlotContext>
             requires HasD3D11SlotCount<TSlotContext>
         static inline auto UnwrapBuffers(ID3D11Buffer* const* pp, UINT count) {
-            LOG_MSG("ProxyD3D11Wrapper::UnwrapBuffers called");
             return ProxyWrapper::UnwrapArray<ProxyD3D11Buffer, D3D11SlotCount<TSlotContext>::value>(pp, count);
         }
 
@@ -154,43 +144,35 @@ namespace d3d11 {
         template <typename T>
             requires HasD3D11SlotCount<T>
         static inline auto UnwrapViews(T* const* pp, UINT count) {
-            LOG_MSG("ProxyD3D11Wrapper::UnwrapViews called");
             return ProxyWrapper::UnwrapArray<T, D3D11SlotCount<T>::value>(pp, count);
         }
 
         // Single Pointer Unwrapping
         static inline ID3D11Buffer* Unwrap(ID3D11Buffer* p) {
-            LOG_MSG("ProxyD3D11Wrapper::Unwrap (Buffer) called");
             return ProxyWrapper::Unwrap<ProxyD3D11Buffer>(p);
         }
         /*
         static inline ID3D11ShaderResourceView* Unwrap(ID3D11ShaderResourceView* p) {
-            LOG_MSG("ProxyD3D11Wrapper::Unwrap (SRV) called");
             return ProxyWrapper::Unwrap<ProxyD3D11ShaderResourceView>(p);
         }
 
         static inline ID3D11UnorderedAccessView* Unwrap(ID3D11UnorderedAccessView* p) {
-            LOG_MSG("ProxyD3D11Wrapper::Unwrap (UAV) called");
             return ProxyWrapper::Unwrap<ProxyD3D11UnorderedAccessView>(p);
         }
 
         static inline ID3D11RenderTargetView* Unwrap(ID3D11RenderTargetView* p) {
-            LOG_MSG("ProxyD3D11Wrapper::Unwrap (RTV) called");
             return ProxyWrapper::Unwrap<ProxyD3D11RenderTargetView>(p);
         }
 
         static inline ID3D11DepthStencilView* Unwrap(ID3D11DepthStencilView* p) {
-            LOG_MSG("ProxyD3D11Wrapper::Unwrap (DSV) called");
             return ProxyWrapper::Unwrap<ProxyD3D11DepthStencilView>(p);
         }
 
         static inline ID3D11SamplerState* Unwrap(ID3D11SamplerState* p) {
-            LOG_MSG("ProxyD3D11Wrapper::Unwrap (Sampler) called");
             return ProxyWrapper::Unwrap<ProxyD3D11SamplerState>(p);
         }
         */
         static inline ID3D11Resource* Unwrap(ID3D11Resource* p) {
-            LOG_MSG("ProxyD3D11Wrapper::Unwrap (Resource) called");
             if (!p) return nullptr;
 
             if (auto* pReal = ProxyWrapper::Unwrap<ProxyD3D11Buffer>(reinterpret_cast<ID3D11Buffer*>(p)))

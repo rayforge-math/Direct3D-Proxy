@@ -24,9 +24,6 @@
     <ClInclude Include="include\com\COMRegistry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\com\concepts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\d3d\d3d_version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
