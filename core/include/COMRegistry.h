@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <mutex>
 
-namespace com {
+namespace dll {
 
     template <typename TProxy>
     class COMRegistry {

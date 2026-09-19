@@ -8,8 +8,8 @@
         https://github.com/crosire/reshade/blob/main/source/d3d11/d3d11.cpp
 */
 
-#include "d3d11/d3d11_impl.h"
-#include "d3d11/d3d11_internal.h"
+#include "D3D11Impl.h"
+#include "D3D11JumpStubs.h"
 #include "d3d11/D3D11Inspector.h"
 #include "d3d11/ProxyD3D11Device.h"
 #include "d3d11/ProxyD3D11DeviceContext.h"
@@ -19,6 +19,7 @@
 
 using namespace dxgi;
 using namespace d3d;
+using namespace d3d11;
 
 /**
  * @file d3d11_impl.cpp
@@ -45,7 +46,7 @@ using namespace d3d;
  * @see jump_stubs.asm for the implementation of these functions.
  */
 
-namespace d3d11 {
+namespace dll {
 
     // ============================================================================
     // DIRECT3D 11 PROXY DLL - MODULE ARCHITECTURE & TABLE OF CONTENTS
@@ -155,7 +156,7 @@ namespace d3d11 {
              * own proxy classes to intercept all subsequent rendering calls.
              */
 
-            HRESULT result = reinterpret_cast<D3D11CreateDevice_t>(proc_D3D11CreateDevice)(
+            HRESULT result = reinterpret_cast<D3D11CreateDevice_t>(dll::proc_D3D11CreateDevice)(
                 pAdapter,
                 DriverType,
                 Software,
@@ -234,7 +235,7 @@ namespace d3d11 {
              * rendering usually happens.
              */
 
-            HRESULT result = reinterpret_cast<D3D11CreateDeviceAndSwapChain_t>(proc_D3D11CreateDeviceAndSwapChain)(
+            HRESULT result = reinterpret_cast<D3D11CreateDeviceAndSwapChain_t>(dll::proc_D3D11CreateDeviceAndSwapChain)(
                 pAdapter,
                 DriverType,
                 Software,
@@ -332,7 +333,7 @@ namespace d3d11 {
              * can be wrapped in your D3D11 proxy class.
              */
 
-            HRESULT result = reinterpret_cast<D3D11On12CreateDevice_t>(proc_D3D11On12CreateDevice)(
+            HRESULT result = reinterpret_cast<D3D11On12CreateDevice_t>(dll::proc_D3D11On12CreateDevice)(
                 pDevice,
                 Flags,
                 pFeatureLevels,
@@ -398,7 +399,7 @@ namespace d3d11 {
              * to maintain the hook chain into the WinRT/UWP environment.
              */
 
-            HRESULT result = reinterpret_cast<CreateDirect3D11DeviceFromDXGIDevice_t>(proc_CreateDirect3D11DeviceFromDXGIDevice)(
+            HRESULT result = reinterpret_cast<CreateDirect3D11DeviceFromDXGIDevice_t>(dll::proc_CreateDirect3D11DeviceFromDXGIDevice)(
                 dxgiDevice,
                 graphicsDevice
                 );
@@ -455,7 +456,7 @@ namespace d3d11 {
              * correctly to maintain the proxy chain.
              */
 
-            HRESULT result = reinterpret_cast<CreateDirect3D11SurfaceFromDXGISurface_t>(proc_CreateDirect3D11SurfaceFromDXGISurface)(
+            HRESULT result = reinterpret_cast<CreateDirect3D11SurfaceFromDXGISurface_t>(dll::proc_CreateDirect3D11SurfaceFromDXGISurface)(
                 dxgiSurface,
                 graphicsSurface
                 );
@@ -1588,4 +1589,4 @@ namespace d3d11 {
 
     }
 
-} // namespace d3d11
+} // namespace dll

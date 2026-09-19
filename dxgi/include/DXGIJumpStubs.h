@@ -1,6 +1,6 @@
 #include <minwindef.h>
 
-namespace dxgi {
+namespace dll {
 
     extern "C" {
         extern FARPROC proc_CreateDXGIFactory;

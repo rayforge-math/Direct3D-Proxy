@@ -264,7 +264,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\coreapi.h" />
-    <ClInclude Include="include\d3d11\D3D11HookExporter.h" />
+    <ClInclude Include="include\HookExporter.h" />
     <ClInclude Include="include\d3d11\D3D11Inspector.h" />
     <ClInclude Include="include\d3d11\d3d11_version.h" />
     <ClInclude Include="include\d3d11\ProxyD3D11Buffer.h" />
@@ -286,7 +286,7 @@
     <ClInclude Include="include\dxgi\ProxyDXGISwapChain.h" />
     <ClInclude Include="include\globals.h" />
     <ClInclude Include="include\logger.h" />
-    <ClInclude Include="include\com\COMRegistry.h" />
+    <ClInclude Include="include\COMRegistry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
@@ -300,6 +300,7 @@
     <ClCompile Include="src\d3d\D3DInspector.cpp" />
     <ClCompile Include="src\dxgi\DXGIInspector.cpp" />
     <ClCompile Include="src\dxgi\ProxyDXGISwapChain.cpp" />
+    <ClCompile Include="src\HookExporter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

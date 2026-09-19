@@ -139,7 +139,7 @@
 #define PROXY_D3D11_CORE_CREATE_DEVICE_LEGACY
 #endif
 
-namespace d3d11 {
+namespace dll {
 
     extern "C" {
 
@@ -1094,4 +1094,4 @@ namespace d3d11 {
         
     }
 
-} // namespace d3d11
+} // namespace dll

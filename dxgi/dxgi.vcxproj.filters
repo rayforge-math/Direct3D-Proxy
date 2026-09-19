@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\dxgi\dxgi_internal.h">
+    <ClInclude Include="include\DXGIJumpStubs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

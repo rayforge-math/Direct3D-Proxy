@@ -27,16 +27,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\d3d11\d3d11_impl.h" />
-    <ClInclude Include="include\d3d11\d3d11_internal.h" />
+    <ClInclude Include="include\D3D11JumpStubs.h" />
+    <ClInclude Include="include\D3D11HookExporter.h" />
+    <ClInclude Include="include\D3D11Impl.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\d3d11\D3D11HookExporter.cpp" />
-    <ClCompile Include="src\d3d11\d3d11_impl.cpp" />
+    <ClCompile Include="src\D3D11HookExporter.cpp" />
+    <ClCompile Include="src\D3D11Impl.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\d3d11\jump_stubs.asm" />
+    <MASM Include="src\jump_stubs.asm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\core\core.vcxproj">

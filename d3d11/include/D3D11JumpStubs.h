@@ -1,7 +1,9 @@
-#include <minwindef.h>
+#pragma once
 
-namespace d3d11 {
+#include <windows.h>
 
+namespace dll {
+	// Global function pointer declarations for D3D11 / D3DKMT proxying
 	extern "C" {
 		extern FARPROC proc_CreateDirect3D11DeviceFromDXGIDevice;
 		extern FARPROC proc_CreateDirect3D11SurfaceFromDXGISurface;
@@ -55,5 +57,4 @@ namespace d3d11 {
 		extern FARPROC proc_OpenAdapter10;
 		extern FARPROC proc_OpenAdapter10_2;
 	}
-
-} // namespace d3d11
+}

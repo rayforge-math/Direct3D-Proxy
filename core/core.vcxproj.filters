@@ -21,7 +21,7 @@
     <ClInclude Include="include\logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\com\COMRegistry.h">
+    <ClInclude Include="include\COMRegistry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\d3d\d3d_version.h">
@@ -36,7 +36,7 @@
     <ClInclude Include="include\d3d\ProxyWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\d3d11\D3D11HookExporter.h">
+    <ClInclude Include="include\HookExporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\d3d11\D3D11Inspector.h">
@@ -120,6 +120,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\d3d11\ProxyD3D11Texture3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HookExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,7 +2,7 @@
 
 #include "d3d11/d3d11_version.h"
 #include "d3d/ProxyD3D.h"
-#include "com/COMRegistry.h"
+#include "COMRegistry.h"
 #include "d3d11/ProxyD3D11Device.h"
 #include <concepts>
 
@@ -42,7 +42,7 @@ namespace d3d11 {
             this->m_pReal->GetDevice(ppDevice);
 
             if (*ppDevice) {
-                if (auto* pProxy = com::COMRegistry<ID3D11Device>::Find(*ppDevice)) {
+                if (auto* pProxy = dll::COMRegistry<ID3D11Device>::Find(*ppDevice)) {
                     (*ppDevice)->Release();
                     pProxy->AddRef();
                     *ppDevice = pProxy;

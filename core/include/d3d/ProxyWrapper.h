@@ -1,6 +1,6 @@
 #pragma once
 
-#include "com/COMRegistry.h"
+#include "COMRegistry.h"
 #include "d3d/ProxyD3D.h"
 #include <cassert>
 #include <unknwn.h>
@@ -30,7 +30,7 @@ namespace d3d {
             TReal* pReal = *ppInterface;
 
             // Check registry using IUnknown* for correct COM identity lookup
-            if (TProxy* pExisting = com::COMRegistry<TProxy>::Find(pReal)) {
+            if (TProxy* pExisting = dll::COMRegistry<TProxy>::Find(pReal)) {
                 pExisting->AddRef();
                 pReal->Release();
                 *ppInterface = static_cast<TReal*>(pExisting);
@@ -72,7 +72,7 @@ namespace d3d {
             using TReal = typename TProxy::InterfaceType;
             if (!pInterface) return nullptr;
 
-            if (TProxy* pProxy = com::COMRegistry<TProxy>::Find(pInterface)) {
+            if (TProxy* pProxy = dll::COMRegistry<TProxy>::Find(pInterface)) {
                 return static_cast<TReal*>(pProxy->GetReal());
             }
 
