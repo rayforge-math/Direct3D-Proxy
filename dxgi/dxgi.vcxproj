@@ -103,37 +103,37 @@
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)\$(ProjectName)\</IntDir>
     <TargetName>dxgi</TargetName>
-    <IncludePath>../core/include;$(IncludePath)</IncludePath>
+    <IncludePath>../core/include;include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)\$(ProjectName)\</IntDir>
     <TargetName>dxgi</TargetName>
-    <IncludePath>../core/include;$(IncludePath)</IncludePath>
+    <IncludePath>../core/include;include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Logging|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)\$(ProjectName)\</IntDir>
     <TargetName>dxgi</TargetName>
-    <IncludePath>../core/include;$(IncludePath)</IncludePath>
+    <IncludePath>../core/include;include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)\$(ProjectName)\</IntDir>
     <TargetName>dxgi</TargetName>
-    <IncludePath>../core/include;$(IncludePath)</IncludePath>
+    <IncludePath>../core/include;include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)\$(ProjectName)\</IntDir>
     <TargetName>dxgi</TargetName>
-    <IncludePath>../core/include;$(IncludePath)</IncludePath>
+    <IncludePath>../core/include;include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Logging|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>$(OutDir)\$(ProjectName)\</IntDir>
     <TargetName>dxgi</TargetName>
-    <IncludePath>../core/include;$(IncludePath)</IncludePath>
+    <IncludePath>../core/include;include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -265,6 +265,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\DXGIHookExporter.cpp" />
+    <ClCompile Include="src\DXGIImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\core\core.vcxproj">
@@ -272,7 +274,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\DXGIHookExporter.h" />
+    <ClInclude Include="include\DXGIImpl.h" />
     <ClInclude Include="include\DXGIJumpStubs.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="src\jump_stubs.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

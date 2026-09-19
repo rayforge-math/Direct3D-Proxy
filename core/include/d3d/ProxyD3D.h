@@ -23,8 +23,7 @@ namespace d3d {
          */
         virtual ~ProxyD3D() noexcept {
             if (m_pReal) {
-                // Unregister using the canonical IUnknown* key
-                dll::COMRegistry<TDerived>::Unregister(m_pReal);
+                dll::COMRegistry::Unregister(m_pReal);
 
                 InterfaceType* pReal = m_pReal;
                 m_pReal = nullptr;
@@ -37,7 +36,7 @@ namespace d3d {
          * @brief Constructor: Takes ownership of the provided pointer.
          */
         explicit ProxyD3D(InterfaceType* pReal) : m_pReal(pReal), m_RefCount(1) {
-            dll::COMRegistry<TDerived>::Register(m_pReal, static_cast<TDerived*>(this));
+            dll::COMRegistry::Register(m_pReal, static_cast<TDerived*>(this));
         }
 
         // Non-copyable, non-movable (Rule of Five)

@@ -264,6 +264,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\coreapi.h" />
+    <ClInclude Include="include\debug\debug_dxgi.h" />
+    <ClInclude Include="include\dxgi\ProxyDXGIAdapter.h" />
+    <ClInclude Include="include\dxgi\ProxyDXGIFactory.h" />
     <ClInclude Include="include\HookExporter.h" />
     <ClInclude Include="include\d3d11\D3D11Inspector.h" />
     <ClInclude Include="include\d3d11\d3d11_version.h" />
@@ -299,6 +302,8 @@
     <ClCompile Include="src\d3d11\ProxyD3D11Texture3D.cpp" />
     <ClCompile Include="src\d3d\D3DInspector.cpp" />
     <ClCompile Include="src\dxgi\DXGIInspector.cpp" />
+    <ClCompile Include="src\dxgi\ProxyDXGIAdapter.cpp" />
+    <ClCompile Include="src\dxgi\ProxyDXGIFactory.cpp" />
     <ClCompile Include="src\dxgi\ProxyDXGISwapChain.cpp" />
     <ClCompile Include="src\HookExporter.cpp" />
   </ItemGroup>

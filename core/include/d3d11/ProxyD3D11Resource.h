@@ -42,10 +42,10 @@ namespace d3d11 {
             this->m_pReal->GetDevice(ppDevice);
 
             if (*ppDevice) {
-                if (auto* pProxy = dll::COMRegistry<ID3D11Device>::Find(*ppDevice)) {
+                if (auto* pProxy = dll::COMRegistry::Find<ProxyD3D11Device>(*ppDevice)) {
                     (*ppDevice)->Release();
                     pProxy->AddRef();
-                    *ppDevice = pProxy;
+                    *ppDevice = static_cast<ID3D11Device*>(pProxy);
                 }
             }
         }
