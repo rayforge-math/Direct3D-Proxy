@@ -96,6 +96,9 @@
     <ClInclude Include="include\dxgi\ProxyDXGIAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\debug\debug_core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">

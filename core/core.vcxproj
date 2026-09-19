@@ -264,6 +264,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\coreapi.h" />
+    <ClInclude Include="include\debug\debug_core.h" />
     <ClInclude Include="include\debug\debug_dxgi.h" />
     <ClInclude Include="include\dxgi\ProxyDXGIAdapter.h" />
     <ClInclude Include="include\dxgi\ProxyDXGIFactory.h" />
