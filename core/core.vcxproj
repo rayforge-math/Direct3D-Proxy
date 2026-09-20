@@ -289,7 +289,7 @@
     <ClInclude Include="include\dxgi\dxgi_version.h" />
     <ClInclude Include="include\dxgi\ProxyDXGISwapChain.h" />
     <ClInclude Include="include\globals.h" />
-    <ClInclude Include="include\logger.h" />
+    <ClInclude Include="include\debug\logger.h" />
     <ClInclude Include="include\COMRegistry.h" />
   </ItemGroup>
   <ItemGroup>

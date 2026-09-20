@@ -1,5 +1,5 @@
 #include "HookExporter.h"
-#include "debug/debug_d3d11.h"
+#include "debug/debug_core.h"
 #include <algorithm>
 #include <string>
 
