@@ -15,7 +15,7 @@ namespace dxgi {
      * It intercepts advanced presentation methods such as `Present1`, composition features,
      * and window handle retrieval (`GetHwnd`), ensuring full compatibility with modern windowing and flip models.
      */
-    class CORE_API ProxyDXGISwapChain : public d3d::ProxyD3D<IDXGISwapChain4, ProxyDXGISwapChain> {
+    class CORE_API ProxyDXGISwapChain : public d3d::ProxyD3D<ProxyDXGISwapChain, IDXGISwapChain4> {
     public:
         ProxyDXGISwapChain(IDXGISwapChain4* pReal);
 

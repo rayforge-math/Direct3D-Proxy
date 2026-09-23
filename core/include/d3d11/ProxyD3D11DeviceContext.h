@@ -31,7 +31,7 @@ namespace d3d11 {
      * 3. **Feature Augmentation:** Implementing modern features (like post-processing effects)
      * into legacy applications by intercepting the final execution stages.
      */
-    class CORE_API ProxyD3D11DeviceContext : public d3d::ProxyD3D<ID3D11DeviceContext4, ProxyD3D11DeviceContext> {
+    class CORE_API ProxyD3D11DeviceContext : public d3d::ProxyD3D<ProxyD3D11DeviceContext, ID3D11DeviceContext4> {
     public:
         ProxyD3D11DeviceContext(ID3D11DeviceContext4* context);
 

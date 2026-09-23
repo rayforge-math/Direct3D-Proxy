@@ -3,7 +3,7 @@
 namespace d3d11 {
 
     ProxyD3D11Buffer::ProxyD3D11Buffer(ID3D11Buffer* pReal, const D3D11_BUFFER_DESC* pDesc)
-        : ProxyD3D11Resource<ID3D11Buffer, ProxyD3D11Buffer>(pReal)
+        : ProxyD3D11Resource<ProxyD3D11Buffer, ID3D11Buffer>(pReal)
     {
         if (pDesc) {
             m_Desc = *pDesc;

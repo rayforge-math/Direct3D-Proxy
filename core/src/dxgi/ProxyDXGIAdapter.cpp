@@ -6,8 +6,8 @@
 
 namespace dxgi {
 
-    ProxyDXGIAdapter::ProxyDXGIAdapter(IDXGIAdapter3* pReal)
-        : ProxyD3D<IDXGIAdapter3, ProxyDXGIAdapter>(pReal)
+    ProxyDXGIAdapter::ProxyDXGIAdapter(IDXGIAdapter4* pReal)
+        : ProxyD3D<ProxyDXGIAdapter, IDXGIAdapter4>(pReal)
     {
     }
 
@@ -28,14 +28,15 @@ namespace dxgi {
         if (riid == __uuidof(IDXGIAdapter) ||
             riid == __uuidof(IDXGIAdapter1) ||
             riid == __uuidof(IDXGIAdapter2) ||
-            riid == __uuidof(IDXGIAdapter3))
+            riid == __uuidof(IDXGIAdapter3) ||
+            riid == __uuidof(IDXGIAdapter4))
         {
-            *ppvObject = static_cast<IDXGIAdapter3*>(this);
+            *ppvObject = static_cast<IDXGIAdapter4*>(this);
             AddRef();
             return S_OK;
         }
 
-        return d3d::ProxyD3D<IDXGIAdapter3, ProxyDXGIAdapter>::QueryInterface(riid, ppvObject);
+        return d3d::ProxyD3D<ProxyDXGIAdapter, IDXGIAdapter4>::QueryInterface(riid, ppvObject);
     }
 
     // --- IDXGIObject Methods ---
@@ -129,6 +130,11 @@ namespace dxgi {
     void STDMETHODCALLTYPE ProxyDXGIAdapter::UnregisterVideoMemoryBudgetChangeNotification(DWORD dwCookie) {
         LOG_MSG("ProxyDXGIAdapter::UnregisterVideoMemoryBudgetChangeNotification called");
         m_pReal->UnregisterVideoMemoryBudgetChangeNotification(dwCookie);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGIAdapter::GetDesc3(DXGI_ADAPTER_DESC3* pDesc) {
+        LOG_MSG("ProxyDXGIAdapter::GetDesc3 called");
+        return m_pReal->GetDesc3(pDesc);
     }
 
 } // namespace dxgi

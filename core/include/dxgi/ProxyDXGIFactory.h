@@ -20,7 +20,7 @@ namespace dxgi {
      * - **Stereo & Occlusion Management:** Intercepts window association, stereo status events, and occlusion monitoring.
      * - **Automatic Proxy Wrapping:** Ensures that all created swap chains (IDXGISwapChain1) and adapters are automatically wrapped in their corresponding proxy implementations.
      */
-    class CORE_API ProxyDXGIFactory : public d3d::ProxyD3D<IDXGIFactory4, ProxyDXGIFactory> {
+    class CORE_API ProxyDXGIFactory : public d3d::ProxyD3D<ProxyDXGIFactory, IDXGIFactory4> {
     public:
         ProxyDXGIFactory(IDXGIFactory4* pReal);
 

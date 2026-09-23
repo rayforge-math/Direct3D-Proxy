@@ -35,7 +35,7 @@ namespace d3d11 {
      * 3. **Validation Layer:** Providing a custom diagnostic layer to log resource creation
      * parameters that may be inconsistent with modern hardware requirements.
      */
-    class CORE_API ProxyD3D11Device : public d3d::ProxyD3D<ID3D11Device5, ProxyD3D11Device> {
+    class CORE_API ProxyD3D11Device : public d3d::ProxyD3D<ProxyD3D11Device, ID3D11Device5> {
     public:
         ProxyD3D11Device(ID3D11Device5* pReal);
 

@@ -16,14 +16,14 @@ namespace d3d11 {
     /**
      * @brief Intermediate Proxy for all ID3D11Resource types.
      */
-    template <IsResourceObject T, typename TDerived>
-    class ProxyD3D11Resource : public ProxyD3D<T, TDerived> {
+    template <typename TDerived, IsResourceObject T>
+    class ProxyD3D11Resource : public ProxyD3D<TDerived, T> {
     public:
         /**
          * @brief Constructor: Takes exclusive ownership of the provided pointer.
          */
         explicit ProxyD3D11Resource(T* pReal)
-            : ProxyD3D<T, TDerived>(pReal)
+            : ProxyD3D<TDerived, T>(pReal)
         {
         }
 
@@ -76,15 +76,5 @@ namespace d3d11 {
             return this->m_pReal->GetEvictionPriority();
         }
     };
-
-    template <typename TProxy>
-    concept IsResourceProxy =
-        requires { typename TProxy::InterfaceType; }
-    && IsResourceObject<typename TProxy::InterfaceType>
-        && std::derived_from<TProxy, ProxyD3D11Resource<typename TProxy::InterfaceType, TProxy>>;
-
-    template <typename TProxy, typename TResource>
-    concept IsResourceProxyFor = IsResourceProxy<TProxy>
-        && std::same_as<typename TProxy::InterfaceType, TResource>;
 
 } // namespace d3d11

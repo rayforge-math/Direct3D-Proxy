@@ -11,7 +11,7 @@ using namespace d3d;
 namespace d3d11 {
 
     ProxyD3D11Device::ProxyD3D11Device(ID3D11Device5* device)
-        : ProxyD3D<ID3D11Device5, ProxyD3D11Device>(device)
+        : ProxyD3D<ProxyD3D11Device, ID3D11Device5>(device)
     {
     }
 
@@ -34,7 +34,7 @@ namespace d3d11 {
             return S_OK;
         }
 
-        return d3d::ProxyD3D<ID3D11Device5, ProxyD3D11Device>::QueryInterface(riid, ppvObject);
+        return d3d::ProxyD3D<ProxyD3D11Device, ID3D11Device5>::QueryInterface(riid, ppvObject);
     }
 
     // --- ID3D11Device Methods ---

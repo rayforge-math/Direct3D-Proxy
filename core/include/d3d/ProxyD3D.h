@@ -11,10 +11,11 @@ namespace d3d {
     template <typename T>
     concept IsCOMObject = std::is_base_of_v<IUnknown, T>;
 
-    template <IsCOMObject T, typename TDerived>
-    class ProxyD3D : public T , public IProxy {
+    template <typename TDerived, IsCOMObject T, IsCOMObject... TAdditional>
+    class ProxyD3D : public T, public TAdditional..., public IProxy {
     public:
         using InterfaceType = T;
+        using ProxyBase = ProxyD3D<TDerived, T, TAdditional...>;
 
     protected:
         InterfaceType* m_pReal;
@@ -73,9 +74,33 @@ namespace d3d {
                 *ppvObject = dynamic_cast<IProxy*>(this);
                 return S_OK;
             }
-            
-            LOG_MSG("QueryInterface called with unknown IID, returning real pointer");
-            return m_pReal->QueryInterface(riid, ppvObject);
+
+            char iidString[39]{};
+            std::snprintf(
+                iidString, sizeof(iidString),
+                "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
+                static_cast<unsigned int>(riid.Data1),
+                static_cast<unsigned int>(riid.Data2),
+                static_cast<unsigned int>(riid.Data3),
+                static_cast<unsigned int>(riid.Data4[0]),
+                static_cast<unsigned int>(riid.Data4[1]),
+                static_cast<unsigned int>(riid.Data4[2]),
+                static_cast<unsigned int>(riid.Data4[3]),
+                static_cast<unsigned int>(riid.Data4[4]),
+                static_cast<unsigned int>(riid.Data4[5]),
+                static_cast<unsigned int>(riid.Data4[6]),
+                static_cast<unsigned int>(riid.Data4[7])
+            );
+
+            auto hr = m_pReal->QueryInterface(riid, ppvObject);
+            if (SUCCEEDED(hr)) {
+                LOG_MSG("QueryInterface called with unknown IID, returning real pointer (IID: ", iidString, ")");
+            }
+            else {
+                LOG_MSG("QueryInterface called with unknown IID, returning E_NOINTERFACE (IID: ", iidString, ")");
+            }
+
+            return hr;
         }
 
         virtual ULONG STDMETHODCALLTYPE AddRef() override {
@@ -94,10 +119,12 @@ namespace d3d {
     template <typename TProxy>
     concept IsProxy = requires {
         typename TProxy::InterfaceType;
-    }&& std::derived_from<TProxy, ProxyD3D<typename TProxy::InterfaceType, TProxy>>;
+        typename TProxy::ProxyBase;
+    }&& std::derived_from<TProxy, typename TProxy::ProxyBase>;
 
     template <typename TProxy, typename TResource>
-    concept IsProxyFor = IsProxy<TProxy>
-        && std::same_as<typename TProxy::InterfaceType, TResource>;
+    concept IsProxyFor =
+        IsProxy<TProxy> &&
+        std::same_as<typename TProxy::InterfaceType, TResource>;
 
 } // namespace d3d

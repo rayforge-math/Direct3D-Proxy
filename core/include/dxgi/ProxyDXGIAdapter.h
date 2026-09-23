@@ -15,9 +15,9 @@ namespace dxgi {
      * (IDXGIAdapter, IDXGIAdapter1, IDXGIAdapter2) while providing access to advanced features
      * such as memory budget tracking and query methods.
      */
-    class CORE_API ProxyDXGIAdapter : public d3d::ProxyD3D<IDXGIAdapter3, ProxyDXGIAdapter> {
+    class CORE_API ProxyDXGIAdapter : public d3d::ProxyD3D<ProxyDXGIAdapter, IDXGIAdapter4> {
     public:
-        explicit ProxyDXGIAdapter(IDXGIAdapter3* pReal);
+        explicit ProxyDXGIAdapter(IDXGIAdapter4* pReal);
 
         virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
 
@@ -45,6 +45,9 @@ namespace dxgi {
         virtual HRESULT STDMETHODCALLTYPE SetVideoMemoryReservation(UINT NodeIndex, DXGI_MEMORY_SEGMENT_GROUP MemorySegmentGroup, UINT64 Reservation) override;
         virtual HRESULT STDMETHODCALLTYPE RegisterVideoMemoryBudgetChangeNotificationEvent(HANDLE hEvent, DWORD* pdwCookie) override;
         virtual void STDMETHODCALLTYPE UnregisterVideoMemoryBudgetChangeNotification(DWORD dwCookie) override;
+
+        // --- IDXGIAdapter4 Methods ---
+        virtual HRESULT STDMETHODCALLTYPE GetDesc3(DXGI_ADAPTER_DESC3* pDesc) override;
     };
 
 } // namespace dxgi

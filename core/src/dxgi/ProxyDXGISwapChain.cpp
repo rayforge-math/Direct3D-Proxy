@@ -11,7 +11,7 @@ using namespace d3d;
 namespace dxgi {
 
     ProxyDXGISwapChain::ProxyDXGISwapChain(IDXGISwapChain4* swapChain)
-        : ProxyD3D<IDXGISwapChain4, ProxyDXGISwapChain>(swapChain)
+        : ProxyD3D<ProxyDXGISwapChain, IDXGISwapChain4>(swapChain)
     {
     }
 
@@ -33,7 +33,7 @@ namespace dxgi {
             return S_OK;
         }
 
-        return d3d::ProxyD3D<IDXGISwapChain4, ProxyDXGISwapChain>::QueryInterface(riid, ppvObject);
+        return d3d::ProxyD3D<ProxyDXGISwapChain, IDXGISwapChain4>::QueryInterface(riid, ppvObject);
     }
 
     // --- IDXGIObject Methods ---

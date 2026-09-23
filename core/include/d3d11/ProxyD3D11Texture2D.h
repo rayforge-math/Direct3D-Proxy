@@ -6,7 +6,7 @@
 
 namespace d3d11 {
 
-    class CORE_API ProxyD3D11Texture2D : public ProxyD3D11Resource<ID3D11Texture2D, ProxyD3D11Texture2D> {
+    class CORE_API ProxyD3D11Texture2D : public ProxyD3D11Resource<ProxyD3D11Texture2D, ID3D11Texture2D> {
     public:
         ProxyD3D11Texture2D(ID3D11Texture2D* pReal, const D3D11_TEXTURE2D_DESC* pDesc = nullptr);
         virtual ~ProxyD3D11Texture2D() override;

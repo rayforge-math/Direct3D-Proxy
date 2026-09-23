@@ -12,7 +12,7 @@ namespace d3d11 {
     // --- Constructor & Destructor ---
 
     ProxyD3D11DeviceContext::ProxyD3D11DeviceContext(ID3D11DeviceContext4* context)
-        : ProxyD3D<ID3D11DeviceContext4, ProxyD3D11DeviceContext>(context)
+        : ProxyD3D<ProxyD3D11DeviceContext, ID3D11DeviceContext4>(context)
     {
     }
 
@@ -34,7 +34,7 @@ namespace d3d11 {
             return S_OK;
         }
 
-        return d3d::ProxyD3D<ID3D11DeviceContext4, ProxyD3D11DeviceContext>::QueryInterface(riid, ppvObject);
+        return d3d::ProxyD3D<ProxyD3D11DeviceContext, ID3D11DeviceContext4>::QueryInterface(riid, ppvObject);
     }
 
     // --- ID3D11DeviceChild methods ---

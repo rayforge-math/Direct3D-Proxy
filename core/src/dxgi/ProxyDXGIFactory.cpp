@@ -11,7 +11,7 @@ using namespace d3d;
 namespace dxgi {
 
     ProxyDXGIFactory::ProxyDXGIFactory(IDXGIFactory4* factory)
-        : ProxyD3D<IDXGIFactory4, ProxyDXGIFactory>(factory)
+        : ProxyD3D<ProxyDXGIFactory, IDXGIFactory4>(factory)
     {
     }
 
@@ -33,7 +33,7 @@ namespace dxgi {
             return S_OK;
         }
 
-        return d3d::ProxyD3D<IDXGIFactory4, ProxyDXGIFactory>::QueryInterface(riid, ppvObject);
+        return d3d::ProxyD3D<ProxyDXGIFactory, IDXGIFactory4>::QueryInterface(riid, ppvObject);
     }
 
     // --- IDXGIObject Methods ---
