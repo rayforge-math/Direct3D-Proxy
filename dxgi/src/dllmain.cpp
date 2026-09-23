@@ -1,5 +1,5 @@
 #include "dllmain.h"
-#include "debug/debug_dxgi.h"
+#include "logging/debug_dxgi.h"
 #include "globals.h"
 #include "DXGIHookExporter.h"
 

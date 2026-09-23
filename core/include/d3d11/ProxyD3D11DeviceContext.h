@@ -31,10 +31,12 @@ namespace d3d11 {
      * 3. **Feature Augmentation:** Implementing modern features (like post-processing effects)
      * into legacy applications by intercepting the final execution stages.
      */
-    class CORE_API ProxyD3D11DeviceContext : public d3d::ProxyD3D<ID3D11DeviceContext, ProxyD3D11DeviceContext> {
+    class CORE_API ProxyD3D11DeviceContext : public d3d::ProxyD3D<ID3D11DeviceContext4, ProxyD3D11DeviceContext> {
     public:
-        ProxyD3D11DeviceContext(ID3D11DeviceContext* context);
-        
+        ProxyD3D11DeviceContext(ID3D11DeviceContext4* context);
+
+        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
+
         // --- ID3D11DeviceChild methods ---
         virtual void STDMETHODCALLTYPE GetDevice(ID3D11Device** ppDevice) override;
         virtual HRESULT STDMETHODCALLTYPE GetPrivateData(REFGUID guid, UINT* pDataSize, void* pData) override;
@@ -178,6 +180,61 @@ namespace d3d11 {
         virtual D3D11_DEVICE_CONTEXT_TYPE STDMETHODCALLTYPE GetType() override;
         virtual UINT STDMETHODCALLTYPE GetContextFlags() override;
         virtual HRESULT STDMETHODCALLTYPE FinishCommandList(BOOL RestoreDeferredContextState, ID3D11CommandList** ppCommandList) override;
+
+        // --- ID3D11DeviceContext1 methods ---
+
+        virtual void STDMETHODCALLTYPE CopySubresourceRegion1(ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox, UINT CopyFlags) override;
+        virtual void STDMETHODCALLTYPE UpdateSubresource1(ID3D11Resource* pDstResource, UINT DstSubresource, const D3D11_BOX* pDstBox, const void* pSrcData, UINT SrcRowPitch, UINT SrcDepthPitch, UINT CopyFlags) override;
+        virtual void STDMETHODCALLTYPE DiscardResource(ID3D11Resource* pResource) override;
+        virtual void STDMETHODCALLTYPE DiscardView(ID3D11View* pResourceView) override;
+
+        // Constant Buffer Ranges — Set
+        virtual void STDMETHODCALLTYPE VSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE HSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE DSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE GSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE PSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE CSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) override;
+
+        // Constant Buffer Ranges — Get
+        virtual void STDMETHODCALLTYPE VSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE HSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE DSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE GSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE PSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) override;
+        virtual void STDMETHODCALLTYPE CSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) override;
+
+        // Context State & Views
+        virtual void STDMETHODCALLTYPE SwapDeviceContextState(ID3DDeviceContextState* pState, ID3DDeviceContextState** ppPreviousState) override;
+        virtual void STDMETHODCALLTYPE ClearView(ID3D11View* pView, const FLOAT Color[4], const D3D11_RECT* pRect, UINT NumRects) override;
+        virtual void STDMETHODCALLTYPE DiscardView1(ID3D11View* pResourceView, const D3D11_RECT* pRects, UINT NumRects) override;
+
+        // --- ID3D11DeviceContext2 methods ---
+
+        // Tiled Resources
+        virtual HRESULT STDMETHODCALLTYPE UpdateTileMappings(ID3D11Resource* pTiledResource, UINT NumTiledResourceRegions, const D3D11_TILED_RESOURCE_COORDINATE* pTiledResourceRegionStartCoordinates, const D3D11_TILE_REGION_SIZE* pTiledResourceRegionSizes, ID3D11Buffer* pTilePool, UINT NumRanges, const UINT* pRangeFlags, const UINT* pTilePoolStartOffsets, const UINT* pRangeTileCounts, UINT Flags) override;
+        virtual HRESULT STDMETHODCALLTYPE CopyTileMappings(ID3D11Resource* pDstTiledResource, const D3D11_TILED_RESOURCE_COORDINATE* pDstRegionStartCoordinate, ID3D11Resource* pSrcTiledResource, const D3D11_TILED_RESOURCE_COORDINATE* pSrcRegionStartCoordinate, const D3D11_TILE_REGION_SIZE* pTileRegionSize, UINT Flags) override;
+        virtual void STDMETHODCALLTYPE CopyTiles(ID3D11Resource* pTiledResource, const D3D11_TILED_RESOURCE_COORDINATE* pTileRegionStartCoordinate, const D3D11_TILE_REGION_SIZE* pTileRegionSize, ID3D11Buffer* pBuffer, UINT64 BufferStartOffsetInBytes, UINT Flags) override;
+        virtual void STDMETHODCALLTYPE UpdateTiles(ID3D11Resource* pDestTiledResource, const D3D11_TILED_RESOURCE_COORDINATE* pDestTileRegionStartCoordinate, const D3D11_TILE_REGION_SIZE* pDestTileRegionSize, const void* pSourceTileData, UINT Flags) override;
+        virtual HRESULT STDMETHODCALLTYPE ResizeTilePool(ID3D11Buffer* pTilePool, UINT64 NewSizeInBytes) override;
+        virtual void STDMETHODCALLTYPE TiledResourceBarrier(ID3D11DeviceChild* pTiledResourceOrViewAccessBeforeBarrier, ID3D11DeviceChild* pTiledResourceOrViewAccessAfterBarrier) override;
+
+        // Annotations
+        virtual BOOL STDMETHODCALLTYPE IsAnnotationEnabled() override;
+        virtual void STDMETHODCALLTYPE SetMarkerInt(LPCWSTR pLabel, INT Data) override;
+        virtual void STDMETHODCALLTYPE BeginEventInt(LPCWSTR pLabel, INT Data) override;
+        virtual void STDMETHODCALLTYPE EndEvent() override;
+
+        // --- ID3D11DeviceContext3 methods ---
+
+        virtual void STDMETHODCALLTYPE Flush1(D3D11_CONTEXT_TYPE ContextType, HANDLE hEvent) override;
+        virtual void STDMETHODCALLTYPE SetHardwareProtectionState(BOOL HwProtectionEnable) override;
+        virtual void STDMETHODCALLTYPE GetHardwareProtectionState(BOOL* pHwProtectionEnable) override;
+
+        // --- ID3D11DeviceContext4 methods ---
+
+        virtual HRESULT STDMETHODCALLTYPE Signal(ID3D11Fence* pFence, UINT64 Value) override;
+        virtual HRESULT STDMETHODCALLTYPE Wait(ID3D11Fence* pFence, UINT64 Value) override;
     };
 
 } // namespace d3d11

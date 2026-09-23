@@ -1,6 +1,7 @@
 #pragma once
 #include "COMRegistry.h"
 #include "d3d/ProxyD3D.h"
+#include "logging/debug_core.h"
 #include <cassert>
 #include <unknwn.h>
 
@@ -22,7 +23,7 @@ namespace d3d {
          *        reusing existing ones from the central registry.
          */
         template <typename TProxy, typename TInputInterface = typename TProxy::InterfaceType, typename... Args>
-            requires IsProxy<TProxy> && std::is_base_of_v<IUnknown, TInputInterface>
+            requires IsProxy<TProxy>&& std::is_base_of_v<IUnknown, TInputInterface>
         static HRESULT Wrap(TInputInterface** ppInterface, Args&&... args) {
             using TReal = typename TProxy::InterfaceType;
             if (!ppInterface || !*ppInterface) return S_OK;
@@ -66,7 +67,7 @@ namespace d3d {
          * @brief In-place wrapping for arrays of COM pointers supporting arbitrary interface versions.
          */
         template <typename TProxy, typename TInputInterface = typename TProxy::InterfaceType, typename... Args>
-            requires IsProxy<TProxy> && std::is_base_of_v<IUnknown, TInputInterface>
+            requires IsProxy<TProxy>&& std::is_base_of_v<IUnknown, TInputInterface>
         static HRESULT WrapArray(TInputInterface** ppInterfaces, UINT count, Args&&... args) {
             if (!ppInterfaces || count == 0) return S_OK;
             for (UINT i = 0; i < count; ++i) {
@@ -123,6 +124,46 @@ namespace d3d {
                 }
             }
             return result;
+        }
+
+        /**
+         * @brief Safely retrieves the underlying real IUnknown pointer if the input is a proxy,
+         *        otherwise returns the input pointer unchanged.
+         */
+        static inline IUnknown* GetRealUnknown(IUnknown* pUnknown) {
+            if (!pUnknown) return nullptr;
+
+            IProxy* pProxyBase = nullptr;
+            HRESULT hr = pUnknown->QueryInterface(__uuidof(IProxy), reinterpret_cast<void**>(&pProxyBase));
+
+            if (SUCCEEDED(hr) && pProxyBase) {
+                IUnknown* pReal = pProxyBase->GetRealUnknown();
+                return pReal;
+            }
+
+            return pUnknown;
+        }
+
+        /**
+         * @brief Unwraps a proxy by casting directly to TProxy and calling GetReal().
+         */
+        template <typename TProxy, typename TInputInterface = typename TProxy::InterfaceType>
+            requires IsProxy<TProxy>
+        static inline typename TProxy::InterfaceType* GetReal(TInputInterface* pInterface) {
+            using TReal = typename TProxy::InterfaceType;
+            if (!pInterface) return nullptr;
+
+            if (auto* pProxy = dynamic_cast<TProxy*>(pInterface)) {
+                return pProxy->GetReal();
+            }
+
+            TReal* pReal = nullptr;
+            if (SUCCEEDED(pInterface->QueryInterface(__uuidof(TReal), reinterpret_cast<void**>(&pReal)))) {
+                pReal->Release();
+                return pReal;
+            }
+
+            return reinterpret_cast<TReal*>(pInterface);
         }
     };
 

@@ -2,13 +2,40 @@
 //#include "dxgi/ProxyDXGIOutput.h"
 #include "dxgi/ProxyDXGIFactory.h"
 #include "d3d/ProxyWrapper.h"
-#include "debug/debug_dxgi.h"
+#include "logging/debug_dxgi.h"
 
 namespace dxgi {
 
     ProxyDXGIAdapter::ProxyDXGIAdapter(IDXGIAdapter3* pReal)
         : ProxyD3D<IDXGIAdapter3, ProxyDXGIAdapter>(pReal)
     {
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGIAdapter::QueryInterface(REFIID riid, void** ppvObject)
+    {
+        if (!ppvObject)
+            return E_POINTER;
+
+        *ppvObject = nullptr;
+
+        if (riid == __uuidof(IDXGIObject))
+        {
+            *ppvObject = static_cast<IDXGIObject*>(this);
+            AddRef();
+            return S_OK;
+        }
+
+        if (riid == __uuidof(IDXGIAdapter) ||
+            riid == __uuidof(IDXGIAdapter1) ||
+            riid == __uuidof(IDXGIAdapter2) ||
+            riid == __uuidof(IDXGIAdapter3))
+        {
+            *ppvObject = static_cast<IDXGIAdapter3*>(this);
+            AddRef();
+            return S_OK;
+        }
+
+        return d3d::ProxyD3D<IDXGIAdapter3, ProxyDXGIAdapter>::QueryInterface(riid, ppvObject);
     }
 
     // --- IDXGIObject Methods ---

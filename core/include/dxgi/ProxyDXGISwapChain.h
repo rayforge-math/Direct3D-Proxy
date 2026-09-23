@@ -2,7 +2,7 @@
 
 #include "coreapi.h"
 #include "d3d/ProxyD3D.h"
-#include <dxgi1_2.h>
+#include "dxgi_version.h"
 
 namespace dxgi {
 
@@ -15,9 +15,11 @@ namespace dxgi {
      * It intercepts advanced presentation methods such as `Present1`, composition features,
      * and window handle retrieval (`GetHwnd`), ensuring full compatibility with modern windowing and flip models.
      */
-    class CORE_API ProxyDXGISwapChain : public d3d::ProxyD3D<IDXGISwapChain1, ProxyDXGISwapChain> {
+    class CORE_API ProxyDXGISwapChain : public d3d::ProxyD3D<IDXGISwapChain4, ProxyDXGISwapChain> {
     public:
-        ProxyDXGISwapChain(IDXGISwapChain1* pReal);
+        ProxyDXGISwapChain(IDXGISwapChain4* pReal);
+
+        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
 
         // --- IDXGIObject Methods ---
         virtual HRESULT STDMETHODCALLTYPE SetPrivateData(REFGUID Name, UINT DataSize, const void* pData) override;
@@ -52,6 +54,24 @@ namespace dxgi {
         virtual HRESULT STDMETHODCALLTYPE GetBackgroundColor(DXGI_RGBA* pColor) override;
         virtual HRESULT STDMETHODCALLTYPE SetRotation(DXGI_MODE_ROTATION Rotation) override;
         virtual HRESULT STDMETHODCALLTYPE GetRotation(DXGI_MODE_ROTATION* pRotation) override;
+
+        // --- IDXGISwapChain2 Methods ---
+        virtual HRESULT STDMETHODCALLTYPE SetSourceSize(UINT Width, UINT Height) override;
+        virtual HRESULT STDMETHODCALLTYPE GetSourceSize(UINT* pWidth, UINT* pHeight) override;
+        virtual HRESULT STDMETHODCALLTYPE SetMaximumFrameLatency(UINT MaxLatency) override;
+        virtual HRESULT STDMETHODCALLTYPE GetMaximumFrameLatency(UINT* pMaxLatency) override;
+        virtual HANDLE STDMETHODCALLTYPE GetFrameLatencyWaitableObject(void) override;
+        virtual HRESULT STDMETHODCALLTYPE SetMatrixTransform(const DXGI_MATRIX_3X2_F* pMatrix) override;
+        virtual HRESULT STDMETHODCALLTYPE GetMatrixTransform(DXGI_MATRIX_3X2_F* pMatrix) override;
+
+        // --- IDXGISwapChain3 Methods ---
+        virtual UINT STDMETHODCALLTYPE GetCurrentBackBufferIndex(void) override;
+        virtual HRESULT STDMETHODCALLTYPE CheckColorSpaceSupport(DXGI_COLOR_SPACE_TYPE ColorSpace, UINT* pColorSpaceSupport) override;
+        virtual HRESULT STDMETHODCALLTYPE SetColorSpace1(DXGI_COLOR_SPACE_TYPE ColorSpace) override;
+        virtual HRESULT STDMETHODCALLTYPE ResizeBuffers1(UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT Format, UINT SwapChainFlags, const UINT* pCreationNodeMask, IUnknown* const* ppPresentQueue) override;
+
+        // --- IDXGISwapChain4 Methods ---
+        virtual HRESULT STDMETHODCALLTYPE SetHDRMetaData(DXGI_HDR_METADATA_TYPE Type, UINT Size, void* pMetaData) override;
     };
 
 } // namespace dxgi

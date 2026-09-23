@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\debug\debug.h">
+    <ClInclude Include="include\logging\debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\debug\logger.h">
+    <ClInclude Include="include\logging\logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\COMRegistry.h">
@@ -87,7 +87,7 @@
     <ClInclude Include="include\coreapi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\debug\debug_dxgi.h">
+    <ClInclude Include="include\logging\debug_dxgi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\dxgi\ProxyDXGIFactory.h">
@@ -96,7 +96,13 @@
     <ClInclude Include="include\dxgi\ProxyDXGIAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\debug\debug_core.h">
+    <ClInclude Include="include\logging\debug_core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\logging\debug_d3d11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\d3d\IProxy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

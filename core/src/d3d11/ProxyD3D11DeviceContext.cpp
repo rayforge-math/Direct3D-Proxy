@@ -2,7 +2,7 @@
 
 #include "d3d11/ProxyD3D11DeviceContext.h"
 #include "d3d11/ProxyD3D11Wrapper.h"
-#include "debug/debug_d3d11.h"
+#include "logging/debug_d3d11.h"
 #include <d3d11/ProxyD3D11Buffer.h>
 
 using namespace d3d;
@@ -11,9 +11,31 @@ namespace d3d11 {
 
     // --- Constructor & Destructor ---
 
-    ProxyD3D11DeviceContext::ProxyD3D11DeviceContext(ID3D11DeviceContext* context)
-        : ProxyD3D<ID3D11DeviceContext, ProxyD3D11DeviceContext>(context)
-    { }
+    ProxyD3D11DeviceContext::ProxyD3D11DeviceContext(ID3D11DeviceContext4* context)
+        : ProxyD3D<ID3D11DeviceContext4, ProxyD3D11DeviceContext>(context)
+    {
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11DeviceContext::QueryInterface(REFIID riid, void** ppvObject)
+    {
+        if (!ppvObject)
+            return E_POINTER;
+
+        *ppvObject = nullptr;
+
+        if (riid == __uuidof(ID3D11DeviceContext) ||
+            riid == __uuidof(ID3D11DeviceContext1) ||
+            riid == __uuidof(ID3D11DeviceContext2) ||
+            riid == __uuidof(ID3D11DeviceContext3) ||
+            riid == __uuidof(ID3D11DeviceContext4))
+        {
+            *ppvObject = static_cast<ID3D11DeviceContext4*>(this);
+            AddRef();
+            return S_OK;
+        }
+
+        return d3d::ProxyD3D<ID3D11DeviceContext4, ProxyD3D11DeviceContext>::QueryInterface(riid, ppvObject);
+    }
 
     // --- ID3D11DeviceChild methods ---
 
@@ -611,6 +633,194 @@ namespace d3d11 {
     HRESULT STDMETHODCALLTYPE ProxyD3D11DeviceContext::FinishCommandList(BOOL RestoreDeferredContextState, ID3D11CommandList** ppCommandList) {
         LOG_MSG("ProxyD3D11DeviceContext::FinishCommandList called");
         return m_pReal->FinishCommandList(RestoreDeferredContextState, ppCommandList);
+    }
+
+    // --- ID3D11DeviceContext1 methods ---
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::CopySubresourceRegion1(ID3D11Resource* pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox, UINT CopyFlags) {
+        LOG_MSG("ProxyD3D11DeviceContext::CopySubresourceRegion1 called");
+        m_pReal->CopySubresourceRegion1(pDstResource, DstSubresource, DstX, DstY, DstZ, pSrcResource, SrcSubresource, pSrcBox, CopyFlags);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::UpdateSubresource1(ID3D11Resource* pDstResource, UINT DstSubresource, const D3D11_BOX* pDstBox, const void* pSrcData, UINT SrcRowPitch, UINT SrcDepthPitch, UINT CopyFlags) {
+        LOG_MSG("ProxyD3D11DeviceContext::UpdateSubresource1 called");
+        m_pReal->UpdateSubresource1(pDstResource, DstSubresource, pDstBox, pSrcData, SrcRowPitch, SrcDepthPitch, CopyFlags);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::DiscardResource(ID3D11Resource* pResource) {
+        LOG_MSG("ProxyD3D11DeviceContext::DiscardResource called");
+        m_pReal->DiscardResource(pResource);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::DiscardView(ID3D11View* pResourceView) {
+        LOG_MSG("ProxyD3D11DeviceContext::DiscardView called");
+        m_pReal->DiscardView(pResourceView);
+    }
+
+    // Constant Buffer Ranges — Set
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::VSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::VSSetConstantBuffers1 called");
+        m_pReal->VSSetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::HSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::HSSetConstantBuffers1 called");
+        m_pReal->HSSetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::DSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::DSSetConstantBuffers1 called");
+        m_pReal->DSSetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::GSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::GSSetConstantBuffers1 called");
+        m_pReal->GSSetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::PSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::PSSetConstantBuffers1 called");
+        m_pReal->PSSetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::CSSetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer* const* ppConstantBuffers, const UINT* pFirstConstant, const UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::CSSetConstantBuffers1 called");
+        m_pReal->CSSetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    // Constant Buffer Ranges — Get
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::VSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::VSGetConstantBuffers1 called");
+        m_pReal->VSGetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::HSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::HSGetConstantBuffers1 called");
+        m_pReal->HSGetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::DSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::DSGetConstantBuffers1 called");
+        m_pReal->DSGetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::GSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::GSGetConstantBuffers1 called");
+        m_pReal->GSGetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::PSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::PSGetConstantBuffers1 called");
+        m_pReal->PSGetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::CSGetConstantBuffers1(UINT StartSlot, UINT NumBuffers, ID3D11Buffer** ppConstantBuffers, UINT* pFirstConstant, UINT* pNumConstants) {
+        LOG_MSG("ProxyD3D11DeviceContext::CSGetConstantBuffers1 called");
+        m_pReal->CSGetConstantBuffers1(StartSlot, NumBuffers, ppConstantBuffers, pFirstConstant, pNumConstants);
+    }
+
+    // Context State & Views
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::SwapDeviceContextState(ID3DDeviceContextState* pState, ID3DDeviceContextState** ppPreviousState) {
+        LOG_MSG("ProxyD3D11DeviceContext::SwapDeviceContextState called");
+        m_pReal->SwapDeviceContextState(pState, ppPreviousState);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::ClearView(ID3D11View* pView, const FLOAT Color[4], const D3D11_RECT* pRect, UINT NumRects) {
+        LOG_MSG("ProxyD3D11DeviceContext::ClearView called");
+        m_pReal->ClearView(pView, Color, pRect, NumRects);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::DiscardView1(ID3D11View* pResourceView, const D3D11_RECT* pRects, UINT NumRects) {
+        LOG_MSG("ProxyD3D11DeviceContext::DiscardView1 called");
+        m_pReal->DiscardView1(pResourceView, pRects, NumRects);
+    }
+
+    // --- ID3D11DeviceContext2 methods ---
+
+    // Tiled Resources
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11DeviceContext::UpdateTileMappings(ID3D11Resource* pTiledResource, UINT NumTiledResourceRegions, const D3D11_TILED_RESOURCE_COORDINATE* pTiledResourceRegionStartCoordinates, const D3D11_TILE_REGION_SIZE* pTiledResourceRegionSizes, ID3D11Buffer* pTilePool, UINT NumRanges, const UINT* pRangeFlags, const UINT* pTilePoolStartOffsets, const UINT* pRangeTileCounts, UINT Flags) {
+        LOG_MSG("ProxyD3D11DeviceContext::UpdateTileMappings called");
+        return m_pReal->UpdateTileMappings(pTiledResource, NumTiledResourceRegions, pTiledResourceRegionStartCoordinates, pTiledResourceRegionSizes, pTilePool, NumRanges, pRangeFlags, pTilePoolStartOffsets, pRangeTileCounts, Flags);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11DeviceContext::CopyTileMappings(ID3D11Resource* pDstTiledResource, const D3D11_TILED_RESOURCE_COORDINATE* pDstRegionStartCoordinate, ID3D11Resource* pSrcTiledResource, const D3D11_TILED_RESOURCE_COORDINATE* pSrcRegionStartCoordinate, const D3D11_TILE_REGION_SIZE* pTileRegionSize, UINT Flags) {
+        LOG_MSG("ProxyD3D11DeviceContext::CopyTileMappings called");
+        return m_pReal->CopyTileMappings(pDstTiledResource, pDstRegionStartCoordinate, pSrcTiledResource, pSrcRegionStartCoordinate, pTileRegionSize, Flags);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::CopyTiles(ID3D11Resource* pTiledResource, const D3D11_TILED_RESOURCE_COORDINATE* pTileRegionStartCoordinate, const D3D11_TILE_REGION_SIZE* pTileRegionSize, ID3D11Buffer* pBuffer, UINT64 BufferStartOffsetInBytes, UINT Flags) {
+        LOG_MSG("ProxyD3D11DeviceContext::CopyTiles called");
+        m_pReal->CopyTiles(pTiledResource, pTileRegionStartCoordinate, pTileRegionSize, pBuffer, BufferStartOffsetInBytes, Flags);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::UpdateTiles(ID3D11Resource* pDestTiledResource, const D3D11_TILED_RESOURCE_COORDINATE* pDestTileRegionStartCoordinate, const D3D11_TILE_REGION_SIZE* pDestTileRegionSize, const void* pSourceTileData, UINT Flags) {
+        LOG_MSG("ProxyD3D11DeviceContext::UpdateTiles called");
+        m_pReal->UpdateTiles(pDestTiledResource, pDestTileRegionStartCoordinate, pDestTileRegionSize, pSourceTileData, Flags);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11DeviceContext::ResizeTilePool(ID3D11Buffer* pTilePool, UINT64 NewSizeInBytes) {
+        LOG_MSG("ProxyD3D11DeviceContext::ResizeTilePool called");
+        return m_pReal->ResizeTilePool(pTilePool, NewSizeInBytes);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::TiledResourceBarrier(ID3D11DeviceChild* pTiledResourceOrViewAccessBeforeBarrier, ID3D11DeviceChild* pTiledResourceOrViewAccessAfterBarrier) {
+        LOG_MSG("ProxyD3D11DeviceContext::TiledResourceBarrier called");
+        m_pReal->TiledResourceBarrier(pTiledResourceOrViewAccessBeforeBarrier, pTiledResourceOrViewAccessAfterBarrier);
+    }
+
+    // Annotations
+
+    BOOL STDMETHODCALLTYPE ProxyD3D11DeviceContext::IsAnnotationEnabled() {
+        LOG_MSG("ProxyD3D11DeviceContext::IsAnnotationEnabled called");
+        return m_pReal->IsAnnotationEnabled();
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::SetMarkerInt(LPCWSTR pLabel, INT Data) {
+        LOG_MSG("ProxyD3D11DeviceContext::SetMarkerInt called");
+        m_pReal->SetMarkerInt(pLabel, Data);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::BeginEventInt(LPCWSTR pLabel, INT Data) {
+        LOG_MSG("ProxyD3D11DeviceContext::BeginEventInt called");
+        m_pReal->BeginEventInt(pLabel, Data);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::EndEvent() {
+        LOG_MSG("ProxyD3D11DeviceContext::EndEvent called");
+        m_pReal->EndEvent();
+    }
+
+    // --- ID3D11DeviceContext3 methods ---
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::Flush1(D3D11_CONTEXT_TYPE ContextType, HANDLE hEvent) {
+        LOG_MSG("ProxyD3D11DeviceContext::Flush1 called");
+        m_pReal->Flush1(ContextType, hEvent);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::SetHardwareProtectionState(BOOL HwProtectionEnable) {
+        LOG_MSG("ProxyD3D11DeviceContext::SetHardwareProtectionState called");
+        m_pReal->SetHardwareProtectionState(HwProtectionEnable);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11DeviceContext::GetHardwareProtectionState(BOOL* pHwProtectionEnable) {
+        LOG_MSG("ProxyD3D11DeviceContext::GetHardwareProtectionState called");
+        m_pReal->GetHardwareProtectionState(pHwProtectionEnable);
+    }
+
+    // --- ID3D11DeviceContext4 methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11DeviceContext::Signal(ID3D11Fence* pFence, UINT64 Value) {
+        LOG_MSG("ProxyD3D11DeviceContext::Signal called");
+        return m_pReal->Signal(pFence, Value);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11DeviceContext::Wait(ID3D11Fence* pFence, UINT64 Value) {
+        LOG_MSG("ProxyD3D11DeviceContext::Wait called");
+        return m_pReal->Wait(pFence, Value);
     }
 
 } // namespace d3d11

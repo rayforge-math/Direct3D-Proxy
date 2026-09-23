@@ -264,8 +264,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\coreapi.h" />
-    <ClInclude Include="include\debug\debug_core.h" />
-    <ClInclude Include="include\debug\debug_dxgi.h" />
+    <ClInclude Include="include\d3d\IProxy.h" />
+    <ClInclude Include="include\logging\debug_core.h" />
+    <ClInclude Include="include\logging\debug_d3d11.h" />
+    <ClInclude Include="include\logging\debug_dxgi.h" />
     <ClInclude Include="include\dxgi\ProxyDXGIAdapter.h" />
     <ClInclude Include="include\dxgi\ProxyDXGIFactory.h" />
     <ClInclude Include="include\HookExporter.h" />
@@ -283,13 +285,13 @@
     <ClInclude Include="include\d3d\d3d_version.h" />
     <ClInclude Include="include\d3d\ProxyD3D.h" />
     <ClInclude Include="include\d3d\ProxyWrapper.h" />
-    <ClInclude Include="include\debug\debug.h" />
+    <ClInclude Include="include\logging\debug.h" />
     <ClInclude Include="include\dllmain.h" />
     <ClInclude Include="include\dxgi\DXGIInspector.h" />
     <ClInclude Include="include\dxgi\dxgi_version.h" />
     <ClInclude Include="include\dxgi\ProxyDXGISwapChain.h" />
     <ClInclude Include="include\globals.h" />
-    <ClInclude Include="include\debug\logger.h" />
+    <ClInclude Include="include\logging\logger.h" />
     <ClInclude Include="include\COMRegistry.h" />
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 
 #include "coreapi.h"
 #include "d3d/ProxyD3D.h"
-#include <dxgi1_4.h>
+#include "dxgi_version.h"
 
 namespace dxgi {
 
@@ -18,6 +18,8 @@ namespace dxgi {
     class CORE_API ProxyDXGIAdapter : public d3d::ProxyD3D<IDXGIAdapter3, ProxyDXGIAdapter> {
     public:
         explicit ProxyDXGIAdapter(IDXGIAdapter3* pReal);
+
+        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
 
         // --- IDXGIObject Methods ---
         virtual HRESULT STDMETHODCALLTYPE SetPrivateData(REFGUID Name, UINT DataSize, const void* pData) override;

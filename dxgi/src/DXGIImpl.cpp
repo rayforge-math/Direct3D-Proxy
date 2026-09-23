@@ -9,7 +9,7 @@
 #include "d3d/ProxyWrapper.h"
 #include "dxgi/ProxyDXGISwapChain.h"
 #include "dxgi/ProxyDXGIFactory.h"
-#include "debug/debug_dxgi.h"
+#include "logging/debug_dxgi.h"
 
 using namespace dxgi;
 using namespace d3d;

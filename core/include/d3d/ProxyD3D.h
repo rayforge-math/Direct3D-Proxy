@@ -3,6 +3,8 @@
 #include "COMRegistry.h"
 #include "d3dcommon.h"
 #include <unknwn.h>
+#include "logging/debug_core.h"
+#include "IProxy.h"
 
 namespace d3d {
 
@@ -10,7 +12,7 @@ namespace d3d {
     concept IsCOMObject = std::is_base_of_v<IUnknown, T>;
 
     template <IsCOMObject T, typename TDerived>
-    class ProxyD3D : public T {
+    class ProxyD3D : public T , public IProxy {
     public:
         using InterfaceType = T;
 
@@ -47,18 +49,32 @@ namespace d3d {
 
         // Accessor for the real underlying object
         InterfaceType* GetReal() const noexcept { return m_pReal; }
+        IUnknown* GetRealUnknown() const noexcept { return m_pReal; }
 
         // --- IUnknown ---
 
         virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override {
             if (!ppvObject) return E_POINTER;
 
-            if (riid == __uuidof(InterfaceType) || riid == __uuidof(IUnknown)) {
+            if (riid == __uuidof(IUnknown)) {
                 AddRef();
-                *ppvObject = this;
+                *ppvObject = static_cast<IUnknown*>(static_cast<InterfaceType*>(this));
                 return S_OK;
             }
 
+            if (riid == __uuidof(InterfaceType)) {
+                AddRef();
+                *ppvObject = static_cast<InterfaceType*>(this);
+                return S_OK;
+            }
+
+            if (riid == __uuidof(IProxy)) {
+                AddRef();
+                *ppvObject = dynamic_cast<IProxy*>(this);
+                return S_OK;
+            }
+            
+            LOG_MSG("QueryInterface called with unknown IID, returning real pointer");
             return m_pReal->QueryInterface(riid, ppvObject);
         }
 

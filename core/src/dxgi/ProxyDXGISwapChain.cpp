@@ -4,15 +4,36 @@
 //#include "dxgi/ProxyDXGIOutput.h"
 #include "dxgi/ProxyDXGIFactory.h"
 #include "d3d/ProxyWrapper.h"
-#include "debug/debug_dxgi.h"
+#include "logging/debug_dxgi.h"
 
 using namespace d3d;
 
 namespace dxgi {
 
-    ProxyDXGISwapChain::ProxyDXGISwapChain(IDXGISwapChain1* swapChain)
-        : ProxyD3D<IDXGISwapChain1, ProxyDXGISwapChain>(swapChain)
+    ProxyDXGISwapChain::ProxyDXGISwapChain(IDXGISwapChain4* swapChain)
+        : ProxyD3D<IDXGISwapChain4, ProxyDXGISwapChain>(swapChain)
     {
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::QueryInterface(REFIID riid, void** ppvObject)
+    {
+        if (!ppvObject)
+            return E_POINTER;
+
+        *ppvObject = nullptr;
+
+        if (riid == __uuidof(IDXGISwapChain) ||
+            riid == __uuidof(IDXGISwapChain1) ||
+            riid == __uuidof(IDXGISwapChain2) ||
+            riid == __uuidof(IDXGISwapChain3) ||
+            riid == __uuidof(IDXGISwapChain4))
+        {
+            *ppvObject = static_cast<IDXGISwapChain4*>(this);
+            AddRef();
+            return S_OK;
+        }
+
+        return d3d::ProxyD3D<IDXGISwapChain4, ProxyDXGISwapChain>::QueryInterface(riid, ppvObject);
     }
 
     // --- IDXGIObject Methods ---
@@ -167,6 +188,72 @@ namespace dxgi {
     HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::GetRotation(DXGI_MODE_ROTATION* pRotation) {
         LOG_MSG("ProxyDXGISwapChain::GetRotation called");
         return m_pReal->GetRotation(pRotation);
+    }
+
+    // --- IDXGISwapChain2 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::SetSourceSize(UINT Width, UINT Height) {
+        LOG_MSG("ProxyDXGISwapChain::SetSourceSize called");
+        return m_pReal->SetSourceSize(Width, Height);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::GetSourceSize(UINT* pWidth, UINT* pHeight) {
+        LOG_MSG("ProxyDXGISwapChain::GetSourceSize called");
+        return m_pReal->GetSourceSize(pWidth, pHeight);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::SetMaximumFrameLatency(UINT MaxLatency) {
+        LOG_MSG("ProxyDXGISwapChain::SetMaximumFrameLatency called");
+        return m_pReal->SetMaximumFrameLatency(MaxLatency);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::GetMaximumFrameLatency(UINT* pMaxLatency) {
+        LOG_MSG("ProxyDXGISwapChain::GetMaximumFrameLatency called");
+        return m_pReal->GetMaximumFrameLatency(pMaxLatency);
+    }
+
+    HANDLE STDMETHODCALLTYPE ProxyDXGISwapChain::GetFrameLatencyWaitableObject(void) {
+        LOG_MSG("ProxyDXGISwapChain::GetFrameLatencyWaitableObject called");
+        return m_pReal->GetFrameLatencyWaitableObject();
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::SetMatrixTransform(const DXGI_MATRIX_3X2_F* pMatrix) {
+        LOG_MSG("ProxyDXGISwapChain::SetMatrixTransform called");
+        return m_pReal->SetMatrixTransform(pMatrix);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::GetMatrixTransform(DXGI_MATRIX_3X2_F* pMatrix) {
+        LOG_MSG("ProxyDXGISwapChain::GetMatrixTransform called");
+        return m_pReal->GetMatrixTransform(pMatrix);
+    }
+
+    // --- IDXGISwapChain3 Methods ---
+
+    UINT STDMETHODCALLTYPE ProxyDXGISwapChain::GetCurrentBackBufferIndex(void) {
+        LOG_MSG("ProxyDXGISwapChain::GetCurrentBackBufferIndex called");
+        return m_pReal->GetCurrentBackBufferIndex();
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::CheckColorSpaceSupport(DXGI_COLOR_SPACE_TYPE ColorSpace, UINT* pColorSpaceSupport) {
+        LOG_MSG("ProxyDXGISwapChain::CheckColorSpaceSupport called");
+        return m_pReal->CheckColorSpaceSupport(ColorSpace, pColorSpaceSupport);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::SetColorSpace1(DXGI_COLOR_SPACE_TYPE ColorSpace) {
+        LOG_MSG("ProxyDXGISwapChain::SetColorSpace1 called");
+        return m_pReal->SetColorSpace1(ColorSpace);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::ResizeBuffers1(UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT Format, UINT SwapChainFlags, const UINT* pCreationNodeMask, IUnknown* const* ppPresentQueue) {
+        LOG_MSG("ProxyDXGISwapChain::ResizeBuffers1 called");
+        return m_pReal->ResizeBuffers1(BufferCount, Width, Height, Format, SwapChainFlags, pCreationNodeMask, ppPresentQueue);
+    }
+
+    // --- IDXGISwapChain4 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGISwapChain::SetHDRMetaData(DXGI_HDR_METADATA_TYPE Type, UINT Size, void* pMetaData) {
+        LOG_MSG("ProxyDXGISwapChain::SetHDRMetaData called");
+        return m_pReal->SetHDRMetaData(Type, Size, pMetaData);
     }
 
 } // namespace dxgi

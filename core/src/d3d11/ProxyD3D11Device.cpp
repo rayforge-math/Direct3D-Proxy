@@ -3,16 +3,39 @@
 #include "d3d11/ProxyD3D11Device.h"
 #include "d3d11/ProxyD3D11Buffer.h"
 #include "d3d/ProxyWrapper.h"
-#include "debug/debug_d3d11.h"
+#include "logging/debug_d3d11.h"
 #include <d3d11/ProxyD3D11DeviceContext.h>
 
 using namespace d3d;
 
 namespace d3d11 {
 
-    ProxyD3D11Device::ProxyD3D11Device(ID3D11Device* device)
-        : ProxyD3D<ID3D11Device, ProxyD3D11Device>(device)
-    { }
+    ProxyD3D11Device::ProxyD3D11Device(ID3D11Device5* device)
+        : ProxyD3D<ID3D11Device5, ProxyD3D11Device>(device)
+    {
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::QueryInterface(REFIID riid, void** ppvObject)
+    {
+        if (!ppvObject)
+            return E_POINTER;
+
+        *ppvObject = nullptr;
+
+        if (riid == __uuidof(ID3D11Device) ||
+            riid == __uuidof(ID3D11Device1) ||
+            riid == __uuidof(ID3D11Device2) ||
+            riid == __uuidof(ID3D11Device3) ||
+            riid == __uuidof(ID3D11Device4) ||
+            riid == __uuidof(ID3D11Device5))
+        {
+            *ppvObject = static_cast<ID3D11Device5*>(this);
+            AddRef();
+            return S_OK;
+        }
+
+        return d3d::ProxyD3D<ID3D11Device5, ProxyD3D11Device>::QueryInterface(riid, ppvObject);
+    }
 
     // --- ID3D11Device Methods ---
 
@@ -26,7 +49,7 @@ namespace d3d11 {
             hr = ProxyWrapper::Wrap<ProxyD3D11Buffer>(ppBuffer, pDesc);
         }
         */
-        
+
         return hr;
     }
 
@@ -228,6 +251,158 @@ namespace d3d11 {
     UINT STDMETHODCALLTYPE ProxyD3D11Device::GetExceptionMode(void) {
         LOG_MSG("ProxyD3D11Device::GetExceptionMode called");
         return m_pReal->GetExceptionMode();
+    }
+
+    // --- ID3D11Device1 Methods ---
+
+    void STDMETHODCALLTYPE ProxyD3D11Device::GetImmediateContext1(ID3D11DeviceContext1** ppImmediateContext) {
+        LOG_MSG("ProxyD3D11Device::GetImmediateContext1 called");
+        m_pReal->GetImmediateContext1(ppImmediateContext);
+
+        if (ppImmediateContext && *ppImmediateContext) {
+            ProxyWrapper::Wrap<ProxyD3D11DeviceContext>(ppImmediateContext);
+        }
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateDeferredContext1(UINT ContextFlags, ID3D11DeviceContext1** ppDeferredContext) {
+        LOG_MSG("ProxyD3D11Device::CreateDeferredContext1 called");
+        return m_pReal->CreateDeferredContext1(ContextFlags, ppDeferredContext);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateBlendState1(const D3D11_BLEND_DESC1* pBlendStateDesc, ID3D11BlendState1** ppBlendState) {
+        LOG_MSG("ProxyD3D11Device::CreateBlendState1 called");
+        return m_pReal->CreateBlendState1(pBlendStateDesc, ppBlendState);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateRasterizerState1(const D3D11_RASTERIZER_DESC1* pRasterizerDesc, ID3D11RasterizerState1** ppRasterizerState) {
+        LOG_MSG("ProxyD3D11Device::CreateRasterizerState1 called");
+        return m_pReal->CreateRasterizerState1(pRasterizerDesc, ppRasterizerState);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateDeviceContextState(UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, REFIID EmulatedInterface, D3D_FEATURE_LEVEL* pChosenFeatureLevel, ID3DDeviceContextState** ppContextState) {
+        LOG_MSG("ProxyD3D11Device::CreateDeviceContextState called");
+        return m_pReal->CreateDeviceContextState(Flags, pFeatureLevels, FeatureLevels, SDKVersion, EmulatedInterface, pChosenFeatureLevel, ppContextState);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::OpenSharedResource1(HANDLE hResource, REFIID ReturnedInterface, void** ppResource) {
+        LOG_MSG("ProxyD3D11Device::OpenSharedResource1 called");
+        return m_pReal->OpenSharedResource1(hResource, ReturnedInterface, ppResource);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::OpenSharedResourceByName(LPCWSTR lpName, DWORD dwDesiredAccess, REFIID ReturnedInterface, void** ppResource) {
+        LOG_MSG("ProxyD3D11Device::OpenSharedResourceByName called");
+        return m_pReal->OpenSharedResourceByName(lpName, dwDesiredAccess, ReturnedInterface, ppResource);
+    }
+
+    // --- ID3D11Device2 Methods ---
+
+    void STDMETHODCALLTYPE ProxyD3D11Device::GetImmediateContext2(ID3D11DeviceContext2** ppImmediateContext) {
+        LOG_MSG("ProxyD3D11Device::GetImmediateContext2 called");
+        m_pReal->GetImmediateContext2(ppImmediateContext);
+
+        if (ppImmediateContext && *ppImmediateContext) {
+            ProxyWrapper::Wrap<ProxyD3D11DeviceContext>(ppImmediateContext);
+        }
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateDeferredContext2(UINT ContextFlags, ID3D11DeviceContext2** ppDeferredContext) {
+        LOG_MSG("ProxyD3D11Device::CreateDeferredContext2 called");
+        return m_pReal->CreateDeferredContext2(ContextFlags, ppDeferredContext);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11Device::GetResourceTiling(ID3D11Resource* pTiledResource, UINT* pNumTilesForEntireResource, D3D11_PACKED_MIP_DESC* pPackedMipDesc, D3D11_TILE_SHAPE* pStandardTileShapeForNonPackedMips, UINT* pNumSubresourceTilings, UINT FirstSubresourceTilingToGet, D3D11_SUBRESOURCE_TILING* pSubresourceTilingsForNonPackedMips) {
+        LOG_MSG("ProxyD3D11Device::GetResourceTiling called");
+        m_pReal->GetResourceTiling(pTiledResource, pNumTilesForEntireResource, pPackedMipDesc, pStandardTileShapeForNonPackedMips, pNumSubresourceTilings, FirstSubresourceTilingToGet, pSubresourceTilingsForNonPackedMips);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CheckMultisampleQualityLevels1(DXGI_FORMAT Format, UINT SampleCount, UINT Flags, UINT* pNumQualityLevels) {
+        LOG_MSG("ProxyD3D11Device::CheckMultisampleQualityLevels1 called");
+        return m_pReal->CheckMultisampleQualityLevels1(Format, SampleCount, Flags, pNumQualityLevels);
+    }
+
+    // --- ID3D11Device3 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateTexture2D1(const D3D11_TEXTURE2D_DESC1* pDesc, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Texture2D1** ppTexture2D) {
+        LOG_MSG("ProxyD3D11Device::CreateTexture2D1 called");
+        return m_pReal->CreateTexture2D1(pDesc, pInitialData, ppTexture2D);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateTexture3D1(const D3D11_TEXTURE3D_DESC1* pDesc, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Texture3D1** ppTexture3D) {
+        LOG_MSG("ProxyD3D11Device::CreateTexture3D1 called");
+        return m_pReal->CreateTexture3D1(pDesc, pInitialData, ppTexture3D);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateRasterizerState2(const D3D11_RASTERIZER_DESC2* pRasterizerDesc, ID3D11RasterizerState2** ppRasterizerState) {
+        LOG_MSG("ProxyD3D11Device::CreateRasterizerState2 called");
+        return m_pReal->CreateRasterizerState2(pRasterizerDesc, ppRasterizerState);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateShaderResourceView1(ID3D11Resource* pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC1* pDesc, ID3D11ShaderResourceView1** ppSRView) {
+        LOG_MSG("ProxyD3D11Device::CreateShaderResourceView1 called");
+        return m_pReal->CreateShaderResourceView1(pResource, pDesc, ppSRView);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateUnorderedAccessView1(ID3D11Resource* pResource, const D3D11_UNORDERED_ACCESS_VIEW_DESC1* pDesc, ID3D11UnorderedAccessView1** ppUAView) {
+        LOG_MSG("ProxyD3D11Device::CreateUnorderedAccessView1 called");
+        return m_pReal->CreateUnorderedAccessView1(pResource, pDesc, ppUAView);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateRenderTargetView1(ID3D11Resource* pResource, const D3D11_RENDER_TARGET_VIEW_DESC1* pDesc, ID3D11RenderTargetView1** ppRTView) {
+        LOG_MSG("ProxyD3D11Device::CreateRenderTargetView1 called");
+        return m_pReal->CreateRenderTargetView1(pResource, pDesc, ppRTView);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateQuery1(const D3D11_QUERY_DESC1* pQueryDesc, ID3D11Query1** ppQuery) {
+        LOG_MSG("ProxyD3D11Device::CreateQuery1 called");
+        return m_pReal->CreateQuery1(pQueryDesc, ppQuery);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11Device::GetImmediateContext3(ID3D11DeviceContext3** ppImmediateContext) {
+        LOG_MSG("ProxyD3D11Device::GetImmediateContext3 called");
+        m_pReal->GetImmediateContext3(ppImmediateContext);
+
+        if (ppImmediateContext && *ppImmediateContext) {
+            ProxyWrapper::Wrap<ProxyD3D11DeviceContext>(ppImmediateContext);
+        }
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateDeferredContext3(UINT ContextFlags, ID3D11DeviceContext3** ppDeferredContext) {
+        LOG_MSG("ProxyD3D11Device::CreateDeferredContext3 called");
+        return m_pReal->CreateDeferredContext3(ContextFlags, ppDeferredContext);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11Device::WriteToSubresource(ID3D11Resource* pDstResource, UINT DstSubresource, const D3D11_BOX* pDstBox, const void* pSrcData, UINT SrcRowPitch, UINT SrcDepthPitch) {
+        LOG_MSG("ProxyD3D11Device::WriteToSubresource called");
+        m_pReal->WriteToSubresource(pDstResource, DstSubresource, pDstBox, pSrcData, SrcRowPitch, SrcDepthPitch);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11Device::ReadFromSubresource(void* pDstData, UINT DstRowPitch, UINT DstDepthPitch, ID3D11Resource* pSrcResource, UINT SrcSubresource, const D3D11_BOX* pSrcBox) {
+        LOG_MSG("ProxyD3D11Device::ReadFromSubresource called");
+        m_pReal->ReadFromSubresource(pDstData, DstRowPitch, DstDepthPitch, pSrcResource, SrcSubresource, pSrcBox);
+    }
+
+    // --- ID3D11Device4 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::RegisterDeviceRemovedEvent(HANDLE hEvent, DWORD* pdwCookie) {
+        LOG_MSG("ProxyD3D11Device::RegisterDeviceRemovedEvent called");
+        return m_pReal->RegisterDeviceRemovedEvent(hEvent, pdwCookie);
+    }
+
+    void STDMETHODCALLTYPE ProxyD3D11Device::UnregisterDeviceRemoved(DWORD dwCookie) {
+        LOG_MSG("ProxyD3D11Device::UnregisterDeviceRemoved called");
+        m_pReal->UnregisterDeviceRemoved(dwCookie);
+    }
+
+    // --- ID3D11Device5 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::OpenSharedFence(HANDLE hFence, REFIID ReturnedInterface, void** ppFence) {
+        LOG_MSG("ProxyD3D11Device::OpenSharedFence called");
+        return m_pReal->OpenSharedFence(hFence, ReturnedInterface, ppFence);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateFence(UINT64 InitialValue, D3D11_FENCE_FLAG Flags, REFIID ReturnedInterface, void** ppFence) {
+        LOG_MSG("ProxyD3D11Device::CreateFence called");
+        return m_pReal->CreateFence(InitialValue, Flags, ReturnedInterface, ppFence);
     }
 
 } // namespace d3d11

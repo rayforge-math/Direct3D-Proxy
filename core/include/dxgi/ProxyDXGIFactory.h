@@ -2,7 +2,7 @@
 
 #include "coreapi.h"
 #include "d3d/ProxyD3D.h"
-#include <dxgi1_2.h>
+#include "dxgi_version.h"
 
 namespace dxgi {
 
@@ -20,9 +20,11 @@ namespace dxgi {
      * - **Stereo & Occlusion Management:** Intercepts window association, stereo status events, and occlusion monitoring.
      * - **Automatic Proxy Wrapping:** Ensures that all created swap chains (IDXGISwapChain1) and adapters are automatically wrapped in their corresponding proxy implementations.
      */
-    class CORE_API ProxyDXGIFactory : public d3d::ProxyD3D<IDXGIFactory2, ProxyDXGIFactory> {
+    class CORE_API ProxyDXGIFactory : public d3d::ProxyD3D<IDXGIFactory4, ProxyDXGIFactory> {
     public:
-        ProxyDXGIFactory(IDXGIFactory2* pReal);
+        ProxyDXGIFactory(IDXGIFactory4* pReal);
+
+        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override;
 
         // --- IDXGIObject Methods ---
         virtual HRESULT STDMETHODCALLTYPE SetPrivateData(REFGUID Name, UINT DataSize, const void* pData) override;
@@ -53,6 +55,13 @@ namespace dxgi {
         virtual HRESULT STDMETHODCALLTYPE RegisterOcclusionStatusEvent(HANDLE EventHandle, DWORD* pCookie) override;
         virtual void  STDMETHODCALLTYPE UnregisterOcclusionStatus(DWORD Cookie) override;
         virtual HRESULT STDMETHODCALLTYPE CreateSwapChainForComposition(IUnknown* pDevice, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain) override;
+
+        // --- IDXGIFactory3 Methods ---
+        virtual UINT STDMETHODCALLTYPE GetCreationFlags(void) override;
+
+        // --- IDXGIFactory4 Methods ---
+        virtual HRESULT STDMETHODCALLTYPE EnumAdapterByLuid(LUID AdapterLuid, REFIID riid, void** ppvAdapter) override;
+        virtual HRESULT STDMETHODCALLTYPE EnumWarpAdapter(REFIID riid, void** ppvAdapter) override;
     };
 
 } // namespace dxgi

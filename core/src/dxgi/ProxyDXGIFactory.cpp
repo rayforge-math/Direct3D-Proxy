@@ -4,15 +4,36 @@
 #include "dxgi/ProxyDXGIAdapter.h"
 #include "dxgi/ProxyDXGISwapChain.h"
 #include "d3d/ProxyWrapper.h"
-#include "debug/debug_dxgi.h"
+#include "logging/debug_dxgi.h"
 
 using namespace d3d;
 
 namespace dxgi {
 
-    ProxyDXGIFactory::ProxyDXGIFactory(IDXGIFactory2* factory)
-        : ProxyD3D<IDXGIFactory2, ProxyDXGIFactory>(factory)
+    ProxyDXGIFactory::ProxyDXGIFactory(IDXGIFactory4* factory)
+        : ProxyD3D<IDXGIFactory4, ProxyDXGIFactory>(factory)
     {
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGIFactory::QueryInterface(REFIID riid, void** ppvObject)
+    {
+        if (!ppvObject)
+            return E_POINTER;
+
+        *ppvObject = nullptr;
+
+        if (riid == __uuidof(IDXGIFactory) ||
+            riid == __uuidof(IDXGIFactory1) ||
+            riid == __uuidof(IDXGIFactory2) ||
+            riid == __uuidof(IDXGIFactory3) ||
+            riid == __uuidof(IDXGIFactory4))
+        {
+            *ppvObject = static_cast<IDXGIFactory4*>(this);
+            AddRef();
+            return S_OK;
+        }
+
+        return d3d::ProxyD3D<IDXGIFactory4, ProxyDXGIFactory>::QueryInterface(riid, ppvObject);
     }
 
     // --- IDXGIObject Methods ---
@@ -163,6 +184,25 @@ namespace dxgi {
             ProxyWrapper::Wrap<ProxyDXGISwapChain>(ppSwapChain);
         }
         return hr;
+    }
+
+    // --- IDXGIFactory3 Methods ---
+
+    UINT STDMETHODCALLTYPE ProxyDXGIFactory::GetCreationFlags(void) {
+        LOG_MSG("ProxyDXGIFactory::GetCreationFlags called");
+        return m_pReal->GetCreationFlags();
+    }
+
+    // --- IDXGIFactory4 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGIFactory::EnumAdapterByLuid(LUID AdapterLuid, REFIID riid, void** ppvAdapter) {
+        LOG_MSG("ProxyDXGIFactory::EnumAdapterByLuid called");
+        return m_pReal->EnumAdapterByLuid(AdapterLuid, riid, ppvAdapter);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyDXGIFactory::EnumWarpAdapter(REFIID riid, void** ppvAdapter) {
+        LOG_MSG("ProxyDXGIFactory::EnumWarpAdapter called");
+        return m_pReal->EnumWarpAdapter(riid, ppvAdapter);
     }
 
 } // namespace dxgi
