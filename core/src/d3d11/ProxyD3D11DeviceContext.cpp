@@ -23,6 +23,13 @@ namespace d3d11 {
 
         *ppvObject = nullptr;
 
+        if (riid == __uuidof(ID3D11DeviceChild))
+        {
+            *ppvObject = static_cast<ID3D11DeviceChild*>(this);
+            AddRef();
+            return S_OK;
+        }
+
         if (riid == __uuidof(ID3D11DeviceContext) ||
             riid == __uuidof(ID3D11DeviceContext1) ||
             riid == __uuidof(ID3D11DeviceContext2) ||

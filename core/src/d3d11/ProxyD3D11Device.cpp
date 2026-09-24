@@ -11,8 +11,14 @@ using namespace d3d;
 namespace d3d11 {
 
     ProxyD3D11Device::ProxyD3D11Device(ID3D11Device5* device)
-        : ProxyD3D<ProxyD3D11Device, ID3D11Device5>(device)
+        : ProxyD3D<ProxyD3D11Device, ID3D11Device5, IDXGIDevice4>(device)
     {
+		m_pRealDXGI = nullptr;
+		auto hr = device->QueryInterface(__uuidof(IDXGIDevice4), reinterpret_cast<void**>(&m_pRealDXGI));
+        if (SUCCEEDED(hr) && m_pRealDXGI)
+        {
+			m_pRealDXGI->Release();
+        }
     }
 
     HRESULT STDMETHODCALLTYPE ProxyD3D11Device::QueryInterface(REFIID riid, void** ppvObject)
@@ -34,7 +40,25 @@ namespace d3d11 {
             return S_OK;
         }
 
-        return d3d::ProxyD3D<ProxyD3D11Device, ID3D11Device5>::QueryInterface(riid, ppvObject);
+        if (riid == __uuidof(IDXGIObject))
+        {
+            *ppvObject = static_cast<IDXGIObject*>(this);
+            AddRef();
+            return S_OK;
+        }
+
+        if (riid == __uuidof(IDXGIDevice) ||
+            riid == __uuidof(IDXGIDevice1) ||
+            riid == __uuidof(IDXGIDevice2) ||
+            riid == __uuidof(IDXGIDevice3) ||
+            riid == __uuidof(IDXGIDevice4))
+        {
+            *ppvObject = static_cast<IDXGIDevice4*>(this);
+            AddRef();
+            return S_OK;
+        }
+
+        return d3d::ProxyD3D<ProxyD3D11Device, ID3D11Device5, IDXGIDevice4>::QueryInterface(riid, ppvObject);
     }
 
     // --- ID3D11Device Methods ---
@@ -403,6 +427,88 @@ namespace d3d11 {
     HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateFence(UINT64 InitialValue, D3D11_FENCE_FLAG Flags, REFIID ReturnedInterface, void** ppFence) {
         LOG_MSG("ProxyD3D11Device::CreateFence called");
         return m_pReal->CreateFence(InitialValue, Flags, ReturnedInterface, ppFence);
+    }
+
+    // --- IDXGIObject Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::GetParent(REFIID riid, void** ppParent) {
+        LOG_MSG("ProxyD3D11Device::GetParent called");
+        return m_pRealDXGI->GetParent(riid, ppParent);
+    }
+
+    // --- IDXGIDevice Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::GetAdapter(IDXGIAdapter** pAdapter) {
+        LOG_MSG("ProxyD3D11Device::GetAdapter called");
+        return m_pRealDXGI->GetAdapter(pAdapter);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::CreateSurface(const DXGI_SURFACE_DESC* pDesc, UINT NumSurfaces, DXGI_USAGE Usage, const DXGI_SHARED_RESOURCE* pSharedResource, IDXGISurface** ppSurface) {
+        LOG_MSG("ProxyD3D11Device::CreateSurface called");
+        return m_pRealDXGI->CreateSurface(pDesc, NumSurfaces, Usage, pSharedResource, ppSurface);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::QueryResourceResidency(IUnknown* const* ppResources, DXGI_RESIDENCY* pResidencyStatus, UINT NumResources) {
+        LOG_MSG("ProxyD3D11Device::QueryResourceResidency called");
+        return m_pRealDXGI->QueryResourceResidency(ppResources, pResidencyStatus, NumResources);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::SetGPUThreadPriority(INT Priority) {
+        LOG_MSG("ProxyD3D11Device::SetGPUThreadPriority called");
+        return m_pRealDXGI->SetGPUThreadPriority(Priority);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::GetGPUThreadPriority(INT* pPriority) {
+        LOG_MSG("ProxyD3D11Device::GetGPUThreadPriority called");
+        return m_pRealDXGI->GetGPUThreadPriority(pPriority);
+    }
+
+    // --- IDXGIDevice1 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::SetMaximumFrameLatency(UINT MaxLatency) {
+        LOG_MSG("ProxyD3D11Device::SetMaximumFrameLatency called");
+        return m_pRealDXGI->SetMaximumFrameLatency(MaxLatency);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::GetMaximumFrameLatency(UINT* pMaxLatency) {
+        LOG_MSG("ProxyD3D11Device::GetMaximumFrameLatency called");
+        return m_pRealDXGI->GetMaximumFrameLatency(pMaxLatency);
+    }
+
+    // --- IDXGIDevice2 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::OfferResources(UINT NumResources, IDXGIResource* const* ppResources, DXGI_OFFER_RESOURCE_PRIORITY Priority) {
+        LOG_MSG("ProxyD3D11Device::OfferResources called");
+        return m_pRealDXGI->OfferResources(NumResources, ppResources, Priority);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::ReclaimResources(UINT NumResources, IDXGIResource* const* ppResources, BOOL* pDiscarded) {
+        LOG_MSG("ProxyD3D11Device::ReclaimResources called");
+        return m_pRealDXGI->ReclaimResources(NumResources, ppResources, pDiscarded);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::EnqueueSetEvent(HANDLE hEvent) {
+        LOG_MSG("ProxyD3D11Device::EnqueueSetEvent called");
+        return m_pRealDXGI->EnqueueSetEvent(hEvent);
+    }
+
+    // --- IDXGIDevice3 Methods ---
+
+    void STDMETHODCALLTYPE ProxyD3D11Device::Trim(void) {
+        LOG_MSG("ProxyD3D11Device::Trim called");
+        m_pRealDXGI->Trim();
+    }
+
+    // --- IDXGIDevice4 Methods ---
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::OfferResources1(UINT NumResources, IDXGIResource* const* ppResources, DXGI_OFFER_RESOURCE_PRIORITY Priority, UINT Flags) {
+        LOG_MSG("ProxyD3D11Device::OfferResources1 called");
+        return m_pRealDXGI->OfferResources1(NumResources, ppResources, Priority, Flags);
+    }
+
+    HRESULT STDMETHODCALLTYPE ProxyD3D11Device::ReclaimResources1(UINT NumResources, IDXGIResource* const* ppResources, DXGI_RECLAIM_RESOURCE_RESULTS* pResults) {
+        LOG_MSG("ProxyD3D11Device::ReclaimResources1 called");
+        return m_pRealDXGI->ReclaimResources1(NumResources, ppResources, pResults);
     }
 
 } // namespace d3d11

@@ -22,6 +22,13 @@ namespace dxgi {
 
         *ppvObject = nullptr;
 
+        if (riid == __uuidof(IDXGIObject))
+        {
+            *ppvObject = static_cast<IDXGIObject*>(this);
+            AddRef();
+            return S_OK;
+        }
+
         if (riid == __uuidof(IDXGIFactory) ||
             riid == __uuidof(IDXGIFactory1) ||
             riid == __uuidof(IDXGIFactory2) ||
@@ -126,7 +133,8 @@ namespace dxgi {
 
     HRESULT STDMETHODCALLTYPE ProxyDXGIFactory::CreateSwapChainForHwnd(IUnknown* pDevice, HWND hWnd, const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain) {
         LOG_MSG("ProxyDXGIFactory::CreateSwapChainForHwnd called");
-        HRESULT hr = m_pReal->CreateSwapChainForHwnd(pDevice, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput, ppSwapChain);
+		IUnknown* pDeviceReal = ProxyWrapper::GetRealUnknown(pDevice);
+        HRESULT hr = m_pReal->CreateSwapChainForHwnd(pDeviceReal, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput, ppSwapChain);
         if (SUCCEEDED(hr) && ppSwapChain && *ppSwapChain) {
             ProxyWrapper::Wrap<ProxyDXGISwapChain>(ppSwapChain);
         }
@@ -135,7 +143,8 @@ namespace dxgi {
 
     HRESULT STDMETHODCALLTYPE ProxyDXGIFactory::CreateSwapChainForCoreWindow(IUnknown* pDevice, IUnknown* pWindow, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain) {
         LOG_MSG("ProxyDXGIFactory::CreateSwapChainForCoreWindow called");
-        HRESULT hr = m_pReal->CreateSwapChainForCoreWindow(pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
+        IUnknown* pDeviceReal = ProxyWrapper::GetRealUnknown(pDevice);
+        HRESULT hr = m_pReal->CreateSwapChainForCoreWindow(pDeviceReal, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
         if (SUCCEEDED(hr) && ppSwapChain && *ppSwapChain) {
             ProxyWrapper::Wrap<ProxyDXGISwapChain>(ppSwapChain);
         }
@@ -179,7 +188,8 @@ namespace dxgi {
 
     HRESULT STDMETHODCALLTYPE ProxyDXGIFactory::CreateSwapChainForComposition(IUnknown* pDevice, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain) {
         LOG_MSG("ProxyDXGIFactory::CreateSwapChainForComposition called");
-        HRESULT hr = m_pReal->CreateSwapChainForComposition(pDevice, pDesc, pRestrictToOutput, ppSwapChain);
+        IUnknown* pDeviceReal = ProxyWrapper::GetRealUnknown(pDevice);
+        HRESULT hr = m_pReal->CreateSwapChainForComposition(pDeviceReal, pDesc, pRestrictToOutput, ppSwapChain);
         if (SUCCEEDED(hr) && ppSwapChain && *ppSwapChain) {
             ProxyWrapper::Wrap<ProxyDXGISwapChain>(ppSwapChain);
         }

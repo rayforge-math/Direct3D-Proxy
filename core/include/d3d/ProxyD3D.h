@@ -39,7 +39,7 @@ namespace d3d {
          * @brief Constructor: Takes ownership of the provided pointer.
          */
         explicit ProxyD3D(InterfaceType* pReal) : m_pReal(pReal), m_RefCount(1) {
-            dll::COMRegistry::Register(m_pReal, static_cast<TDerived*>(this));
+            dll::COMRegistry::Register(m_pReal, GetProxyUnknown());
         }
 
         // Non-copyable, non-movable (Rule of Five)
@@ -51,6 +51,10 @@ namespace d3d {
         // Accessor for the real underlying object
         InterfaceType* GetReal() const noexcept { return m_pReal; }
         IUnknown* GetRealUnknown() const noexcept { return m_pReal; }
+
+        IUnknown* GetProxyUnknown() noexcept {
+            return static_cast<IUnknown*>(static_cast<InterfaceType*>(this));
+        }
 
         // --- IUnknown ---
 

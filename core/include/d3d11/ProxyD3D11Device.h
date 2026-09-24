@@ -35,7 +35,10 @@ namespace d3d11 {
      * 3. **Validation Layer:** Providing a custom diagnostic layer to log resource creation
      * parameters that may be inconsistent with modern hardware requirements.
      */
-    class CORE_API ProxyD3D11Device : public d3d::ProxyD3D<ProxyD3D11Device, ID3D11Device5> {
+    class CORE_API ProxyD3D11Device : public d3d::ProxyD3D<ProxyD3D11Device, ID3D11Device5, IDXGIDevice4> {
+    private:
+		IDXGIDevice4* m_pRealDXGI;
+
     public:
         ProxyD3D11Device(ID3D11Device5* pReal);
 
@@ -118,6 +121,32 @@ namespace d3d11 {
         // --- ID3D11Device5 Methods ---
         virtual HRESULT STDMETHODCALLTYPE OpenSharedFence(HANDLE hFence, REFIID ReturnedInterface, void** ppFence) override;
         virtual HRESULT STDMETHODCALLTYPE CreateFence(UINT64 InitialValue, D3D11_FENCE_FLAG Flags, REFIID ReturnedInterface, void** ppFence) override;
+
+        // --- IDXGIObject Methods ---
+        virtual HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void** ppParent) override;
+
+        // --- IDXGIDevice Methods ---
+        virtual HRESULT STDMETHODCALLTYPE GetAdapter(IDXGIAdapter** pAdapter) override;
+        virtual HRESULT STDMETHODCALLTYPE CreateSurface(const DXGI_SURFACE_DESC* pDesc, UINT NumSurfaces, DXGI_USAGE Usage, const DXGI_SHARED_RESOURCE* pSharedResource, IDXGISurface** ppSurface) override;
+        virtual HRESULT STDMETHODCALLTYPE QueryResourceResidency(IUnknown* const* ppResources, DXGI_RESIDENCY* pResidencyStatus, UINT NumResources) override;
+        virtual HRESULT STDMETHODCALLTYPE SetGPUThreadPriority(INT Priority) override;
+        virtual HRESULT STDMETHODCALLTYPE GetGPUThreadPriority(INT* pPriority) override;
+
+        // --- IDXGIDevice1 Methods ---
+        virtual HRESULT STDMETHODCALLTYPE SetMaximumFrameLatency(UINT MaxLatency) override;
+        virtual HRESULT STDMETHODCALLTYPE GetMaximumFrameLatency(UINT* pMaxLatency) override;
+
+        // --- IDXGIDevice2 Methods ---
+        virtual HRESULT STDMETHODCALLTYPE OfferResources(UINT NumResources, IDXGIResource* const* ppResources, DXGI_OFFER_RESOURCE_PRIORITY Priority) override;
+        virtual HRESULT STDMETHODCALLTYPE ReclaimResources(UINT NumResources, IDXGIResource* const* ppResources, BOOL* pDiscarded) override;
+        virtual HRESULT STDMETHODCALLTYPE EnqueueSetEvent(HANDLE hEvent) override;
+
+        // --- IDXGIDevice3 Methods ---
+        virtual void STDMETHODCALLTYPE Trim(void) override;
+
+        // --- IDXGIDevice4 Methods ---
+        virtual HRESULT STDMETHODCALLTYPE OfferResources1(UINT NumResources, IDXGIResource* const* ppResources, DXGI_OFFER_RESOURCE_PRIORITY Priority, UINT Flags) override;
+        virtual HRESULT STDMETHODCALLTYPE ReclaimResources1(UINT NumResources, IDXGIResource* const* ppResources, DXGI_RECLAIM_RESOURCE_RESULTS* pResults) override;
     };
 
 } // namespace d3d11

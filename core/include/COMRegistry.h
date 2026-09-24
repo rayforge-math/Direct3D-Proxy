@@ -47,7 +47,9 @@ namespace dll {
             TProxy* pFound = nullptr;
             auto it = s_Map.find(pCanonicalKey);
             if (it != s_Map.end()) {
-                pFound = static_cast<TProxy*>(it->second);
+                using Interface = typename TProxy::InterfaceType;
+                Interface* pInterface = static_cast<Interface*>(it->second);
+                pFound = static_cast<TProxy*>(pInterface);
             }
 
             pCanonicalKey->Release();

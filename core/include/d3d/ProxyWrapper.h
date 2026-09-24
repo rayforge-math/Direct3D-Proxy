@@ -55,7 +55,9 @@ namespace d3d {
             }
 
             // 3. Register the new proxy in the central COMRegistry
-            dll::COMRegistry::Register(pReal, pProxy);
+            using Interface = typename TProxy::InterfaceType;
+            Interface* pInterface = static_cast<Interface*>(pProxy);
+            dll::COMRegistry::Register(pReal, pInterface);
 
             // Release the original input reference and assign the proxy casted to the input interface type
             pInput->Release();
